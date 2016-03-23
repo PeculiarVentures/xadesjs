@@ -1,0 +1,3 @@
+namespace xadesjs{
+    export class 
+}

@@ -1,0 +1,30 @@
+{
+  "name": "xadesjs",
+  "version": "1.0.0",
+  "description": "A JavaScript library for XAdES signature",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PeculiarVentures/xadesjs.git"
+  },
+  "keywords": [
+    "xml",
+    "webcrypto",
+    "signature",
+    "rsa",
+    "ec"
+  ],
+  "author": "Peculiar Ventures",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PeculiarVentures/xadesjs/issues"
+  },
+  "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
+  "dependencies": {
+    "xmldom": "^0.1.22",
+    "xpath": "0.0.22"
+  }
+}
