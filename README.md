@@ -12,6 +12,7 @@ There are seven different profiles of XAdES, they are:
 - XAdES with Explicit policy electronic signatures (XAdES-EPES)
 
 They differ slightly based on what is included in the signature:
+
 |            | Provides Digital Signature | Includes Cryptographic Timestamp | Includes Revocation References | Includes Revocation Data | Allows Secure Timestamp Countersignature |
 |------------|----------------------------|----------------------------------|--------------------------------|--------------------------|------------------------------------------|
 | XAdES-BES  | Yes                        | No                               | No                             | No                       | No                                       |
