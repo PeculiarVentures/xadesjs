@@ -1,6 +1,6 @@
 # XAdESjs
 
-[XAdES](https://en.wikipedia.org/wiki/XAdES) is short for "XML Advanced Electronic Signatures"). This library aims to provide a implementation of the associated standards in pure Javascript based on Web Crypto so it can be used both in the browsers and in Nodejs.
+[XAdES](https://en.wikipedia.org/wiki/XAdES) is short for "XML Advanced Electronic Signatures"). This library aims to provide a implementation of the associated standards in pure Javascript based on Web Crypto so it can be used both in the browsers and in Node.js.
 
 There are seven different profiles of XAdES, they are:
 - Basic Electronic Signature (XAdES-BES)
