@@ -12,16 +12,15 @@ There are seven different profiles of XAdES, they are:
 - XAdES with Explicit policy electronic signatures (XAdES-EPES)
 
 They differ slightly based on what is included in the signature:
-|----------------------------| Provides Digital Signature | Includes Cryptographic Timestamp | Includes Revocation References | Includes Revocation Data | Allows Secure Timestamp Countersignature |     |
-|----------------------------|----------------------------------|--------------------------------|--------------------------|------------------------------------------|
-| XAdES-BES                  | Yes                              | No                             | No                       | No                                       | No  |
-| XAdES-EPES                 | Yes                              | No                             | No                       | No                                       | No  |
-| XAdES-T                    | Yes                              | Yes                            | No                       | No                                       | No  |
-| XAdES-C                    | Yes                              | Yes                            | Yes                      | No                                       | No  |
-| XAdES-X                    | Yes                              | Yes                            | Yes                      | No                                       | No  |
-| XAdES-X-L                  | Yes                              | Yes                            | Yes                      | Yes                                      | No  |
-| XAdES-A                    | Yes                              | Yes                            | Yes                      | Yes                                      | Yes |
-
+|            | Provides Digital Signature | Includes Cryptographic Timestamp | Includes Revocation References | Includes Revocation Data | Allows Secure Timestamp Countersignature |
+|------------|----------------------------|----------------------------------|--------------------------------|--------------------------|------------------------------------------|
+| XAdES-BES  | Yes                        | No                               | No                             | No                       | No                                       |
+| XAdES-EPES | Yes                        | No                               | No                             | No                       | No                                       |
+| XAdES-T    | Yes                        | Yes                              | No                             | No                       | No                                       |
+| XAdES-C    | Yes                        | Yes                              | Yes                            | No                       | No                                       |
+| XAdES-X    | Yes                        | Yes                              | Yes                            | No                       | No                                       |
+| XAdES-X-L  | Yes                        | Yes                              | Yes                            | Yes                      | No                                       |
+| XAdES-A    | Yes                        | Yes                              | Yes                            | Yes                      | Yes                                      |
 
 ## WARNING
 
