@@ -63,7 +63,7 @@ namespace xadesjs {
                         throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, alg_oid);
                 }
 
-                crypto.subtle.importKey("jwk", jwk, algorithm, true, ["verify"])
+                getCrypto().subtle.importKey("jwk", jwk, algorithm, true, ["verify"])
                     .then(resolve, reject);
             });
         }

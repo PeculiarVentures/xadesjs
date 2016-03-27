@@ -4,6 +4,8 @@ var xadesjs = require("../built/xades.js");
 
 // console.log(xadesjs);
 
+var ossl = require("node-webcrypto-ossl").default;
+xadesjs.setEngine(new ossl(), "WebCrypto OpenSSL");
 var XMLSerializer = require("xmldom").XMLSerializer;
 var DOMParser = require("xmldom").DOMParser;
 var DOMImplementation = require("xmldom").DOMImplementation;
@@ -18,8 +20,13 @@ var xmlSignature = xmlDoc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmld
 console.log(xmlSignature);
 var sxml = new xadesjs.SignedXml(xmlDoc);
 sxml.loadXml(xmlSignature[0]);
-sxml.CheckSignature();
-console.log(sxml);
+sxml.CheckSignature()
+.then(function(v){
+    console.log("Verify:", v);
+})
+.catch(function(e){
+    console.log(e);
+})
 
 // ==============================================================
 
