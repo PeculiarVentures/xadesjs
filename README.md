@@ -29,7 +29,7 @@ They differ slightly based on what is included in the signature:
 
 ## EXAMPLES
 
-### Check XAdES-BES Signature
+### Check XAdES-BES Cryptographic Signature
 
 ```Javascript
 var xadesjs = require("../built/xades.js");
