@@ -27,6 +27,30 @@ They differ slightly based on what is included in the signature:
 
 **At this time this solution should be considered suitable for research and experimentation, further code and security review is needed before utilization in a production application.**
 
+## EXAMPLES
+
+### Check XAdES-BES Signature
+
+```Javascript
+var xadesjs = require("../built/xades.js");
+
+var XMLSerializer = require("xmldom").XMLSerializer;
+var DOMParser = require("xmldom").DOMParser;
+var DOMImplementation = require("xmldom").DOMImplementation;
+var document = new DOMImplementation().createDocument("http://www.w3.org/1999/xhtml", "html", null);
+
+var fs = require("fs");
+var ref = fs.readFileSync("./test/files/document.signed.t.bes.xml","utf8");
+
+var parser = new DOMParser();
+var xmlDoc = parser.parseFromString(ref, "application/xml");
+var xmlSignature = xmlDoc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
+
+var sxml = new xadesjs.SignedXml(xmlDoc);
+sxml.loadXml(xmlSignature[0]);
+sxml.CheckSignature();
+```
+
 ## RELATED
 - [ETSI TS 101 903 - XML Advanced Electronic Signatures (XAdES)](http://www.etsi.org/deliver/etsi_ts/101900_101999/101903/01.04.01_60/ts_101903v010401p.pdf)
 - [XML Signature Syntax and Processing](https://www.w3.org/TR/xmldsig-core/)
