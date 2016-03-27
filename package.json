@@ -24,6 +24,8 @@
   },
   "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
   "dependencies": {
+    "co": "^4.6.0",
+    "node.extend": "^1.1.5",
     "xmldom": "^0.1.22",
     "xpath": "0.0.22"
   }

@@ -34,21 +34,25 @@ namespace xadesjs {
     export class XmlError extends Error {
         constructor(code: XE, ...args: any[]) {
             super();
-            arguments[0] = xes[code];
+            let _code = code;
+            arguments[0] = xes[_code];
             let message = printf.apply(this, arguments);
-            this.message = `XADESJS${padNum(code, 4)}: ${message}`;
-
+            this.message = `XADESJS${padNum(_code, 4)}: ${message}`;
             this.stack = (new Error(this.message)).stack;
         }
     }
 
     export enum XE {
         NONE,
+        NULL_REFERENCE,
         METHOD_NOT_IMPLEMENTED,
+        METHOD_NOT_SUPPORTED,
         PARAM_REQUIRED,
         CONVERTER_UNSUPPORTED,
         ELEMENT_MALFORMED,
         CRYPTOGRAPHIC,
+        CRYPTOGRAPHIC_UNKNOWN_TRANSFORM,
+        ALGORITHM_NOT_SUPPORTED,
     }
 
     interface IXmlError {
@@ -57,9 +61,13 @@ namespace xadesjs {
 
     const xes: IXmlError = {};
     xes[XE.NONE] = "No decription";
+    xes[XE.NULL_REFERENCE] = "Null reference";
     xes[XE.METHOD_NOT_IMPLEMENTED] = "Method is not implemented";
+    xes[XE.METHOD_NOT_SUPPORTED] = "Method is not supported";
     xes[XE.PARAM_REQUIRED] = "Required parameter is missing '%1'";
     xes[XE.CONVERTER_UNSUPPORTED] = "Converter is not supported";
     xes[XE.ELEMENT_MALFORMED] = "Malformed element '%1'";
-    xes[XE.CRYPTOGRAPHIC] = "Cryptogrphic error with '%1'";
+    xes[XE.CRYPTOGRAPHIC] = "Cryptogrphic error: %1";
+    xes[XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM] = "Unknown transform %1";
+    xes[XE.ALGORITHM_NOT_SUPPORTED] = "Algorithm is not supported '%1'";
 }

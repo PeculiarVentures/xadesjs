@@ -31,6 +31,20 @@ namespace xadesjs {
             this.id = value;
         }
 
+        GetEnumerator(): Array<KeyInfoClause>;
+        GetEnumerator(requestedObjectType: any): Array<KeyInfoClause>;
+        GetEnumerator(requestedObjectType?: any) {
+            if (!requestedObjectType)
+                return this.Info;
+
+            let TypeList: Array<KeyInfoClause> = [];
+            for (let el of this.Info)
+                // ...with all object of specified type...
+                if (el instanceof requestedObjectType)
+                    TypeList.push(el);
+            // ...and return its enumerator
+            return TypeList;
+        }
 
         AddClause(clause: KeyInfoClause): void {
             this.Info.push(clause);
@@ -95,8 +109,9 @@ namespace xadesjs {
                             kic = <KeyInfoClause>new RSAKeyValue();
                             break;
                         case XmlSignature.ElementNames.EncryptedKey:
-                            kic = <KeyInfoClause>new KeyInfoEncryptedKey();
-                            break;
+                            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
+                            // kic = <KeyInfoClause>new KeyInfoEncryptedKey();
+                            // break;
                         default:
                             kic = <KeyInfoClause>new KeyInfoNode();
                             break;
@@ -113,7 +128,6 @@ namespace xadesjs {
     }
 
     export interface KeyInfoClause extends IXmlSerializable {
-
     }
 
 }

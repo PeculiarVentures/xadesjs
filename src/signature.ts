@@ -17,7 +17,7 @@ namespace xadesjs {
         private info: SignedInfo;
         private key: KeyInfo;
         private id: string;
-        private signature: ArrayBuffer;
+        private signature: Uint8Array;
         private element: Element;
 
         public constructor() {
@@ -49,10 +49,10 @@ namespace xadesjs {
         }
 
 
-        get SignatureValue(): ArrayBuffer {
+        get SignatureValue(): Uint8Array {
             return this.signature;
         }
-        set SignatureValue(value: ArrayBuffer) {
+        set SignatureValue(value: Uint8Array) {
             this.element = null;
             this.signature = value;
         }
@@ -144,13 +144,14 @@ namespace xadesjs {
                     this.key.loadXml(kinfo);
                 }
 
-                let xnl = value.getElementsByTagNameNS(dsigNsmgr, "xd:Object");
-                for (let i = 0; i < xnl.length; i++) {
-                    let xn = xnl[i];
-                    let obj = new DataObject();
-                    obj.loadXml(xn);
-                    this.AddObject(obj);
-                }
+                console.warn("TODO: xd:Object");
+                // let xnl = value.getElementsByTagNameNS(dsigNsmgr, "xd:Object");
+                // for (let i = 0; i < xnl.length; i++) {
+                //     let xn = xnl[i];
+                //     let obj = new DataObject();
+                //     obj.loadXml(xn);
+                //     this.AddObject(obj);
+                // }
             }
             else
                 throw new XmlError(XE.ELEMENT_MALFORMED, "Signature");
@@ -257,8 +258,8 @@ namespace xadesjs {
         },
 
         GetAttributeFromElement: function GetAttributeFromElement(xel: Element, attribute: string, element: string): string {
-            let el = this.GetChildElement(xel, element, XmlSignature.NamespaceURI);
-            return el != null ? el.GetAttribute(attribute) : null;
+            let el: Element = this.GetChildElement(xel, element, XmlSignature.NamespaceURI);
+            return el != null ? el.getAttribute(attribute) : null;
         },
 
         GetChildElements: function GetChildElements(xel: Element, element: string): Element[] {
@@ -270,7 +271,7 @@ namespace xadesjs {
             }
             return al;
         }
-    }
+    };
 }
 
 

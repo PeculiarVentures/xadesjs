@@ -41,6 +41,3 @@ namespace xadesjs {
     }
 
 }
-
-let t = new xadesjs.KeyInfo();
-t.getXml();
