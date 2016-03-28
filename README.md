@@ -58,7 +58,7 @@ sxml.loadXml(xmlSignature[0]);
 sxml.CheckSignature();
 ```
 
-### Check XAdES-BES Signature and Trust
+### Validate XAdES-BES Signature
 
 ```Javascript
 ```
