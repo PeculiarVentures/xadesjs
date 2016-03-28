@@ -64,7 +64,8 @@ sxml.CheckSignature();
 ```
 
 ## RELATED
-- [ETSI TS 101 903 - XML Advanced Electronic Signatures (XAdES)](http://www.etsi.org/deliver/etsi_ts/101900_101999/101903/01.04.01_60/ts_101903v010401p.pdf)
+- [ETSI EN 319 132-1 - XML Advanced Electronic Signatures (XAdES)](http://www.etsi.org/deliver/etsi_en/319100_319199/31913201/01.01.00_30/en_31913201v010100v.pdf)
+- [ETSI EN 319 132-2 - XML Advanced Electronic Signatures (XAdES)](http://www.etsi.org/deliver/etsi_en/319100_319199/31913202/01.01.00_30/en_31913202v010100v.pdf)
 - [XML Signature Syntax and Processing](https://www.w3.org/TR/xmldsig-core/)
 - [XML Security Algorithm Cross-Reference](https://tools.ietf.org/html/rfc6931)
 - [Canonical XML](https://www.w3.org/TR/xml-c14n)
