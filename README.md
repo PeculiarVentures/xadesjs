@@ -23,7 +23,7 @@ They differ slightly based on what is included in the signature:
 | XAdES-X-L  | Yes                        | Yes                              | Yes                            | Yes                      | No                                       |
 | XAdES-A    | Yes                        | Yes                              | Yes                            | Yes                      | Yes                                      |
 
-- Items in **BOLD** are currently supported by XAdESjs
+- Variants in **BOLD** are currently supported by XAdESjs
  
 ## WARNING
 
