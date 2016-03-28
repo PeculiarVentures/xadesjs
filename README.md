@@ -31,7 +31,7 @@ They differ slightly based on what is included in the signature:
 
 ## EXAMPLES
 
-### Check XAdES-BES Cryptographic Signature
+### Check XAdES-BES Signature Cryptographically
 
 ```Javascript
 var xadesjs = require("../built/xades.js");
@@ -51,6 +51,11 @@ var xmlSignature = xmlDoc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmld
 var sxml = new xadesjs.SignedXml(xmlDoc);
 sxml.loadXml(xmlSignature[0]);
 sxml.CheckSignature();
+```
+
+### Check XAdES-BES Signature and Trust
+
+```Javascript
 ```
 
 ## RELATED
