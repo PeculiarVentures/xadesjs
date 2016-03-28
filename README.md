@@ -15,7 +15,7 @@ They differ slightly based on what is included in the signature:
 
 |            | Provides Digital Signature | Includes Cryptographic Timestamp | Includes Revocation References | Includes Revocation Data | Allows Secure Timestamp Countersignature |
 |------------|----------------------------|----------------------------------|--------------------------------|--------------------------|------------------------------------------|
-| XAdES-BES  | Yes                        | No                               | No                             | No                       | No                                       |
+| **XAdES-BES**  | Yes                        | No                               | No                             | No                       | No                                       |
 | XAdES-EPES | Yes                        | No                               | No                             | No                       | No                                       |
 | XAdES-T    | Yes                        | Yes                              | No                             | No                       | No                                       |
 | XAdES-C    | Yes                        | Yes                              | Yes                            | No                       | No                                       |
@@ -23,6 +23,8 @@ They differ slightly based on what is included in the signature:
 | XAdES-X-L  | Yes                        | Yes                              | Yes                            | Yes                      | No                                       |
 | XAdES-A    | Yes                        | Yes                              | Yes                            | Yes                      | Yes                                      |
 
+- Items in **BOLD** are currently supported by XAdESjs
+ 
 ## WARNING
 
 **At this time this solution should be considered suitable for research and experimentation, further code and security review is needed before utilization in a production application.**
