@@ -36,7 +36,7 @@ They differ slightly based on what is included in the signature:
 ```Javascript
 ```
 
-### Check XAdES-BES Signature Cryptographically
+### Check XAdES-BES Signature 
 
 ```Javascript
 var xadesjs = require("../built/xades.js");
