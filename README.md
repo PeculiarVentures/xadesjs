@@ -31,6 +31,11 @@ They differ slightly based on what is included in the signature:
 
 ## EXAMPLES
 
+### Create XAdES-BES Signature
+
+```Javascript
+```
+
 ### Check XAdES-BES Signature Cryptographically
 
 ```Javascript
