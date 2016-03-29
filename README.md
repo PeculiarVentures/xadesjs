@@ -15,7 +15,7 @@ They differ slightly based on what is included in the signature:
 
 |            | Provides Digital Signature | Includes Cryptographic Timestamp | Includes Revocation References | Includes Revocation Data | Allows Secure Timestamp Countersignature |
 |------------|----------------------------|----------------------------------|--------------------------------|--------------------------|------------------------------------------|
-| XAdES-BES  | Yes                        | No                               | No                             | No                       | No                                       |
+| **XAdES-BES**  | Yes                        | No                               | No                             | No                       | No                                       |
 | XAdES-EPES | Yes                        | No                               | No                             | No                       | No                                       |
 | XAdES-T    | Yes                        | Yes                              | No                             | No                       | No                                       |
 | XAdES-C    | Yes                        | Yes                              | Yes                            | No                       | No                                       |
@@ -23,12 +23,52 @@ They differ slightly based on what is included in the signature:
 | XAdES-X-L  | Yes                        | Yes                              | Yes                            | Yes                      | No                                       |
 | XAdES-A    | Yes                        | Yes                              | Yes                            | Yes                      | Yes                                      |
 
+- Variants in **BOLD** are currently supported by XAdESjs
+ 
 ## WARNING
 
-**At this time this solution should be considered suitable for research and experimentation, further code and security review is needed before utilization in a production application.**
+**Using XMLDSIG is a bit like running with scissors, that said it is needed for interopability with a number of systems, for this reason we have done this implementation.** 
+
+**Given the nuances in handling XMLDSIG securely at this time you should consider this solution suitable for research and experimentation, further code and security review is needed before utilization in a production application.**
+
+## EXAMPLES
+
+### Create XAdES-BES Signature
+
+```Javascript
+```
+
+### Check XAdES-BES Signature 
+
+```Javascript
+var xadesjs = require("../built/xades.js");
+
+var XMLSerializer = require("xmldom").XMLSerializer;
+var DOMParser = require("xmldom").DOMParser;
+var DOMImplementation = require("xmldom").DOMImplementation;
+var document = new DOMImplementation().createDocument("http://www.w3.org/1999/xhtml", "html", null);
+
+var fs = require("fs");
+var ref = fs.readFileSync("./test/files/document.signed.t.bes.xml","utf8");
+
+var parser = new DOMParser();
+var xmlDoc = parser.parseFromString(ref, "application/xml");
+var xmlSignature = xmlDoc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
+
+var sxml = new xadesjs.SignedXml(xmlDoc);
+sxml.loadXml(xmlSignature[0]);
+sxml.CheckSignature();
+```
+
+### Validate XAdES-BES Signature
+
+```Javascript
+```
 
 ## RELATED
-- [ETSI TS 101 903 - XML Advanced Electronic Signatures (XAdES)](http://www.etsi.org/deliver/etsi_ts/101900_101999/101903/01.04.01_60/ts_101903v010401p.pdf)
+- [Why XML Security is Broken](https://www.cs.auckland.ac.nz/~pgut001/pubs/xmlsec.txt)
+- [ETSI EN 319 132-1 - XML Advanced Electronic Signatures (XAdES)](http://www.etsi.org/deliver/etsi_en/319100_319199/31913201/01.01.00_30/en_31913201v010100v.pdf)
+- [ETSI EN 319 132-2 - XML Advanced Electronic Signatures (XAdES)](http://www.etsi.org/deliver/etsi_en/319100_319199/31913202/01.01.00_30/en_31913202v010100v.pdf)
 - [XML Signature Syntax and Processing](https://www.w3.org/TR/xmldsig-core/)
 - [XML Security Algorithm Cross-Reference](https://tools.ietf.org/html/rfc6931)
 - [Canonical XML](https://www.w3.org/TR/xml-c14n)
@@ -36,3 +76,5 @@ They differ slightly based on what is included in the signature:
 - [Internet X.509 Public Key Infrastructure Time-Stamp Protocol](https://www.ietf.org/rfc/rfc3161.txt)
 - [XAdESj](https://github.com/luisgoncalves/xades4j)
 - [PKIjs](pkijs.org)
+- [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl)
+- [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)
