@@ -11,7 +11,7 @@ namespace xadesjs {
                 return btoa(text);
             }
             else if (typeof Buffer !== "undefined") {
-                return new Buffer(text).toString("base64");
+                return new Buffer(text, "binary").toString("base64");
             }
             else {
                 throw new XmlError(XE.CONVERTER_UNSUPPORTED);

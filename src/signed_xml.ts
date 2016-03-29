@@ -568,12 +568,17 @@ namespace xadesjs {
                 if (key == null)
                     return resolve(false);
 
-                let sd = <SignatureDescription>CryptoConfig.CreateFromName(this.m_signature.SignedInfo.SignatureMethod);
-                if (sd == null)
-                    return resolve(false);
+                // let sd = <SignatureDescription>CryptoConfig.CreateFromName(this.m_signature.SignedInfo.SignatureMethod);
+                let alg: any = {};
+                switch (this.m_signature.SignedInfo.SignatureMethod) {
+                    case "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256":
+                        alg = { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-256" } };
+                        break;
+                    default:
+                        throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, this.m_signature.SignedInfo.SignatureMethod);
+                }
 
-                return reject("Verify method is not implemented yet. Needed to get signed data");
-                return crypto.subtle.verify(sd.DigestAlgorithm, key, this.m_signature.SignatureValue, data)
+                return crypto.subtle.verify(alg, key, this.m_signature.SignatureValue, data)
                     .then(resolve, reject);
 
                 // try {
@@ -724,7 +729,7 @@ namespace xadesjs {
                                 default:
                                     throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, sig_alg);
                             }
-                            cert.exportKey(alg)
+                            return cert.exportKey(alg)
                                 .then(resolve, reject);
                         }
                     }
