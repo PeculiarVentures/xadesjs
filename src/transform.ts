@@ -6,7 +6,7 @@ namespace xadesjs {
 
         private algo: string;
         private xmlResolver: XmlResolver;
-        private propagated_namespaces = new Hashtable();
+        private propagated_namespaces: Hashtable[] = [];
 
         protected constructor() {
             // if (SecurityManager.SecurityEnabled) {
@@ -56,7 +56,7 @@ namespace xadesjs {
             throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
         }
 
-        public GetOutput(type: Type): any {
+        public GetOutput(type?: Type): ArrayBufferView {
             throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
         }
 

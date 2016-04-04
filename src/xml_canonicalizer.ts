@@ -42,18 +42,18 @@ namespace xadesjs {
         Canonicalize(doc: Document): string;
         Canonicalize(nodes: NodeList): string;
         Canonicalize(node: NodeList | Document): string {
-            if (node instanceof Document) {
+            if ((<any>node.constructor).name === "Document" || node instanceof Document) {
                 this.Initialize();
 
-                this.FillMissingPrefixes(node, new XmlNamespaceManager(node.nameTable), []);
-                this.WriteDocumentNode(node);
+                this.FillMissingPrefixes(<Document>node, null/*new XmlNamespaceManager(node.nameTable)*/, []);
+                this.WriteDocumentNode(<Document>node);
 
                 // UTF8Encoding utf8 = new UTF8Encoding();
                 // byte[] data = utf8.GetBytes(res.ToString());
                 // return new MemoryStream(data);
                 return this.res;
             }
-            else if (node instanceof NodeList) {
+            else if ((<any>node.constructor).name === "NodeList" || node instanceof NodeList) {
                 this.xnl = node;
                 if (node == null || node.length < 1)
                     return "";
@@ -327,7 +327,7 @@ namespace xadesjs {
 
             let list: Node[] = [];
             for (let i = 0; i < node.attributes.length; i < 0) {
-                let attribute = node.attributes[i]
+                let attribute = node.attributes[i];
                 if (!this.IsNamespaceNode(attribute) && this.IsNodeVisible(attribute))
                     list.push(attribute);
             }
@@ -399,7 +399,7 @@ namespace xadesjs {
             // Console.WriteLine ("Debug: text node");
             if (visible)
                 this.res += this.NormalizeString(node.nodeValue, node.nodeType);
-            //				res.Append (NormalizeString (node.Value, XmlNodeType.Text));
+            // res.Append (NormalizeString (node.Value, XmlNodeType.Text));
         }
 
         // Comment Nodes
@@ -555,9 +555,9 @@ namespace xadesjs {
                 else if (ch == `\x09` && type === XmlNodeType.Attribute)
                     sb += "&#x9;";
                 else if (ch == `\x0A` && type === XmlNodeType.Attribute)
-                    sb += "&#xA;
+                    sb += `&#xA`;
                 else if (ch == `\x0D`)
-                    sb += "&#xD;";
+                    sb += `&#xD;`;
                 else
                     sb += ch;
             }
@@ -567,7 +567,7 @@ namespace xadesjs {
     }
 
     class XmlDsigC14NTransformAttributesComparer {
-        static public Compare(x: Node, y: Node): number {
+        static Compare(x: Node, y: Node): number {
             let n1 = (x as Node);
             let n2 = (y as Node);
 
@@ -596,7 +596,7 @@ namespace xadesjs {
     }
 
     class XmlDsigC14NTransformNamespacesComparer {
-        static public Compare(x: Node, y: Node): number {
+        static Compare(x: Node, y: Node): number {
             let n1 = (x as Node);
             let n2 = (y as Node);
 

@@ -23,6 +23,9 @@ namespace xadesjs {
                 case XmlSignature.AlgorithmNamespaces.XmlDsigXsltTransform:
                     t = new XmlDsigXsltTransform();
                     break;
+                case XmlSignature.AlgorithmNamespaces.XmlDsigExcC14NTransform:
+                    t = new XmlDsigExcC14NTransform();
+                    break;
                 case XmlSignature.AlgorithmNamespaces.XmlDecryptionTransform:
                     t = new XmlDecryptionTransform();
                     break;

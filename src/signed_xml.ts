@@ -69,7 +69,7 @@ namespace xadesjs {
             // constructor();
             this.m_signature = new Signature();
             this.m_signature.SignedInfo = new SignedInfo();
-            this.hashes = new Hashtable(2); // 98% SHA1 for now
+            // this.hashes = new Hashtable(2); // 98% SHA1 for now
             if (node.constructor.name === "Document" || node instanceof Document) {
                 // constructor(node: Document);
                 this.envdoc = node;
@@ -176,11 +176,11 @@ namespace xadesjs {
             }
             else {
                 // e.g. XmlDsigXPathTransform returns XmlNodeList
-                return CanonicalizeOutput(obj);
+                return this.CanonicalizeOutput(obj);
             }
         }
 
-        private CanonicalizeOutput(obj: any): Stream {
+        private CanonicalizeOutput(obj: any): string {
             let c14n = this.GetC14NMethod();
             c14n.LoadInput(obj);
             return c14n.GetOutput();
@@ -356,16 +356,16 @@ namespace xadesjs {
             return t;
         }
 
-        private SignedInfoTransformed(): Stream {
+        private SignedInfoTransformed(): string {
             let t = this.GetC14NMethod();
 
             if (this.signatureElement == null) {
                 // when creating signatures
                 let doc = document.implementation.createDocument("", "", null);
-                doc.preserveWhitespace = true;
-                doc.loadXml(this.m_signature.SignedInfo.getXml().OuterXml);
+                doc.PreserveWhitespace = true;
+                doc.loadXML(this.m_signature.SignedInfo.getXml().outerXml);
                 if (this.envdoc != null)
-                    for (let attr: Attr of this.envdoc.documentElement.selectNodes("namespace::*")) {
+                    for (let attr: Attr of xpath.select("namespace::*", this.envdoc.documentElement)) {
                         if (attr.localName === "xml")
                             continue;
                         if (attr.prefix === doc.documentElement.prefix)
@@ -378,37 +378,41 @@ namespace xadesjs {
                 // when verifying signatures
                 // TODO - check m_signature.SignedInfo.Id
                 let el: Element = <Element>this.signatureElement.getElementsByTagNameNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.SignedInfo)[0];
-                let sw = new StringWriter();
-                let xtw = new XmlTextWriter(sw);
-                xtw.WriteStartElement(el.prefix, el.localName, el.namespaceURI);
+                // let sw = new StringWriter();
+                // let xtw = new XmlTextWriter(sw);
+                // xtw.WriteStartElement(el.prefix, el.localName, el.namespaceURI);
+                let prefix = el.prefix ? `${el.prefix}:` : "";
+                let doc = document.implementation.createDocument(el.namespaceURI, `${prefix}root`, null);
+                doc.prefix = el.prefix;
+                let xtw = doc.createElementNS(el.namespaceURI,  `${prefix}${el.localName}`);
 
                 // context namespace nodes (except for "xmlns:xml")
-                let nl = el.selectNodes("namespace::*");
-                for (let attr: Attr of nl) {
-                    if (attr.parentNode === el)
-                        continue;
-                    if (attr.localName === "xml")
-                        continue;
-                    if (attr.prefix === el.prefix)
-                        continue;
-                    attr.writeTo(xtw);
+                // let nl: Attr[] = xpath.select(el, "namespace::*");
+                // for (let attr: Attr of nl) {
+                //     if (attr.parentNode === el)
+                //         continue;
+                //     if (attr.localName === "xml")
+                //         continue;
+                //     if (attr.prefix === el.prefix)
+                //         continue;
+                //     let a = xtw.createAttribute(attr.localName);
+                //     a.value = attr.value;
+                //     xtw.attributes.setNamedItem(a);
+                // }
+                for (let i = 0; i < el.attributes.length; i++) {
+                    let attr = el.attributes.item(i);
+                    xtw.setAttribute(attr.localName, attr.value);
                 }
-                for (let attr in el.attributes)
-                    attr.WriteTo(xtw);
-                for (let n in el.childNodes)
-                    n.writeTo(xtw);
+                for (let i = 0; i < el.childNodes.length; i++) {
+                    let n = el.childNodes.item(i);
+                    xtw.appendChild(n.cloneNode(true));
+                }
 
-                xtw.WriteEndElement();
-                let si = Encoding.UTF8.GetBytes(sw.ToString());
-
-                let ms = new MemoryStream();
-                ms.Write(si, 0, si.Length);
-                ms.Position = 0;
-
+                let ms = xtw;
                 t.LoadInput(ms);
             }
             // C14N and C14NWithComments always return a Stream in GetOutput
-            return <Stream>t.GetOutput();
+            return t.GetOutput();
         }
 
         // reuse hash - most document will always use the same hash
@@ -578,7 +582,9 @@ namespace xadesjs {
                         throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, this.m_signature.SignedInfo.SignatureMethod);
                 }
 
-                return crypto.subtle.verify(alg, key, this.m_signature.SignatureValue, data)
+                let data = this.SignedInfoTransformed();
+                window.key = key;
+                return crypto.subtle.verify(alg, key, this.m_signature.SignatureValue, Convert.ToBufferString(data))
                     .then(resolve, reject);
 
                 // try {

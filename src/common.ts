@@ -1,4 +1,5 @@
 /// <reference path="../typings/xmldom/xmldom.d.ts" />
+/// <reference path="../typings/xpath/xpath.d.ts" />
 /// <reference path="./promise.d.ts" />
 
 let XMLSerializer = XMLSerializer || require("xmldom").XMLSerializer;
@@ -22,5 +23,7 @@ if (!org) {
     let pkijs_2 = merge(true, pkijs_1, co);
     org = merge(true, pkijs_1, x509schema).org;
 }
+
+let xpath: any = xpath || require("xpath");
 
 /// <reference path="./error.ts" />

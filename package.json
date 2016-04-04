@@ -28,5 +28,8 @@
     "node.extend": "^1.1.5",
     "xmldom": "^0.1.22",
     "xpath": "0.0.22"
+  },
+  "devDependencies": {
+    "express": "^4.13.4"
   }
 }
