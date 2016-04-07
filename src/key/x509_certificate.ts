@@ -1,12 +1,11 @@
 namespace xadesjs {
-    export class X509Certificate extends XmlObject {
+    export class X509Certificate {
 
         protected raw: Uint8Array;
         protected cert_simpl: any;
         protected publicKey: CryptoKey;
 
         constructor(rawData?: Uint8Array) {
-            super();
             this.publicKey = null;
 
             if (rawData) {
@@ -63,7 +62,7 @@ namespace xadesjs {
                         throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, alg_oid);
                 }
 
-                getCrypto().subtle.importKey("jwk", jwk, algorithm, true, ["verify"])
+                Application.crypto.subtle.importKey("jwk", jwk, algorithm, true, ["verify"])
                     .then(resolve, reject);
             });
         }

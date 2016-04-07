@@ -37,8 +37,12 @@ namespace xadesjs {
                 resultView[i] = text.charCodeAt(i);
             return resultView;
         }
-        static FromBufferString(buffer: Uint8Array): string {
+        static FromBufferString(buffer: ArrayBuffer): string;
+        static FromBufferString(buffer: Uint8Array): string;
+        static FromBufferString(buffer: any): string {
             let result_string = "";
+            if (buffer instanceof ArrayBuffer)
+                buffer = new Uint8Array(buffer);
             for (let i = 0; i < buffer.length; i++)
                 result_string = result_string + String.fromCharCode(buffer[i]);
             return result_string;

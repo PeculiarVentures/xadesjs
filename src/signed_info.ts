@@ -23,7 +23,7 @@ namespace xadesjs {
         }
 
         get CanonicalizationMethodObject(): Transform {
-            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
+            return CryptoConfig.CreateFromName(this.CanonicalizationMethod);
         }
 
         // documented as not supported (and throwing exception)
@@ -76,6 +76,18 @@ namespace xadesjs {
         // documented as not supported (and throwing exception)
         get SyncRoot(): any {
             throw new XmlError(XE.METHOD_NOT_SUPPORTED);
+        }
+
+        addReference(xpath: string, transforms: string[], digestAlgorithm: string, uri: string, digestValue: string, inclusiveNamespacesPrefixList: string, isEmptyUri: boolean) {
+            this.references.push({
+                xpath: xpath,
+                uri: uri,
+                digestValue: digestValue,
+                inclusiveNamespacesPrefixList: inclusiveNamespacesPrefixList,
+                isEmptyUri: isEmptyUri,
+                transforms: transforms ? transforms : ["http://www.w3.org/2001/10/xml-exc-c14n#"],
+                digestAlgorithm: digestAlgorithm ? digestAlgorithm : "http://www.w3.org/2000/09/xmldsig#sha1"
+            });
         }
 
         AddReference(reference: Reference): void {
@@ -137,6 +149,56 @@ namespace xadesjs {
             if (!xel.hasAttribute(attribute))
                 return null;
             return xel.getAttribute(attribute);
+        }
+
+        /**
+        * Load the reference xml node to a model
+        *
+        */
+        loadReference(ref: Node): void {
+            let nodes = findChilds(ref, "DigestMethod");
+            if (nodes.length === 0)
+                throw new Error(`could not find DigestMethod in reference ${ref.toString()}`);
+            let digestAlgoNode = nodes[0];
+
+            let attr = findAttr(digestAlgoNode, "Algorithm");
+            if (!attr)
+                throw new Error(`could not find Algorithm attribute in node ${digestAlgoNode.toString()}`);
+            let digestAlgo = attr.value;
+
+            nodes = findChilds(ref, "DigestValue");
+            if (nodes.length === 0)
+                throw new Error(`could not find DigestValue node in reference ${ref.toString()}`);
+            if (nodes[0].childNodes.length === 0 || !(<Text>nodes[0].firstChild).data)
+                throw new Error(`could not find the value of DigestValue in ${nodes[0].toString()}`);
+            let digestValue = (<Text>nodes[0].firstChild).data;
+
+            let transforms: string[] = [];
+            let inclusiveNamespacesPrefixList: string;
+            nodes = findChilds(ref, "Transforms");
+            if (nodes.length !== 0) {
+                let transformsNode = nodes[0];
+                let transformsAll = findChilds(transformsNode, "Transform");
+                for (let t in transformsAll) {
+                    if (!transformsAll.hasOwnProperty(t))
+                        continue;
+
+                    let trans = transformsAll[t];
+                    transforms.push(findAttr(trans, "Algorithm").value);
+                }
+
+                let inclusiveNamespaces = <Element[]>select(transformsNode, "//*[local-name(.)='InclusiveNamespaces']");
+                if (inclusiveNamespaces.length > 0) {
+                    let t = inclusiveNamespaces[0];
+                    inclusiveNamespacesPrefixList = inclusiveNamespaces[0].getAttribute("PrefixList");
+                }
+            }
+
+            // ***workaround for validating windows mobile store signatures - it uses c14n but does not state it in the transforms
+            if (transforms.length === 1 && transforms[0] === "http://www.w3.org/2000/09/xmldsig#enveloped-signature")
+                transforms.push("http://www.w3.org/2001/10/xml-exc-c14n#");
+
+            this.addReference(null, transforms, digestAlgo, findAttr(ref, "URI").value, digestValue, inclusiveNamespacesPrefixList, false);
         }
 
         loadXml(value: Element): void {

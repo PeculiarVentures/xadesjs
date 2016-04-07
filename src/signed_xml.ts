@@ -1,92 +1,85 @@
-// export class SignedXml extends XmlObject {
-//     constructor(doc: Document);
-//     constructor(node: Node);
-//     constructor(node: Node) {
-//         super();
-//     }
+/// <reference path="./common.ts" />
+/// <reference path="./algorithm.ts" />
 
-//     protected references: Reference[];
-//     addReference(ref: Reference): void {
-//         throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
-//     }
-
-//     signingKey: CryptoKey;
-//     keyInfo: IKeyInfo;
-//     signature: Signature;
-//     signatureValue: ArrayBuffer;
-
-//     computeSignature(): Promise {
-//         throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
-//     }
-//     checkSignature(): Promise {
-//         throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
-//     }
-
-// }
 namespace xadesjs {
+
+    const APPLICATION_XML = "application/xml";
+
+    interface IKeyInfoProvider {
+        getKeyInfo(key: string, prefix?: string): string;
+        getKey(keyInfo: any): Buffer;
+    }
+
+    /**
+     * A key info provider implementation
+     *
+     */
+    export class FileKeyInfo implements IKeyInfoProvider {
+        file: string;
+
+        constructor(file: string) {
+            this.file = file;
+        }
+
+        getKeyInfo(key: any, prefix: string = ""): string {
+            prefix = prefix ? prefix + ":" : prefix;
+            return "<" + prefix + "X509Data></" + prefix + "X509Data>";
+        }
+
+        getKey(keyInfo: any): Buffer {
+            return fs.readFileSync(this.file);
+        }
+
+    }
+
+    interface ISignedXmlOptions {
+        signatureAlgorithm?: string;
+        idAttribute?: string;
+    }
+
+    interface IComputeSignatureOptions {
+        prefix?: string;
+        attrs?: IAssocArray;
+        location?: ILocation;
+    }
+
+    interface ILocation {
+        reference?: string;
+        action: "append" | "prepend" | "before" | "after";
+    }
+
+    interface IReference {
+        xpath: string;
+        transforms: string[];
+        digestAlgorithm: string;
+        uri: string;
+        digestValue: string;
+        inclusiveNamespacesPrefixList: string;
+        isEmptyUri: boolean;
+    }
+
+    /**
+    * Xml signature implementation
+    */
     export class SignedXml {
-
-        static protected XmlDsigCanonicalizationUrl = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
-        static protected XmlDsigCanonicalizationWithCommentsUrl = SignedXml.XmlDsigCanonicalizationUrl + "#WithComments";
-        static protected XmlDsigNamespaceUrl = "http://www.w3.org/2000/09/xmldsig#";
-        static protected XmlDsigDSAUrl = SignedXml.XmlDsigNamespaceUrl + "dsa-sha1";
-        static protected XmlDsigHMACSHA1Url = SignedXml.XmlDsigNamespaceUrl + "hmac-sha1";
-        static protected XmlDsigMinimalCanonicalizationUrl = SignedXml.XmlDsigNamespaceUrl + "minimal";
-        static protected XmlDsigRSASHA1Url = SignedXml.XmlDsigNamespaceUrl + "rsa-sha1";
-        static protected XmlDsigSHA1Url = SignedXml.XmlDsigNamespaceUrl + "sha1";
-
-        static protected XmlDecryptionTransformUrl = "http://www.w3.org/2002/07/decrypt#XML";
-        static protected XmlDsigBase64TransformUrl = SignedXml.XmlDsigNamespaceUrl + "base64";
-        static protected XmlDsigC14NTransformUrl = SignedXml.XmlDsigCanonicalizationUrl;
-        static protected XmlDsigC14NWithCommentsTransformUrl = SignedXml.XmlDsigCanonicalizationWithCommentsUrl;
-        static protected XmlDsigEnvelopedSignatureTransformUrl = SignedXml.XmlDsigNamespaceUrl + "enveloped-signature";
-        static protected XmlDsigExcC14NTransformUrl = "http://www.w3.org/2001/10/xml-exc-c14n#";
-        static protected XmlDsigExcC14NWithCommentsTransformUrl = SignedXml.XmlDsigExcC14NTransformUrl + "WithComments";
-        static protected XmlDsigXPathTransformUrl = "http://www.w3.org/TR/1999/REC-xpath-19991116";
-        static protected XmlDsigXsltTransformUrl = "http://www.w3.org/TR/1999/REC-xslt-19991116";
-        static protected XmlLicenseTransformUrl = "urn:mpeg:mpeg21:2003:01-REL-R-NS:licenseTransform";
-
-        // private encryptedXml: EncryptedXml;
-
-        protected m_signature: Signature;
-        private key: CryptoKey;
-        protected m_strSigningKeyName: string;
-        private envdoc: Document;
-        private pkEnumerator;
-        private signatureElement: Element;
-        private hashes: Hashtable;
-        // FIXME: enable it after CAS implementation
-        // private xmlResolver = new XmlUrlResolver();
-        private manifests: Document[];
-        private _x509Enumerator: X509Certificate[];
-
-        private static whitespaceChars = [` `, `\r`, `\n`, `\t`];
-
-        constructor();
-        constructor(node: Document);
-        constructor(node: Element);
-        constructor(node?: any) {
-            // constructor();
-            this.m_signature = new Signature();
-            this.m_signature.SignedInfo = new SignedInfo();
-            // this.hashes = new Hashtable(2); // 98% SHA1 for now
-            if (node.constructor.name === "Document" || node instanceof Document) {
-                // constructor(node: Document);
-                this.envdoc = node;
-            }
-            else if (node.constructor.name === "Element" || node instanceof Element) {
-                // constructor(node: Element);
-                this.envdoc = document.implementation.createDocument("", "", null);
-                this.envdoc.loadXml(node.OuterXml);
-            }
-        }
-
-        get EncryptedXml(): EncryptedXml {
-            return this.encryptedXml;
-        }
-        set EncryptedXml(value: EncryptedXml) {
-            this.encryptedXml = value;
-        }
+        options: ISignedXmlOptions = {};
+        idMode: string;
+        references: IReference[] = [];
+        id = 0;
+        signingKey: string = null;
+        // signatureAlgorithm = this.options.signatureAlgorithm || "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
+        keyInfoProvider: IKeyInfoProvider = null;
+        // canonicalizationAlgorithm = "http://www.w3.org/2001/10/xml-exc-c14n#";
+        signedXml = "";
+        signatureXml = "";
+        signatureElement: Node = null;
+        m_signature: Signature = null;
+        // SignatureValue = "";
+        originalXmlWithIds = "";
+        validationErrors: string[] = [];
+        keyInfo: Element = null;
+        key: CryptoKey = null;
+        idAttributes = ["Id", "ID"];
 
         get KeyInfo(): KeyInfo {
             if (this.m_signature.KeyInfo == null)
@@ -101,8 +94,8 @@ namespace xadesjs {
             return this.m_signature;
         }
 
-        get SignatureLength(): string {
-            return this.m_signature.SignedInfo.SignatureLength;
+        get SignatureLength(): number {
+            return this.m_signature.SignatureValue.length;
         }
 
         get SignatureMethod(): string {
@@ -111,6 +104,10 @@ namespace xadesjs {
 
         get SignatureValue(): ArrayBuffer {
             return this.m_signature.SignatureValue;
+        }
+
+        get CanonicalizationMethod(): string {
+            return this.m_signature.SignedInfo.CanonicalizationMethod;
         }
 
         get SignedInfo(): SignedInfo {
@@ -124,611 +121,77 @@ namespace xadesjs {
             this.key = value;
         }
 
-        // NOTE: CryptoAPI related ? documented as fx internal
-        get SigningKeyName(): string {
-            return this.m_strSigningKeyName;
-        }
-        set SigningKeyName(value: string) {
-            this.m_strSigningKeyName = value;
-        }
-
-        AddObject(dataObject: DataObject): void {
-            this.m_signature.AddObject(dataObject);
-        }
-
-        AddReference(reference: Reference): void {
-            if (reference == null)
-                throw new XmlError(XE.PARAM_REQUIRED, "reference");
-            this.m_signature.SignedInfo.AddReference(reference);
-        }
-
-        private ApplyTransform(t: Transform, input: Document): Stream {
-            // These transformer modify input document, which should
-            // not affect to the input itself.
-            if (t instanceof XmlDsigXPathTransform
-                || t instanceof XmlDsigEnvelopedSignatureTransform
-                || t instanceof XmlDecryptionTransform
-            )
-                input = input.clone();
-
-            t.LoadInput(input);
-
-            if (t instanceof XmlDsigEnvelopedSignatureTransform)
-                // It returns XmlDocument for XmlDocument input.
-                return CanonicalizeOutput(t.GetOutput());
-
-            let obj = t.GetOutput();
-            if (obj instanceof Stream)
-                return obj;
-            else if (obj instanceof Document) {
-                let ms = new MemoryStream();
-                let xtw = new XmlTextWriter(ms, Encoding.UTF8);
-                (<Document>obj).writeTo(xtw);
-
-                xtw.Flush();
-
-                // Rewind to the start of the stream
-                ms.Position = 0;
-                return ms;
-            }
-            else if (obj == null) {
-                throw new XmlError(XE.METHOD_NOT_IMPLEMENTED, "This should not occur. Transform is " + t + ".");
-            }
-            else {
-                // e.g. XmlDsigXPathTransform returns XmlNodeList
-                return this.CanonicalizeOutput(obj);
-            }
-        }
-
-        private CanonicalizeOutput(obj: any): string {
-            let c14n = this.GetC14NMethod();
-            c14n.LoadInput(obj);
-            return c14n.GetOutput();
-        }
-
-        private GetManifest(r: Reference): Document {
-            let doc = document.implementation.createDocument("", "", null);
-            doc.PreserveWhitespace = true;
-
-            if (r.Uri[0] === `#`) {
-                // local manifest
-                if (this.signatureElement != null) {
-                    let xel = this.GetIdElement(this.signatureElement.ownerDocument, r.Uri.substring(1));
-                    if (xel == null)
-                        throw new XmlError(XE.CRYPTOGRAPHIC, "Manifest targeted by Reference was not found: " + r.Uri.substring(1));
-                    doc.appendChild(doc.importNode(xel, true));
-                    this.FixupNamespaceNodes(xel, doc.documentElement, false);
-                }
-            }
-            else if (this.xmlResolver != null) {
-                // TODO: need testing
-                let s = <Stream>this.xmlResolver.GetEntity(new Uri(r.Uri), null, typeof (Stream));
-                doc.load(s);
-            }
-
-            if (doc.firstChild != null) {
-                // keep a copy of the manifests to check their references later
-                if (this.manifests == null)
-                    this.manifests = [];
-                this.manifests.push(doc);
-
-                return doc;
-            }
-            return null;
-        }
-
-        private FixupNamespaceNodes(src: Element, dst: Element, ignoreDefault: boolean): void {
-            // add namespace nodes
-            let nodes = src.selectNodes("namespace::*");
-            for (let i = 0; i < nodes.length; i++) {
-                let attr = nodes[i];
-                if (attr.LocalName === "xml")
-                    continue;
-                if (ignoreDefault && attr.LocalName === "xmlns")
-                    continue;
-                dst.setAttributeNode(dst.ownerDocument.importNode(attr, true) as Attr);
-            }
-        }
-
-        private GetReferenceHash(r: Reference, check_hmac: boolean): ArrayBuffer {
-            let s: Stream = null;
-            let doc: Document = null;
-            if (!r.Uri) { // Empty
-                doc = this.envdoc;
-            }
-            else if (r.Type === XmlSignature.Uri.Manifest) {
-                doc = this.GetManifest(r);
-            }
-            else {
-                doc = document.implementation.createDocument("", "", null);
-                doc.preserveWhitespace = true;
-                let objectName: string = null;
-
-                if (r.Uri.indexOf("#xpointer") === 0) {
-                    let uri: string = r.Uri;
-                    SignedXml.whitespaceChars.forEach((c) => {
-                        uri = uri.substring(9).split(c).join("");
-                    });
-                    if (uri.length < 2 || uri[0] !== `(` || uri[uri.length - 1] !== `)`)
-                        // FIXME: how to handle invalid xpointer?
-                        uri = ""; // String.Empty
-                    else
-                        uri = uri.substring(1, uri.length - 2);
-                    if (uri === "/")
-                        doc = this.envdoc;
-                    else if (uri.length > 6 && uri.indexOf(`id(`) === 0 && uri[uri.length - 1] === `)`)
-                        // id('foo'), id("foo")
-                        objectName = uri.substring(4, uri.length - 6);
-                }
-                else if (r.Uri[0] === `#`) {
-                    objectName = r.Uri.substring(1);
-                }
-                else if (this.xmlResolver != null) {
-                    // TODO: test but doc says that Resolver = null -> no access
-                    try {
-                        // no way to know if valid without throwing an exception
-                        Uri uri = new Uri(r.Uri);
-                        s = <Stream>xmlResolver.GetEntity(uri, null, typeof (Stream));
-                    }
-                    catch (e) {
-                        // may still be a local file (and maybe not xml)
-                        s = File.OpenRead(r.Uri);
-                    }
-                }
-                if (objectName != null) {
-                    let found: Element = null;
-                    for (let i in this.m_signature.ObjectList) {
-                        let obj = this.m_signature.ObjectList[i];
-                        if (obj.Id === objectName) {
-                            found = obj.getXml();
-                            found.setAttribute("xmlns", SignedXml.XmlDsigNamespaceUrl);
-                            doc.appendChild(doc.importNode(found, true));
-                            // FIXME: there should be theoretical justification of copying namespace declaration nodes this way.
-                            for (let j = 0; j < found.childNodes.length; j++) {
-                                let n = found.childNodes[j];
-                                // Do not copy default namespace as it must be xmldsig namespace for "Object" element.
-                                if (n.nodeType === XmlNodeType.Element)
-                                    this.FixupNamespaceNodes(n as Element, doc.documentElement, true);
-                            }
-                            break;
-
-                        }
-                    }
-                    if (found == null && this.envdoc != null) {
-                        found = this.GetIdElement(this.envdoc, objectName);
-                        if (found != null) {
-                            doc.appendChild(doc.importNode(found, true));
-                            this.FixupNamespaceNodes(found, doc.documentElement, false);
-                        }
-                    }
-                    if (found == null)
-                        throw new XmlError(XE.CRYPTOGRAPHIC, `Malformed reference object: ${objectName}`);
-                }
-            }
-
-            if (r.TransformChain.length > 0) {
-                for (let i in r.TransformChain) {
-                    let t = r.TransformChain[i];
-                    if (s == null) {
-                        s = this.ApplyTransform(t, doc);
-                    }
-                    else {
-                        t.LoadInput(s);
-                        let o = t.GetOutput();
-                        if (o instanceof Stream)
-                            s = <Stream>o;
-                        else
-                            s = this.CanonicalizeOutput(o);
-                    }
-                }
-            }
-            else if (s == null) {
-                // we must not C14N references from outside the document
-                // e.g. non-xml documents
-                if (r.Uri[0] != `#`) {
-                    s = new MemoryStream();
-                    doc.Save(s);
-                }
-                else {
-                    // apply default C14N transformation
-                    s = this.ApplyTransform(new XmlDsigC14NTransform(), doc);
-                }
-            }
-            let digest = this.GetHash(r.DigestMethod, check_hmac);
-            return (digest == null) ? null : digest.ComputeHash(s);
-        }
-
-        private DigestReferences(): void {
-            // we must tell each reference which hash algorithm to use 
-            // before asking for the SignedInfo XML !
-            for (let r of this.m_signature.SignedInfo.References) {
-                // assume SHA-1 if nothing is specified
-                if (r.DigestMethod == null)
-                    r.DigestMethod = SignedXml.XmlDsigSHA1Url;
-                r.DigestValue = this.GetReferenceHash(r, false);
-            }
-        }
-
-        private GetC14NMethod(): Transform {
-            let t = <Transform>CryptoConfig.CreateFromName(this.m_signature.SignedInfo.CanonicalizationMethod);
-            if (t == null)
-                throw new XmlError(XE.CRYPTOGRAPHIC, `Unknown Canonicalization Method ${this.m_signature.SignedInfo.CanonicalizationMethod}`);
-            return t;
-        }
-
-        private SignedInfoTransformed(): string {
-            let t = this.GetC14NMethod();
-
-            if (this.signatureElement == null) {
-                // when creating signatures
-                let doc = document.implementation.createDocument("", "", null);
-                doc.PreserveWhitespace = true;
-                doc.loadXML(this.m_signature.SignedInfo.getXml().outerXml);
-                if (this.envdoc != null)
-                    for (let attr: Attr of xpath.select("namespace::*", this.envdoc.documentElement)) {
-                        if (attr.localName === "xml")
-                            continue;
-                        if (attr.prefix === doc.documentElement.prefix)
-                            continue;
-                        doc.documentElement.setAttributeNode(doc.importNode(attr, true) as Attr);
-                    }
-                t.LoadInput(doc);
-            }
-            else {
-                // when verifying signatures
-                // TODO - check m_signature.SignedInfo.Id
-                let el: Element = <Element>this.signatureElement.getElementsByTagNameNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.SignedInfo)[0];
-                // let sw = new StringWriter();
-                // let xtw = new XmlTextWriter(sw);
-                // xtw.WriteStartElement(el.prefix, el.localName, el.namespaceURI);
-                let prefix = el.prefix ? `${el.prefix}:` : "";
-                let doc = document.implementation.createDocument(el.namespaceURI, `${prefix}root`, null);
-                doc.prefix = el.prefix;
-                let xtw = doc.createElementNS(el.namespaceURI,  `${prefix}${el.localName}`);
-
-                // context namespace nodes (except for "xmlns:xml")
-                // let nl: Attr[] = xpath.select(el, "namespace::*");
-                // for (let attr: Attr of nl) {
-                //     if (attr.parentNode === el)
-                //         continue;
-                //     if (attr.localName === "xml")
-                //         continue;
-                //     if (attr.prefix === el.prefix)
-                //         continue;
-                //     let a = xtw.createAttribute(attr.localName);
-                //     a.value = attr.value;
-                //     xtw.attributes.setNamedItem(a);
-                // }
-                for (let i = 0; i < el.attributes.length; i++) {
-                    let attr = el.attributes.item(i);
-                    xtw.setAttribute(attr.localName, attr.value);
-                }
-                for (let i = 0; i < el.childNodes.length; i++) {
-                    let n = el.childNodes.item(i);
-                    xtw.appendChild(n.cloneNode(true));
-                }
-
-                let ms = xtw;
-                t.LoadInput(ms);
-            }
-            // C14N and C14NWithComments always return a Stream in GetOutput
-            return t.GetOutput();
-        }
-
-        // reuse hash - most document will always use the same hash
-        private GetHash(algorithm: string, check_hmac: boolean): HashAlgorithm {
-            let hash = <HashAlgorithm>this.hashes[algorithm];
-            if (hash == null) {
-                hash = HashAlgorithm.Create(algorithm);
-                if (hash == null)
-                    throw new XmlError(XE.CRYPTOGRAPHIC, `Unknown hash algorithm: ${algorithm}`);
-                hashes.Add(algorithm, hash);
-                // now ready to be used
-            }
-            else {
-                // important before reusing an hash object
-                hash.Initialize();
-            }
-            // we can sign using any hash algorith, including HMAC, but we can only verify hash (MS compatibility)
-            if (check_hmac && (hash instanceof KeyedHashAlgorithm))
-                return null;
-            return hash;
-        }
-
-        CheckSignature(): Promise;
-        CheckSignature(key: CryptoKey): Promise;
-        CheckSignature(key: CryptoKey = null): Promise {
-            console.warn("TODO: HMAC");
-            return this.CheckSignatureInternal(key);
-        }
-
-        // public CheckSignature(macAlg: KeyedHashAlgorithm): boolean{
-        //     if (macAlg == null)
-        //         throw new XmlErroe(XE.PARAM_REQUIRED, "macAlg");
-
-        //     this.pkEnumerator = null;
-
-        //     // Is the signature (over SignedInfo) valid ?
-        //     let s = SignedInfoTransformed();
-        //     if (s == null)
-        //         return false;
-
-        //     let actual = macAlg.ComputeHash(s);
-        //     // HMAC signature may be partial and specified by <HMACOutputLength>
-        //     if (this.m_signature.SignedInfo.SignatureLength != null) {
-        //         let length = parseInt(this.m_signature.SignedInfo.SignatureLength);
-        //         // we only support signatures with a multiple of 8 bits
-        //         // and the value must match the signature length
-        //         if ((length & 7) !== 0)
-        //             throw new XmlError(XE.CRYPTOGRAPHIC, "Signature length must be a multiple of 8 bits.");
-
-        //         // SignatureLength is in bits (and we works on bytes, only in multiple of 8 bits)
-        //         // and both values must match for a signature to be valid
-        //         length >>= 3;
-        //         if (length !== this.m_signature.SignatureValue.length)
-        //             throw new XmlError(XE.CRYPTOGRAPHIC, "Invalid signature length.");
-
-        //         // is the length "big" enough to make the signature meaningful ? 
-        //         // we use a minimum of 80 bits (10 bytes) or half the HMAC normal output length
-        //         // e.g. HMACMD5 output 128 bits but our minimum is 80 bits (not 64 bits)
-        //         let minimum = Math.max(10, actual.Length / 2);
-        //         if (length < minimum)
-        //             throw new XmlError(XE.CRYPTOGRAPHIC, "HMAC signature is too small");
-
-        //         if (length < actual.length) {
-        //             let trunked = new Uint8Array(length);
-        //             // Buffer.blockCopy(actual, 0, trunked, 0, length);
-        //             actual = trunked;
-        //         }
-        //     }
-
-        //     if (this.Compare(this.m_signature.SignatureValue, actual)) {
-        //         // some parts may need to be downloaded
-        //         // so where doing it last
-        //         return this.CheckReferenceIntegrity(this.m_signature.SignedInfo.References);
-        //     }
-        //     return false;
-        // }
-
-        private CheckReferenceIntegrity(referenceList: Reference[]): boolean {
-            if (referenceList == null)
-                return false;
-
-            // check digest (hash) for every reference
-            for (let r of referenceList) {
-                // stop at first broken reference
-                let hash = this.GetReferenceHash(r, true);
-                if (!this.Compare(r.DigestValue, hash))
-                    return false;
-            }
-            return true;
-        }
-
 
         /**
-         * Compares two ArrayBuffers. Returns `true` if buffers are equal, else returns `false`
-         * @param  {ArrayBuffer} a
-         * @param  {ArrayBuffer} b
-         * @returns boolean
+         * @param {string} idMode. Value of "wssecurity" will create/validate id's with the ws-security namespace
          */
-        private Compare(a: ArrayBuffer, b: ArrayBuffer): boolean {
-            if (a.byteLength !== b.byteLength) return false;
-            let dv1 = new Uint8Array(a);
-            let dv2 = new Uint8Array(b);
-            for (let i = 0; i < dv1.length; i++) {
-                if (dv1[i] !== dv2[i]) return false;
-            }
-            return true;
+        constructor(idMode: string, options: ISignedXmlOptions = {}) {
+            this.m_signature = new Signature();
+            this.m_signature.SignedInfo = new SignedInfo();
+            this.options = options;
+            this.idMode = idMode;
+            if (this.options.idAttribute) this.idAttributes.splice(0, 0, this.options.idAttribute);
         }
 
+        static CanonicalizationAlgorithms: { [index: string]: ICanonicalizationAlgorithmConstructable } = {
+            "http://www.w3.org/2001/10/xml-exc-c14n#": XmlDsigExcC14NTransform,
+            "http://www.w3.org/2001/10/xml-exc-c14n#WithComments": XmlDsigExcC14NWithCommentsTransform,
+            "http://www.w3.org/2000/09/xmldsig#enveloped-signature": XmlDsigEnvelopedSignatureTransform
+        };
 
-        private CheckSignatureInternal(key: CryptoKey): Promise {
-            return new Promise((resolve, reject) => {
+        static HashAlgorithms: { [index: string]: IHashAlgorithmConstructable } = {
+            "http://www.w3.org/2000/09/xmldsig#sha1": SHA1,
+            "http://www.w3.org/2001/04/xmlenc#sha224": SHA224,
+            "http://www.w3.org/2001/04/xmlenc#sha256": SHA256,
+            "http://www.w3.org/2001/04/xmlenc#sha384": SHA384,
+            "http://www.w3.org/2001/04/xmlenc#sha512": SHA512
+        };
 
-                this.pkEnumerator = null;
+        static SignatureAlgorithms: { [index: string]: ISignatureAlgorithmConstructable } = {
+            "http://www.w3.org/2000/09/xmldsig#rsa-sha1": RSASHA1,
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha224": RSASHA224,
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256": RSASHA256,
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384": RSASHA384,
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512": RSASHA512,
+            "http://www.w3.org/2000/09/xmldsig#hmac-sha1": HMACSHA1
+        };
 
-                if (key != null) {
-                    // check with supplied key
-                    return this.CheckSignatureWithKey(key)
-                        .then(resolve, reject);
-                } else {
-                    if (this.Signature.KeyInfo == null)
-                        return Promise.resolve(null);
-                    // no supplied key, iterates all KeyInfo
-                    // ----------------------------------------
-                    // while ((key = this.GetPublicKey()) != null) {
-                    //     if (this.CheckSignatureWithKey(key)) {
-                    //         break;
-                    //     }
-                    // }
-                    return this.GetPublicKey()
-                        .then((k) => {
-                            this.pkEnumerator = null;
-                            return this.CheckSignatureWithKey(k);
-                        })
-                        .then(resolve, reject);
-                }
+        static defaultNsForPrefix: INsPrefix = {
+            ds: "http://www.w3.org/2000/09/xmldsig#"
+        };
 
-                // some parts may need to be downloaded
-                // so where doing it last
-                if (!this.CheckReferenceIntegrity(this.m_signature.SignedInfo.References))
-                    return Promise.resolve(null);
-
-
-                if (this.manifests != null) {
-                    // do not use foreach as a manifest could contain manifests...
-                    for (let i = 0; i < this.manifests.length; i++) {
-                        let manifest = new Manifest((this.manifests[i] as Document).documentElement);
-                        if (!this.CheckReferenceIntegrity(manifest.References))
-                            return Promise.resolve(null);
-                    }
-                }
-            });
-        }
-
-        // Is the signature (over SignedInfo) valid ?
-        private CheckSignatureWithKey(key: CryptoKey): Promise {
-            return new Promise((resolve, reject) => {
-                if (key == null)
-                    return resolve(false);
-
-                // let sd = <SignatureDescription>CryptoConfig.CreateFromName(this.m_signature.SignedInfo.SignatureMethod);
-                let alg: any = {};
-                switch (this.m_signature.SignedInfo.SignatureMethod) {
-                    case "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256":
-                        alg = { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-256" } };
-                        break;
-                    default:
-                        throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, this.m_signature.SignedInfo.SignatureMethod);
-                }
-
-                let data = this.SignedInfoTransformed();
-                window.key = key;
-                return crypto.subtle.verify(alg, key, this.m_signature.SignatureValue, Convert.ToBufferString(data))
-                    .then(resolve, reject);
-
-                // try {
-                //     verifier.SetKey(key);
-                //     verifier.SetHashAlgorithm(sd.DigestAlgorithm);
-
-                //     HashAlgorithm hash = GetHash(sd.DigestAlgorithm, true);
-                //     // get the hash of the C14N SignedInfo element
-                //     MemoryStream ms = (MemoryStream) SignedInfoTransformed ();
-
-                //     byte[] digest = hash.ComputeHash(ms);
-                //     return verifier.VerifySignature(digest, m_signature.SignatureValue);
-                // }
-                // catch {
-                //     // e.g. SignatureMethod != AsymmetricAlgorithm type
-                //     return false;
-                // }
-            });
-
-        }
-
-        public CheckSignatureReturningKey(signingKey: CryptoKey): boolean {
-            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
-            // console.warn("TODO: signingKey must be ref param");
-            // signingKey = this.CheckSignatureInternal(null);
-            // return (signingKey != null);
-        }
-
-        public ComputeSignature(macAlg: KeyedHAshAlgorithm): Promise {
-            return new Promise((resolve, reject) => {
-                if (!macAlg) {
-                    if (this.key != null) {
-                        if (this.m_signature.SignedInfo.SignatureMethod == null)
-                            // required before hashing
-                            this.m_signature.SignedInfo.SignatureMethod = this.key.SignatureAlgorithm;
-                        else if (this.m_signature.SignedInfo.SignatureMethod !== this.key.SignatureAlgorithm)
-                            throw new XmlError(XE.CRYPTOGRAPHIC, "Specified SignatureAlgorithm is not supported by the signing key.");
-                        this.DigestReferences();
-
-                        let signer: ISignatureFormater = null;
-                        // in need for a CryptoConfig factory
-                        switch (this.key.algorithm.name.toUpperCase()) {
-                            case "RSASSA-PKCS1-V1_5":
-                                signer = new RSAPKCS1SignatureFormatter();
-                                break;
-                            case "ECDSA":
-                                throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
-                            default:
-                                throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, this.key.algorithm.name);
-                        }
-
-                        if (signer != null) {
-                            let sd = <SignatureDescription>CryptoConfig.CreateFromName(this.m_signature.SignedInfo.SignatureMethod);
-
-                            let hash = this.GetHash(sd.DigestAlgorithm, false);
-                            // get the hash of the C14N SignedInfo element
-                            let digest = hash.ComputeHash(this.SignedInfoTransformed());
-
-                            signer.SetHashAlgorithm("SHA1");
-                            signer.CreateSignature(digest)
-                                .then((signature) => {
-                                    this.m_signature.SignatureValue = signature;
-                                    resolve(signature);
-                                })
-                                .catch(reject);
-                        }
-                    }
-                    else
-                        throw new XmlError(XE.CRYPTOGRAPHIC, "signing key is not specified");
-                }
-                else {
-                    let method: string = null;
-
-                    if (macAlg instanceof HMACSHA1) {
-                        method = XmlDsigHMACSHA1Url;
-                    } else if (macAlg instanceof HMACSHA256) {
-                        method = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256";
-                    } else if (macAlg instanceof HMACSHA384) {
-                        method = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha384";
-                    } else if (macAlg instanceof HMACSHA512) {
-                        method = "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512";
-                    } else if (macAlg instanceof HMACRIPEMD160) {
-                        method = "http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160";
-                    }
-
-                    if (method == null)
-                        throw new XmlError(XE.CRYPTOGRAPHIC, "unsupported algorithm");
-
-                    this.DigestReferences();
-                    this.m_signature.SignedInfo.SignatureMethod = method;
-                    this.m_signature.SignatureValue = macAlg.ComputeHash(this.SignedInfoTransformed());
-                }
-            });
-        }
-
-        public GetIdElement(document: Document, idValue: string): Element {
-            if ((document == null) || (idValue == null))
-                return null;
-
-            // this works only if there's a DTD or XSD available to define the ID
-            let xel = <Element>document.getElementById(idValue);
-            if (xel == null) {
-                // search an "undefined" ID
-                xel = <Element>document.selectSingleNode(`//*[@Id='${idValue}']`);
-                if (xel == null) {
-                    xel = <Element>document.selectSingleNode(`//*[@ID='${idValue}']`);
-                    if (xel == null) {
-                        xel = <Element>document.selectSingleNode(`//*[@id='${idValue}']`);
-                    }
-                }
-            }
-            return xel;
-        }
-
-        // According to book ".NET Framework Security" this method
-        // iterates all possible keys then return null
         protected GetPublicKey(): Promise {
             return new Promise((resolve, reject) => {
-                if (this.m_signature.KeyInfo == null)
-                    return resolve(null);
+                if (this.key !== null)
+                    return resolve(this.key);
 
-                if (this.pkEnumerator == null) {
-                    this.pkEnumerator = this.m_signature.KeyInfo.GetEnumerator();
-                }
+                // if (this.pkEnumerator == null) {
+                //     this.pkEnumerator = this.m_signature.KeyInfo.GetEnumerator();
+                // }
+                let pkEnumerator = this.KeyInfo.GetEnumerator();
 
-                for (let kic of this.pkEnumerator) {
+                for (let kic of pkEnumerator) {
                     let key: CryptoKey = null;
 
-                    if (kic instanceof DSAKeyValue)
-                        key = DSA.Create();
-                    else if (kic instanceof RSAKeyValue)
-                        key = RSA.Create();
+                    // if (kic instanceof DSAKeyValue)
+                    //     key = DSA.Create();
+                    // else if (kic instanceof RSAKeyValue)
+                    //     key = RSA.Create();
 
-                    if (this.key != null) {
-                        this.key.FromXmlString(kic.GetXml().InnerXml);
-                        return resolve(this.key);
-                    }
+                    // if (this.key != null) {
+                    //     this.key.FromXmlString(kic.GetXml().InnerXml);
+                    //     return resolve(this.key);
+                    // }
 
                     if (kic instanceof KeyInfoX509Data) {
-                        this._x509Enumerator = (<KeyInfoX509Data>kic).Certificates;
-                        for (let cert of this._x509Enumerator) {
+                        let _x509Enumerator = (<KeyInfoX509Data>kic).Certificates;
+                        for (let cert of _x509Enumerator) {
                             let sig_alg = this.Signature.SignedInfo.SignatureMethod;
                             let alg: any = null;
                             switch (sig_alg) {
+                                case "http://www.w3.org/2000/09/xmldsig#rsa-sha1":
+                                    alg = { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-1" } };
+                                    break;
                                 case "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256":
                                     alg = { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-256" } };
                                     break;
@@ -736,37 +199,466 @@ namespace xadesjs {
                                     throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, sig_alg);
                             }
                             return cert.exportKey(alg)
+                                .then((key: CryptoKey) => {
+                                    this.key = key;
+                                    resolve(key);
+                                })
                                 .then(resolve, reject);
                         }
                     }
                 }
-                return resolve(null);
             });
         }
 
-        public getXml(): Element {
-            return this.m_signature.getXml(this.envdoc);
+        checkSignature(xml: Node): Promise {
+            return new Promise((resolve, reject) => {
+                this.validationErrors = [];
+                // this.signedXml = xml;
+
+                // if (!this.keyInfoProvider) {
+                //     throw new Error("cannot validate signature since no key info resolver was provided");
+                // }
+                // this.signingKey = this.keyInfoProvider.getKey(this.keyInfo);
+                // if (!this.signingKey) throw new Error(`key info provider could not resolve key info ${this.keyInfo}`);
+
+                // let doc = new DOMParser().parseFromString(xml, APPLICATION_XML);
+
+                this.validateReferences(xml)
+                    .then(() => {
+                        console.log("XADESJS: References checked");
+                        return this.validateSignatureValue();
+                    })
+                    .then(resolve, reject);
+            });
         }
 
+        validateSignatureValue(): Promise {
+            let signer: ISignatureAlgorithm;
+            let signedInfoCanon: string;
+            return new Promise((resolve, reject) => {
+                signedInfoCanon = this.getCanonXml([this.SignedInfo.CanonicalizationMethodObject], this.SignedInfo.getXml());
+                signer = this.findSignatureAlgorithm(this.SignatureMethod);
+                this.GetPublicKey()
+                    .then((key: CryptoKey) => {
+                        console.log("XADESJS: Get public key for verification");
+                        return signer.verifySignature(signedInfoCanon, key, Convert.FromBufferString(this.SignatureValue));
+                    })
+                    .then(resolve, reject);
+            });
+        }
+
+        findSignatureAlgorithm(name: string): ISignatureAlgorithm {
+            let algo = SignedXml.SignatureAlgorithms[name];
+            if (algo)
+                return new algo();
+            else throw new Error(`signature algorithm '${name}' is not supported`);
+        }
+
+        findCanonicalizationAlgorithm(name: string): Transform {
+            let algo = (<any>SignedXml).CanonicalizationAlgorithms[name];
+            if (algo)
+                return new algo();
+            else throw new Error(`canonicalization algorithm '${name}' is not supported`);
+        }
+
+        findHashAlgorithm(name: string): IHashAlgorithm {
+            let algo = SignedXml.HashAlgorithms[name];
+            if (algo)
+                return new algo();
+            else throw new Error("hash algorithm '" + name + "' is not supported");
+        }
+
+        validateReferences(doc: Node): Promise {
+            let that = this;
+            return new Promise((resolve, reject) => {
+                let refs = that.SignedInfo.References;
+                let promise = Promise.resolve();
+                for (let ref of refs) {
+                    // if (!this.references.hasOwnProperty(r)) continue;
+                    // let ref = this.references[r];
+
+                    let uri = ref.Uri[0] === "#" ? ref.Uri.substring(1) : ref.Uri;
+                    let elem: Node[] = [];
+
+                    if (uri === "") {
+                        elem = <Node[]>select(doc, "//*");
+                    }
+                    else {
+                        for (let index in that.idAttributes) {
+                            if (!that.idAttributes.hasOwnProperty(index))
+                                continue;
+
+                            elem = <Node[]>select(doc, `//*[@*[local-name(.)='${this.idAttributes[index]}']='${uri}']`);
+                            if (elem.length > 0) break;
+                        }
+                    }
+
+                    if (elem.length === 0) {
+                        this.validationErrors.push(`invalid signature: the signature refernces an element with uri ${ref.Uri} but could not find such element in the xml`);
+                        return false;
+                    }
+                    let canonXml = this.getCanonXml(ref.TransformChain, elem[0], { inclusiveNamespacesPrefixList: ref.inclusiveNamespacesPrefixList });
+
+                    let hash = this.findHashAlgorithm(ref.DigestMethod);
+                    promise = promise.then(() => {
+                        return hash.getHash(canonXml);
+                    })
+                        .then((digest: Uint8Array) => {
+                            if (Convert.FromBufferString(digest) !== Convert.FromBufferString(ref.DigestValue)) {
+                                this.validationErrors.push(`invalid signature: for uri ${ref.Uri} calculated digest is ${digest} but the xml to validate supplies digest ${ref.DigestValue}`);
+                                throw new XmlError(XE.CRYPTOGRAPHIC, "Wrong hash value");
+                            }
+                            return Promise.resolve();
+                        });
+
+                }
+                promise.then(resolve, reject);
+            });
+        }
+
+        /**
+         * Compute the signature of the given xml (usign the already defined settings)
+         *
+         * Options:
+         *
+         * - `prefix` {String} Adds a prefix for the generated signature tags
+         * - `attrs` {Object} A hash of attributes and values `attrName: value` to add to the signature root node
+         * - `location` {{ reference: String, action: String }}
+         *   An object with a `reference` key which should
+         *   contain a XPath expression, an `action` key which
+         *   should contain one of the following values:
+         *   `append`, `prepend`, `before`, `after`
+         *
+         */
+        computeSignature(xml: string, opts: IComputeSignatureOptions = {}) {
+            let doc = new DOMParser().parseFromString(xml, APPLICATION_XML),
+                xmlNsAttr = "xmlns",
+                signatureAttrs: string[] = [],
+                location: ILocation,
+                prefix: string,
+                currentPrefix: string;
+
+            let validActions = ["append", "prepend", "before", "after"];
+
+            opts = opts || {};
+            prefix = opts.prefix;
+            let attrs: IAssocArray = opts.attrs || {};
+            location = <any>opts.location || {};
+            // defaults to the root node
+            location.reference = location.reference || "/*";
+            // defaults to append action
+            location.action = location.action || "append";
+
+            if (validActions.indexOf(location.action) === -1) {
+                throw new Error(`location.action option has an invalid action: ${location.action}, must be any of the following values: ${validActions.join(", ")}`);
+            }
+
+            // automatic insertion of `:`
+            if (prefix) {
+                xmlNsAttr += ":" + prefix;
+                currentPrefix = prefix + ":";
+            } else {
+                currentPrefix = "";
+            }
+
+            Object.keys(attrs).forEach((name) => {
+                if (name !== "xmlns" && name !== xmlNsAttr) {
+                    signatureAttrs.push(`${name}="${attrs[name]}"`);
+                }
+            });
+
+            // add the xml namespace attribute
+            signatureAttrs.push(`${xmlNsAttr}="http://www.w3.org/2000/09/xmldsig#"`);
+
+            this.signatureXml = `<${currentPrefix}Signature ${signatureAttrs.join(" ")}>`;
+
+            let signedInfo = this.createSignedInfo(doc, prefix);
+            this.signatureXml += signedInfo;
+            this.signatureXml += this.createSignature(signedInfo, prefix);
+            this.signatureXml += this.getKeyInfo(prefix);
+            this.signatureXml += `</${currentPrefix}Signature>`;
+
+            this.originalXmlWithIds = doc.toString();
+
+            let signatureDoc = new DOMParser().parseFromString(this.signatureXml, APPLICATION_XML);
+
+            let referenceNode = <Node[]>select(doc, location.reference);
+
+            if (!referenceNode || referenceNode.length === 0) {
+                throw new Error(`the following xpath cannot be used because it was not found: ${location.reference}`);
+            }
+
+            let node = referenceNode[0];
+
+            switch (location.action) {
+                case "append":
+                    node.appendChild(signatureDoc.documentElement);
+                    break;
+                case "prepend":
+                    node.insertBefore(signatureDoc.documentElement, node.firstChild);
+                    break;
+                case "before":
+                    node.parentNode.insertBefore(signatureDoc.documentElement, node);
+                case "after":
+                    node.parentNode.insertBefore(signatureDoc.documentElement, node.nextSibling);
+                    break;
+                default:
+                    throw new TypeError(`Unknnown location action in use '${location.action}'`);
+            }
+
+            this.signedXml = doc.toString();
+        }
+
+        getKeyInfo(prefix: string): string {
+            let res = "";
+
+            let currentPrefix = prefix || "";
+            currentPrefix = currentPrefix ? currentPrefix + ":" : currentPrefix;
+
+            if (this.keyInfoProvider) {
+                res += `<${currentPrefix}KeyInfo>${this.keyInfoProvider.getKeyInfo(this.signingKey, prefix)}</${currentPrefix}KeyInfo>`;
+            }
+            return res;
+        }
+
+        /**
+         * Generate the Reference nodes (as part of the signature process)
+         *
+         */
+        createReferences(doc: Node, prefix: string = ""): string {
+            let res = "";
+
+            prefix = prefix ? prefix + ":" : prefix;
+
+            for (let n in this.references) {
+                if (!this.references.hasOwnProperty(n))
+                    continue;
+
+                let ref = this.references[n],
+                    nodes = <Node[]>select(doc, ref.xpath);
+
+                if (nodes.length === 0) {
+                    throw new Error(`the following xpath cannot be signed because it was not found: ${ref.xpath}`);
+                }
+
+                for (let h in nodes) {
+                    if (!nodes.hasOwnProperty(h))
+                        continue;
+
+                    let node = nodes[h];
+                    if (ref.isEmptyUri) {
+                        res += `<${prefix}Reference URI="">`;
+                    }
+                    else {
+                        let id = this.ensureHasId(<Element>node);
+                        ref.uri = id;
+                        res += `<${prefix}Reference URI="#${id}">`;
+                    }
+                    res += `<${prefix}Transforms>`;
+                    for (let t in ref.transforms) {
+                        if (!ref.transforms.hasOwnProperty(t))
+                            continue;
+
+                        let trans = ref.transforms[t];
+                        let transform = this.findCanonicalizationAlgorithm(trans);
+                        res += `<${prefix}Transform Algorithm="${transform.getAlgorithmName()}"/>`;
+                    }
+
+                    let canonXml = this.getCanonXml(ref.transforms, node);
+
+                    let digestAlgorithm = this.findHashAlgorithm(ref.digestAlgorithm);
+                    res += `</${prefix}Transforms>` +
+                        `<${prefix}DigestMethod Algorithm="${digestAlgorithm.getAlgorithmName()}"/>` +
+                        `<${prefix}DigestValue>${digestAlgorithm.getHash(canonXml)}</${prefix}DigestValue>` +
+                        `</${prefix}Reference>`;
+                }
+            }
+
+            return res;
+        }
+
+        getCanonXml(transforms: Transform[], node: Node, options?: IProcessOptions): string {
+            options = options || {};
+            options.defaultNsForPrefix = options.defaultNsForPrefix || SignedXml.defaultNsForPrefix;
+
+            let canonXml = node;
+
+            for (let transform of transforms) {
+                // if (!transforms.hasOwnProperty(t))
+                //     continue;
+
+                // let transform = this.findCanonicalizationAlgorithm(transforms[t]);
+                canonXml = transform.process(canonXml, options);
+                /**
+                 * TODO: currently transform.process may return either Node or String value (enveloped transformation returns Node, exclusive-canonicalization returns String).
+                 * This eitehr needs to be more explicit in the API, or all should return the same.
+                 * exclusive-canonicalization returns String since it builds the Xml by hand. If it had used xmldom it would inccorectly minimize empty tags
+                 * to <x/> instead of <x></x> and also incorrectly handle some delicate line break issues.
+                 * enveloped transformation returns Node since if it would return String consider this case:
+                 * <x xmlns:p='ns'><p:y/></x>
+                 * if only y is the node to sign then a string would be <p:y/> without the definition of the p namespace. probably xmldom toString() should have added it. 
+                 */
+            }
+            return canonXml.toString();
+        }
+
+        /**
+         * Ensure an element has Id attribute. If not create it with unique value.
+         * Work with both normal and wssecurity Id flavour
+         */
+        ensureHasId(node: Element): string {
+            let attr: Attr;
+
+            if (this.idMode === "wssecurity") {
+                attr = findAttr(node,
+                    "Id",
+                    "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
+            }
+            else {
+                for (let index in this.idAttributes) {
+                    if (!this.idAttributes.hasOwnProperty(index)) continue;
+
+                    attr = findAttr(node, this.idAttributes[index], null);
+                    if (attr) break;
+                }
+            }
+
+            if (attr) return attr.value;
+
+            // add the attribute
+            let id = `_${this.id++}`;
+
+            if (this.idMode === "wssecurity") {
+                node.setAttributeNS("http://www.w3.org/2000/xmlns/",
+                    "xmlns:wsu",
+                    "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
+                node.setAttributeNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
+                    "wsu:Id",
+                    id);
+            }
+            else {
+                node.setAttribute("Id", id);
+            }
+
+            return id;
+        }
+
+        /**
+         * Create the SignedInfo element
+         */
+        createSignedInfo(doc: Node, prefix: string = ""): string {
+            let transform = this.findCanonicalizationAlgorithm(this.CanonicalizationMethod);
+            let algo = this.findSignatureAlgorithm(this.SignatureMethod);
+            let currentPrefix = prefix ? prefix + ":" : prefix;
+
+            let res = `<${currentPrefix}SignedInfo>`;
+            res += `<${currentPrefix}CanonicalizationMethod Algorithm="${transform.getAlgorithmName()}"/>` +
+                `<${currentPrefix}SignatureMethod Algorithm="${algo.getAlgorithmName()}"/>`;
+
+            res += this.createReferences(doc, prefix);
+            res += `</${currentPrefix}SignedInfo>`;
+            return res;
+        }
+
+        /**
+         * Create the Signature element
+         */
+        createSignature(signedInfo: string, prefix: string): string {
+            let xmlNsAttr = "xmlns";
+
+            if (prefix) {
+                xmlNsAttr += `:${prefix}`;
+                prefix += ":";
+            } else {
+                prefix = "";
+            }
+
+            // the canonicalization requires to get a valid xml node.
+            // we need to wrap the info in a dummy signature since it contains the default namespace.
+            let dummySignatureWrapper = `<${prefix}Signature ${xmlNsAttr}="http://www.w3.org/2000/09/xmldsig#">${signedInfo}</${prefix}Signature>`;
+
+            let xml = new DOMParser().parseFromString(dummySignatureWrapper, APPLICATION_XML);
+            // get the signedInfo
+            let node = xml.documentElement.firstChild;
+            let canAlgorithm = this.findCanonicalizationAlgorithm(this.CanonicalizationMethod);
+            let canonizedSignedInfo = canAlgorithm.process(node);
+            let signatureAlgorithm = this.findSignatureAlgorithm(this.SignatureMethod);
+            this.SignatureValue = signatureAlgorithm.getSignature(canonizedSignedInfo, this.key);
+            return `<${prefix}SignatureValue>${this.SignatureValue}</${prefix}SignatureValue>`;
+        }
+
+        // loadSignature(signature: Node): void;
+        // loadSignature(signature: string): void;
+        // loadSignature(signature: Node | string): void {
+        //     let _signature: Node;
+        //     if (typeof signature === "string") {
+        //         this.signatureElement = _signature = new DOMParser().parseFromString(<string>signature, APPLICATION_XML);
+        //     } else {
+        //         this.signatureElement = _signature = <Node>signature;
+        //     }
+
+        //     this.signatureXml = signature.toString();
+
+        //     let nodes: Node[] = <Node[]>select(_signature, ".//*[local-name(.)='CanonicalizationMethod']/@Algorithm");
+        //     if (nodes.length === 0) throw new Error("could not find CanonicalizationMethod/@Algorithm element");
+        //     this.CanonicalizationMethod = nodes[0].nodeValue;
+
+        //     this.SignatureMethod =
+        //         findFirst(_signature, ".//*[local-name(.)='SignatureMethod']/@Algorithm").nodeValue;
+
+        //     this.references = [];
+        //     let references: Node[] = <Node[]>select(_signature, ".//*[local-name(.)='SignedInfo']/*[local-name(.)='Reference']");
+        //     if (references.length === 0)
+        //         throw new Error("could not find any Reference elements");
+
+        //     for (let i in references) {
+        //         if (!references.hasOwnProperty(i))
+        //             continue;
+
+        //         this.loadReference(references[i]);
+        //     }
+
+        //     let signValue = <Text>findFirst(_signature, ".//*[local-name(.)='SignatureValue']/text()");
+        //     this.SignatureValue = signValue.data.replace(/\n/g, "");
+
+        //     this.keyInfo = select(_signature, ".//*[local-name(.)='KeyInfo']")[0] as Element;
+        //     this.key = new KeyInfo();
+        //     this.key.loadXml(this.keyInfo);
+        // }
+
+        /**
+         * loadSignature
+         */
         public loadXml(value: Element): void {
             if (value == null)
                 throw new XmlError(XE.PARAM_REQUIRED, "value");
 
             this.signatureElement = value;
             this.m_signature.loadXml(value);
+            this.signatureXml = value.toString();
             // Need to give the EncryptedXml object to the 
             // XmlDecryptionTransform to give it a fighting 
             // chance at decrypting the document.
-            for (let r of this.m_signature.SignedInfo.References) {
-                for (let t of r.TransformChain) {
-                    if (t instanceof XmlDecryptionTransform)
-                        (<XmlDecryptionTransform>t).EncryptedXml = this.EncryptedXml;
-                }
-            }
+            // for (let r of this.m_signature.SignedInfo.References) {
+            //     for (let t of r.TransformChain) {
+            //         if (t instanceof XmlDecryptionTransform)
+            //             (<XmlDecryptionTransform>t).EncryptedXml = this.EncryptedXml;
+            //     }
+            // }
         }
 
-        public set Resolver(value: XmlResolver) {
-            this.xmlResolver = value;
+
+        getSignatureXml(): string {
+            return this.signatureXml;
         }
+
+        getOriginalXmlWithIds(): string {
+            return this.originalXmlWithIds;
+        }
+
+        getSignedXml(): string {
+            return this.signedXml;
+        }
+
     }
 }

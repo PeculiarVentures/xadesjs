@@ -1,22 +1,10 @@
-// export interface IKeyInfo extends IXmlSerializable {
-//     key: CryptoKey;
-// }
-
-// abstract class KeyValue extends XmlObject implements IXmlSerializable {
-//     key: CryptoKey;
-// }
-
-// export class RsaKeyValue extends KeyValue { }
-// export class EcKeyValue extends KeyValue { }
-// export class X509DataValue extends KeyValue { }
 namespace xadesjs {
-    export class KeyInfo extends XmlObject {
+    export class KeyInfo {
 
         private Info: Array<KeyInfoClause>;
         private id: string;
 
         constructor() {
-            super();
             this.Info = [];
         }
 
@@ -87,34 +75,40 @@ namespace xadesjs {
                                     let m = xnl[j];
                                     switch (m.localName) {
                                         case XmlSignature.ElementNames.DSAKeyValue:
-                                            kic = new DSAKeyValue();
-                                            break;
+                                            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
+                                        // kic = new DSAKeyValue();
+                                        // break;
                                         case XmlSignature.ElementNames.RSAKeyValue:
-                                            kic = <KeyInfoClause>new RSAKeyValue();
-                                            break;
+                                            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
+                                        // kic = <KeyInfoClause>new RSAKeyValue();
+                                        // break;
                                     }
                                 }
                             }
                             break;
                         case XmlSignature.ElementNames.KeyName:
-                            kic = <KeyInfoClause>new KeyInfoName();
-                            break;
+                            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
+                        // kic = <KeyInfoClause>new KeyInfoName();
+                        // break;
                         case XmlSignature.ElementNames.RetrievalMethod:
-                            kic = <KeyInfoClause>new KeyInfoRetrievalMethod();
-                            break;
+                            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
+                        // kic = <KeyInfoClause>new KeyInfoRetrievalMethod();
+                        // break;
                         case XmlSignature.ElementNames.X509Data:
                             kic = <KeyInfoClause>new KeyInfoX509Data();
                             break;
                         case XmlSignature.ElementNames.RSAKeyValue:
-                            kic = <KeyInfoClause>new RSAKeyValue();
-                            break;
+                            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
+                        // kic = <KeyInfoClause>new RSAKeyValue();
+                        // break;
                         case XmlSignature.ElementNames.EncryptedKey:
                             throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
-                            // kic = <KeyInfoClause>new KeyInfoEncryptedKey();
-                            // break;
+                        // kic = <KeyInfoClause>new KeyInfoEncryptedKey();
+                        // break;
                         default:
-                            kic = <KeyInfoClause>new KeyInfoNode();
-                            break;
+                            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
+                        // kic = <KeyInfoClause>new KeyInfoNode();
+                        // break;
                     }
 
                     if (kic != null) {

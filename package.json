@@ -18,7 +18,7 @@
     "ec"
   ],
   "author": "Peculiar Ventures",
-  "license": "ISC",
+  "license": "MID",
   "bugs": {
     "url": "https://github.com/PeculiarVentures/xadesjs/issues"
   },
@@ -27,7 +27,7 @@
     "co": "^4.6.0",
     "node.extend": "^1.1.5",
     "xmldom": "^0.1.22",
-    "xpath": "0.0.22"
+    "xpath.js": "^1.0.6"
   },
   "devDependencies": {
     "express": "^4.13.4"

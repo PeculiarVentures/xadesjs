@@ -1,4 +1,4 @@
-/// <reference path="./crypto_config.ts" />
+/// <reference path="./xml.ts" />
 
 namespace xadesjs {
 
@@ -12,6 +12,7 @@ namespace xadesjs {
         private uri: string;
         private type: string;
         private element: Element;
+        inclusiveNamespacesPrefixList: string;
 
         public constructor(p?: string) {
             super();
@@ -52,7 +53,7 @@ namespace xadesjs {
         get TransformChain(): Transform[] {
             return this.chain;
         }
-        set TransformChain(value:  Transform[]) {
+        set TransformChain(value: Transform[]) {
             this.chain = value;
         }
 
@@ -174,8 +175,17 @@ namespace xadesjs {
                     if (xn.childNodes.length > 0) {
                         t.LoadInnerXml(xn.childNodes);
                     }
+                    // ***workaround for validating windows mobile store signatures - it uses c14n but does not state it in the transforms
+                    // if (transforms.length === 1 && transforms[0] === "http://www.w3.org/2000/09/xmldsig#enveloped-signature")
+                    //     transforms.push("http://www.w3.org/2001/10/xml-exc-c14n#");
                     this.AddTransform(t);
+
                 }
+                // let inclusiveNamespaces = <Element[]>select(xn, "//*[local-name(.)='InclusiveNamespaces']");
+                // if (inclusiveNamespaces.length > 0) {
+                //     let t = inclusiveNamespaces[0];
+                //     inclusiveNamespacesPrefixList = inclusiveNamespaces[0].getAttribute("PrefixList");
+                // }
             }
             // get DigestMethod
             this.DigestMethod = XmlSignature.GetAttributeFromElement(value, XmlSignature.AttributeNames.Algorithm, XmlSignature.ElementNames.DigestMethod);

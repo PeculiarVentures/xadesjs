@@ -10,16 +10,54 @@ namespace xadesjs {
         ProcessingInstruction = 7,   // For example, <?pi test?>
         Comment = 8,
         Document = 9,               // A document object that, as the root of the document tree,
-                                    // provides access to the entire XML document.        
+        // provides access to the entire XML document.        
         DocumentType = 10,          // For example, <!DOCTYPE...>
         DocumentFragment = 11,
         Notation = 12,              // A For example, <!NOTATION...>        
         Whitespace = 13,            // White space between markup.        
         SignificantWhitespace = 14, // White space between markup in a mixed content model 
-                                    // or white space within the xml:space="preserve" scope.
+        // or white space within the xml:space="preserve" scope.
         EndElement = 15,            // An end element tag (for example, </item> ).
         EndEntity = 16,             // Returned when XmlReader gets to the end of the entity 
-                                    // replacement as a result of a call to XmlReader.ResolveEntity()
+        // replacement as a result of a call to XmlReader.ResolveEntity()
         XmlDeclaration = 17,        // for example, <?xml version='1.0'?>
+    }
+
+    export interface IXmlSerializable {
+        /**
+         * Writes object to XML node
+         * @returns Node
+         */
+        getXml(): Node;
+        /**
+         * Reads XML from string
+         * @param  {Node} node
+         * @returns void
+         */
+        loadXml(node: Node): void;
+        /**
+         * Reads XML from Node
+         * @param  {Node} node
+         * @returns void
+         */
+        loadXml(node: Node): void;
+    }
+
+    export abstract class XmlObject implements IXmlSerializable {
+        getXml(): Node;
+        getXml(document: Document): Node;
+        getXml(document: Document = null): Node {
+            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
+        }
+
+        loadXml(node: Node): void {
+            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
+        }
+
+        toString(): string {
+            let xml = this.getXml();
+            return new XMLSerializer().serializeToString(xml);
+        }
+
     }
 }

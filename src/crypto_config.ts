@@ -1,5 +1,3 @@
-/// <reference path="./xml_transform_enveloped_signature.ts" />
-
 namespace xadesjs {
     export class CryptoConfig {
         static CreateFromName(name: string): Transform {
@@ -25,6 +23,9 @@ namespace xadesjs {
                     break;
                 case XmlSignature.AlgorithmNamespaces.XmlDsigExcC14NTransform:
                     t = new XmlDsigExcC14NTransform();
+                    break;
+                case XmlSignature.AlgorithmNamespaces.XmlDsigExcC14NWithCommentsTransform:
+                    t = new XmlDsigExcC14NWithCommentsTransform();
                     break;
                 case XmlSignature.AlgorithmNamespaces.XmlDecryptionTransform:
                     t = new XmlDecryptionTransform();

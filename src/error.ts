@@ -1,5 +1,3 @@
-/// <reference path="./error_str.ts" />
-
 namespace xadesjs {
 
     function printf(text: string, ...args: any[]) {
@@ -51,6 +49,7 @@ namespace xadesjs {
         CONVERTER_UNSUPPORTED,
         ELEMENT_MALFORMED,
         CRYPTOGRAPHIC,
+        CRYPTOGRAPHIC_NO_MODULE,
         CRYPTOGRAPHIC_UNKNOWN_TRANSFORM,
         ALGORITHM_NOT_SUPPORTED,
         XML_EXCEPTION,
@@ -69,6 +68,7 @@ namespace xadesjs {
     xes[XE.CONVERTER_UNSUPPORTED] = "Converter is not supported";
     xes[XE.ELEMENT_MALFORMED] = "Malformed element '%1'";
     xes[XE.CRYPTOGRAPHIC] = "Cryptogrphic error: %1";
+    xes[XE.CRYPTOGRAPHIC_NO_MODULE] = "WebCrypto module is not found";
     xes[XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM] = "Unknown transform %1";
     xes[XE.ALGORITHM_NOT_SUPPORTED] = "Algorithm is not supported '%1'";
     xes[XE.XML_EXCEPTION] = "XML exception: %1";

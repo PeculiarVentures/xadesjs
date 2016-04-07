@@ -11,9 +11,6 @@
     "xmldom/xmldom.d.ts": {
       "commit": "a44529fcb1e1cdc0355e71c42a6048de99b57c34"
     },
-    "xpath/xpath.d.ts": {
-      "commit": "a44529fcb1e1cdc0355e71c42a6048de99b57c34"
-    },
     "mocha/mocha.d.ts": {
       "commit": "a44529fcb1e1cdc0355e71c42a6048de99b57c34"
     },

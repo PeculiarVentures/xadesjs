@@ -53,20 +53,7 @@ namespace xadesjs {
         // 2. test for root using the Mono.Security.X509.X509Certificate class;
         // 3. add the certificates as X509Certificate instances;
         private AddCertificatesChainFrom(cert: X509Certificate, root: boolean): void {
-            let chain = new X509Chain();
-            chain.Build(new X509Certificate2(cert));
-            for (let ce of chain.ChainElements) {
-                let rawdata = ce.Certificate.RawData;
-                if (!root) {
-                    // exclude root
-                    Mono.Security.X509.X509Certificate mx = new Mono.Security.X509.X509Certificate(rawdata);
-                    if (mx.IsSelfSigned)
-                        rawdata = null;
-                }
-
-                if (rawdata != null)
-                    this.AddCertificate(new X509Certificate(rawdata));
-            }
+            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
         }
 
         public get Certificates(): X509Certificate[] {

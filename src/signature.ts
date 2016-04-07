@@ -1,16 +1,6 @@
-// export class Signature extends XmlObject {
-//     id: string;
-//     keyInfo: IKeyInfo;
-//     objectList: any;
-//     signatureValue: ArrayBuffer;
-//     signedInfo: SignedInfo;
+/// <reference path="./xml.ts" />
 
-//     addObject(dataObject: DataObject): void {
-//         throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
-//     }
-// }
 namespace xadesjs {
-
     export class Signature extends XmlObject {
 
         private list: Array<DataObject>;
@@ -183,6 +173,7 @@ namespace xadesjs {
             return -1;
         }
     }
+
     export const XmlSignature = {
 
         ElementNames: {
@@ -272,6 +263,5 @@ namespace xadesjs {
             return al;
         }
     };
+
 }
-
-

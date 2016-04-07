@@ -4,10 +4,29 @@
         "target": "es5",
         "noImplicitAny": true,
         "sourceMap": false,
-        "rootDir": "src",
         "outFile": "built/xades.js"
     },
-    "exclude": [
-        "node_modules"
+    "files": [
+        "src/common.ts",   
+        "src/error.ts" ,  
+        "src/application.ts" ,  
+        "src/xml.ts" ,  
+        "src/utils.ts" ,  
+        "src/convert.ts" ,  
+        "src/algorithm.ts" ,  
+        "src/algorithm/rsa_hash.ts" ,  
+        "src/algorithm/rsa_sign.ts" ,  
+        "src/key/x509_certificate.ts" ,  
+        "src/key/x509_data.ts" ,  
+        "src/transforms/transform.ts" ,  
+        "src/transforms/enveloped_signature.ts" ,  
+        "src/transforms/exe_c14n.ts" ,  
+        "src/crypto_config.ts" ,  
+        "src/reference.ts" ,  
+        "src/key_info.ts" ,  
+        "src/signature.ts" ,  
+        "src/signed_info.ts" ,  
+        "src/signed_xml.ts",  
+        "src/export.ts"  
     ]
 }

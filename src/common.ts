@@ -1,6 +1,6 @@
 /// <reference path="../typings/xmldom/xmldom.d.ts" />
-/// <reference path="../typings/xpath/xpath.d.ts" />
-/// <reference path="./promise.d.ts" />
+/// <reference path="./typings/promise.d.ts" />
+/// <reference path="./typings/xpath.d.ts" />
 
 let XMLSerializer = XMLSerializer || require("xmldom").XMLSerializer;
 let DOMParser = DOMParser || require("xmldom").DOMParser;
@@ -24,6 +24,4 @@ if (!org) {
     org = merge(true, pkijs_1, x509schema).org;
 }
 
-let xpath: any = xpath || require("xpath");
-
-/// <reference path="./error.ts" />
+let select: SelectNodes = (typeof module === "undefined") ? SelectNodes : require("xpath.js");
