@@ -25,8 +25,12 @@ describe("xadesjs", function() {
         })
     }
 
-    it("Verify EXEC C14N RSA-SHA1", function(done) {
+    it("Verify valid-signature.xml EXEC-C14N RSA-SHA1", function(done) {
         verifyXML("valid-signature.xml", done)
+    })
+    
+    it("Verify valid_signature_utf8.xml EXEC-C14N RSA-SHA256", function(done) {
+        verifyXML("valid_signature_utf8.xml", done)
     })
     
     it("Verify SAML EXEC C14N RSA-SHA1", function(done) {

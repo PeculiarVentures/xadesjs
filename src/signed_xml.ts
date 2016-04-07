@@ -488,7 +488,9 @@ namespace xadesjs {
                 //     continue;
 
                 // let transform = this.findCanonicalizationAlgorithm(transforms[t]);
-                canonXml = transform.process(canonXml, options);
+                if (typeof canonXml === "string")
+                    canonXml = new DOMParser().parseFromString(canonXml as any, APPLICATION_XML);
+                return transform.process(canonXml, options);
                 /**
                  * TODO: currently transform.process may return either Node or String value (enveloped transformation returns Node, exclusive-canonicalization returns String).
                  * This eitehr needs to be more explicit in the API, or all should return the same.
