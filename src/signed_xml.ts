@@ -3,7 +3,7 @@
 
 namespace xadesjs {
 
-    const APPLICATION_XML = "application/xml";
+    export const APPLICATION_XML = "application/xml";
 
     interface IKeyInfoProvider {
         getKeyInfo(key: string, prefix?: string): string;
@@ -294,8 +294,9 @@ namespace xadesjs {
                     }
 
                     if (elem.length === 0) {
-                        this.validationErrors.push(`invalid signature: the signature refernces an element with uri ${ref.Uri} but could not find such element in the xml`);
-                        return false;
+                        let err_text = `invalid signature: the signature refernces an element with uri ${ref.Uri} but could not find such element in the xml`;
+                        this.validationErrors.push(err_text);
+                        throw new XmlError(XE.CRYPTOGRAPHIC, err_text);
                     }
                     let canonXml = this.getCanonXml(ref.TransformChain, elem[0], { inclusiveNamespacesPrefixList: ref.inclusiveNamespacesPrefixList });
 
@@ -305,8 +306,9 @@ namespace xadesjs {
                     })
                         .then((digest: Uint8Array) => {
                             if (Convert.FromBufferString(digest) !== Convert.FromBufferString(ref.DigestValue)) {
-                                this.validationErrors.push(`invalid signature: for uri ${ref.Uri} calculated digest is ${digest} but the xml to validate supplies digest ${ref.DigestValue}`);
-                                throw new XmlError(XE.CRYPTOGRAPHIC, "Wrong hash value");
+                                let err_text = `invalid signature: for uri ${ref.Uri} calculated digest is ${digest} but the xml to validate supplies digest ${ref.DigestValue}`;
+                                this.validationErrors.push(err_text);
+                                throw new XmlError(XE.CRYPTOGRAPHIC, err_text);
                             }
                             return Promise.resolve();
                         });
@@ -488,9 +490,7 @@ namespace xadesjs {
                 //     continue;
 
                 // let transform = this.findCanonicalizationAlgorithm(transforms[t]);
-                if (typeof canonXml === "string")
-                    canonXml = new DOMParser().parseFromString(canonXml as any, APPLICATION_XML);
-                return transform.process(canonXml, options);
+                canonXml = transform.process(canonXml, options) as any;
                 /**
                  * TODO: currently transform.process may return either Node or String value (enveloped transformation returns Node, exclusive-canonicalization returns String).
                  * This eitehr needs to be more explicit in the API, or all should return the same.
@@ -501,7 +501,9 @@ namespace xadesjs {
                  * if only y is the node to sign then a string would be <p:y/> without the definition of the p namespace. probably xmldom toString() should have added it. 
                  */
             }
-            return canonXml.toString();
+            if (typeof canonXml === "object")
+                return new XMLSerializer().serializeToString(canonXml);
+            return canonXml as any;
         }
 
         /**

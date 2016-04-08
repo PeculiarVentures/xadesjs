@@ -5,7 +5,7 @@ namespace xadesjs {
             console.log("XADESJS:XmlDsigEnvelopedSignatureTransform: Process", node.nodeName);
             let signature = select(node, ".//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
             if (signature) signature.parentNode.removeChild(signature);
-            return new XMLSerializer().serializeToString(node);
+            return node as any;
         };
 
         getAlgorithmName(): string {

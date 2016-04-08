@@ -28,8 +28,51 @@
     </script>
     <!--Test-->
     <script src="test/test.js"></script>
+    <script src="test/c14n.js"></script>
     <script>
-        mocha.run();
+        var debug = false;
+        if (!debug)
+            mocha.run();
+        else {
+            function done(e){
+                console.log("Done", e);
+            }
+            
+            // function verifyXML(name, done) {
+            //     readXml("./test/static/"+name, function(xml) {
+            //         var signature = select(xml, "//*//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
+            //         var sig = new xadesjs.SignedXml();
+            //         sig.loadXml(signature);
+            //         sig.checkSignature(xml)
+            //             .then(function(v) {
+            //                 assert.equal(v, true, "Wrong signature verifing");
+            //                 done();
+            //             })
+            //             .catch(done);
+            //     })
+            // }
+            
+            // verifyXML("saml_external_ns.xml", done);
+            
+            function compare(xml, xpath, expected, inclusiveNamespacesPrefixList, done) {
+                var doc = new DOMParser().parseFromString(xml, "application/xml")
+                var elem = select(doc, xpath)[0]
+                var can = new xadesjs.XmlDsigExcC14NWithCommentsTransform();
+                var result = can.process(elem, { inclusiveNamespacesPrefixList: inclusiveNamespacesPrefixList }).toString()
+
+                assert.equal(result, expected);
+                done()
+            }
+
+
+        compare(
+            "<root xmlns=\"foo\"><child><inner xmlns=\"\">123</inner></child></root>",
+            "//*[local-name(.)='child']",
+            "<child xmlns=\"foo\"><inner xmlns=\"\">123</inner></child>",
+            null,
+            done)
+
+        }
     </script>
 </body>
 

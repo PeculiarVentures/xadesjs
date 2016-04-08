@@ -25,7 +25,7 @@ namespace xadesjs {
 
     export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorithm {
         getHash(xml: string): Promise {
-            return Application.crypto.subtle.digest(this.algorithm, Convert.ToBufferString(xml));
+            return Application.crypto.subtle.digest(this.algorithm, Convert.ToBufferUtf8String(xml));
         }
     }
 
@@ -50,7 +50,7 @@ namespace xadesjs {
         * Verify the given signature of the given string using key
         */
         verifySignature(signedInfo: string, key: CryptoKey, signatureValue: string): Promise {
-            return Application.crypto.subtle.verify(this.algorithm, key, Convert.ToBufferString(signatureValue), Convert.ToBufferString(signedInfo));
+            return Application.crypto.subtle.verify(this.algorithm, key, Convert.ToBufferString(signatureValue), Convert.ToBufferUtf8String(signedInfo));
         }
     }
 

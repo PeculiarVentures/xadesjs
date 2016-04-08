@@ -74,7 +74,7 @@ namespace xadesjs {
             else if (defaultNs !== currNs) {
                 // new default ns
                 newDefaultNs = node.namespaceURI;
-                res.push(` xmlns="${newDefaultNs}"`);
+                res.push(` xmlns="${newDefaultNs ? newDefaultNs : ""}"`);
             }
 
             // handle the attributes namespace
@@ -121,7 +121,7 @@ namespace xadesjs {
 
             if (node.nodeType === 8)
                 return this.renderComment(node);
-            if ("data" in node) // Text
+            if ((node as any).data) // Text
                 return encodeSpecialCharactersInText((<Text>node).data);
 
             let _node = <Element>node;

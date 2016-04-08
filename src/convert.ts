@@ -1,4 +1,9 @@
 namespace xadesjs {
+
+    declare let unescape: any;
+    declare let escape: any;
+    declare let Buffer: any;
+
     export class Convert {
         static ToBase64UrlString(text: string): string {
             return this.ToBase64String(text).replace(/\+/g, "-").replace(/\//g, "_").replace(/\=/g, "");
@@ -29,6 +34,20 @@ namespace xadesjs {
             else {
                 throw new XmlError(XE.CONVERTER_UNSUPPORTED);
             }
+        }
+
+        static ToBufferUtf8String(text: string): Uint8Array {
+            let s = unescape(encodeURIComponent(text)),
+                uintArray = new Uint8Array(s.length);
+            for (let i = 0; i < s.length; i++) {
+                uintArray[i] = s.charCodeAt(i);
+            }
+            return uintArray;
+        }
+        static FromBufferUtf8String(buffer: Uint8Array): string {
+            let encodedString = String.fromCharCode.apply(null, buffer),
+                decodedString = decodeURIComponent(escape(atob(encodedString)));
+            return decodedString;
         }
         static ToBufferString(text: string): Uint8Array {
             let stringLength = text.length;
