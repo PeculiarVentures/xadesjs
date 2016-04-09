@@ -20,7 +20,7 @@
         "src/key/x509_data.ts" ,  
         "src/transforms/transform.ts" ,  
         "src/transforms/enveloped_signature.ts" ,  
-        "src/transforms/exe_c14n.ts" ,  
+        "src/transforms/exc_c14n.ts" ,  
         "src/crypto_config.ts" ,  
         "src/reference.ts" ,  
         "src/key_info.ts" ,  

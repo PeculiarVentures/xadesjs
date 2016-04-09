@@ -118,7 +118,6 @@ namespace xadesjs {
         };
 
         processInner(node: Node, prefixesInScope: string[], defaultNs: string, defaultNsForPrefix: IAssocArray, inclusiveNamespacesPrefixList: string[]) {
-
             if (node.nodeType === 8)
                 return this.renderComment(node);
             if ((node as any).data) // Text
