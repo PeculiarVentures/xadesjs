@@ -5,33 +5,6 @@ namespace xadesjs {
 
     export const APPLICATION_XML = "application/xml";
 
-    interface IKeyInfoProvider {
-        getKeyInfo(key: string, prefix?: string): string;
-        getKey(keyInfo: any): Buffer;
-    }
-
-    /**
-     * A key info provider implementation
-     *
-     */
-    export class FileKeyInfo implements IKeyInfoProvider {
-        file: string;
-
-        constructor(file: string) {
-            this.file = file;
-        }
-
-        getKeyInfo(key: any, prefix: string = ""): string {
-            prefix = prefix ? prefix + ":" : prefix;
-            return "<" + prefix + "X509Data></" + prefix + "X509Data>";
-        }
-
-        getKey(keyInfo: any): Buffer {
-            return fs.readFileSync(this.file);
-        }
-
-    }
-
     interface ISignedXmlOptions {
         signatureAlgorithm?: string;
         idAttribute?: string;

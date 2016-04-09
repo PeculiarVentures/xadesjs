@@ -59,5 +59,9 @@ describe("xadesjs", function() {
     it("Verify valid_signature_with_root_level_sig_namespace.xml", function(done) {
         verifyXML("valid_signature_with_root_level_sig_namespace.xml", done)
     })
+    
+    it("test validating WS-Fed Metadata", function(done) {
+        verifyXML("wsfederation_metadata.xml", done)
+    })
 
 })

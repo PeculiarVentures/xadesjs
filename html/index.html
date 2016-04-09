@@ -28,15 +28,16 @@
     </script>
     <!--Test-->
     <script src="test/test.js"></script>
-    <script src="test/c14n.js"></script>
+    <script src="test/exc-c14n.js"></script>
     <script>
         var debug = false;
         if (!debug)
             mocha.run();
         else {
-            function done(e){
-                console.log("Done", e);
-            }
+            // ================================ Verify signature =====================================
+            // function done(e){
+            //     console.log("Done", e);
+            // }
             
             // function verifyXML(name, done) {
             //     readXml("./test/static/"+name, function(xml) {
@@ -52,25 +53,46 @@
             //     })
             // }
             
-            // verifyXML("saml_external_ns.xml", done);
+            // verifyXML("valid_signature_with_reference_keyInfo.xml", done);
             
-            function compare(xml, xpath, expected, inclusiveNamespacesPrefixList, done) {
-                var doc = new DOMParser().parseFromString(xml, "application/xml")
-                var elem = select(doc, xpath)[0]
-                var can = new xadesjs.XmlDsigExcC14NWithCommentsTransform();
-                var result = can.process(elem, { inclusiveNamespacesPrefixList: inclusiveNamespacesPrefixList }).toString()
+            // ================================ create signature =====================================
+            
+            var xml = "<library>" +
+                "<book>" +
+                  "<name>Harry Potter</name>" +
+                "</book>" +
+              "</library>"
 
-                assert.equal(result, expected);
-                done()
-            }
+            var sig = new SignedXml()
+            sig.addReference("//*[local-name(.)='book']")    
+            sig.signingKey = fs.readFileSync("./test/static/client.pem")
+            sig.computeSignature(xml)      
+            
+            var signed = sig.getSignedXml();
+            console.log(signed);
+            
+            var doc = new Dom().parseFromString(signed);
+            
+            
+            // ================================ exc-c14n =====================================
+
+        //     function compare(xml, xpath, expected, inclusiveNamespacesPrefixList, done) {
+        //         var doc = new DOMParser().parseFromString(xml, "application/xml")
+        //         var elem = select(doc, xpath)[0]
+        //         var can = new xadesjs.XmlDsigExcC14NWithCommentsTransform();
+        //         var result = can.process(elem, { inclusiveNamespacesPrefixList: inclusiveNamespacesPrefixList }).toString()
+
+        //         assert.equal(result, expected);
+        //         done()
+        //     }
 
 
-        compare(
-            "<root xmlns=\"foo\"><child><inner xmlns=\"\">123</inner></child></root>",
-            "//*[local-name(.)='child']",
-            "<child xmlns=\"foo\"><inner xmlns=\"\">123</inner></child>",
-            null,
-            done)
+        // compare(
+        //     "<root xmlns=\"foo\"><child><inner xmlns=\"\">123</inner></child></root>",
+        //     "//*[local-name(.)='child']",
+        //     "<child xmlns=\"foo\"><inner xmlns=\"\">123</inner></child>",
+        //     null,
+        //     done)
 
         }
     </script>
