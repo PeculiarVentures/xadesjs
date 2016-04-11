@@ -25,6 +25,15 @@ They differ slightly based on what is included in the signature:
 
 - Variants in **BOLD** are currently supported by XAdESjs
  
+## Algorithm Support 
+
+|                   | SHA1 | SHA2-256 | SHA2-384 | SHA2-512 |
+|-------------------|------|----------|----------|----------|
+| RSASSA-PKCS1-v1_5 | X    | X        | X        | X        |
+| RSA-PSS           | X    | X        | X        | X        |
+| ECDSA             | X    | X        | X        | X        |
+
+ 
 ## WARNING
 
 **Using XMLDSIG is a bit like running with scissors, that said it is needed for interopability with a number of systems, for this reason we have done this implementation.** 
