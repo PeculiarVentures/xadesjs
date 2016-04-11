@@ -25,7 +25,7 @@ They differ slightly based on what is included in the signature:
 
 - Variants in **BOLD** are currently supported by XAdESjs
  
-## Algorithm Support 
+## ALGORITHM SUPPORT 
 
 |                   | SHA1 | SHA2-256 | SHA2-384 | SHA2-512 |
 |-------------------|------|----------|----------|----------|
