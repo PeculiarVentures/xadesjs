@@ -11,7 +11,8 @@ namespace xadesjs {
         public constructor() {
             super();
             this.references = new Array();
-            this.c14nMethod = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
+            // this.c14nMethod = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
+            this.c14nMethod = "http://www.w3.org/2001/10/xml-exc-c14n#";
         }
 
         get CanonicalizationMethod(): string {
@@ -108,21 +109,23 @@ namespace xadesjs {
             if (this.references.length === 0)
                 throw new XmlError(XE.CRYPTOGRAPHIC, "References empty");
 
-            let doc = document.implementation.createDocument("", "", null);
-            let xel = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.SignedInfo);
+            let prefix = this.GetPrefix();
+
+            let doc = CreateDocument();
+            let xel = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.SignedInfo);
             if (this.id != null)
                 xel.setAttribute(XmlSignature.AttributeNames.Id, this.id);
 
             if (this.c14nMethod != null) {
-                let c14n = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.CanonicalizationMethod);
+                let c14n = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.CanonicalizationMethod);
                 c14n.setAttribute(XmlSignature.AttributeNames.Algorithm, this.c14nMethod);
                 xel.appendChild(c14n);
             }
             if (this.signatureMethod != null) {
-                let sm = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.SignatureMethod);
+                let sm = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.SignatureMethod);
                 sm.setAttribute(XmlSignature.AttributeNames.Algorithm, this.signatureMethod);
                 if (this.signatureLength != null) {
-                    let hmac = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.HMACOutputLength);
+                    let hmac = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.HMACOutputLength);
                     hmac.textContent = this.signatureLength;
                     sm.appendChild(hmac);
                 }
@@ -137,6 +140,7 @@ namespace xadesjs {
             // xmlns="..." in each reference elements.
             for (let i in this.references) {
                 let r = this.references[i];
+                r.Prefix = this.Prefix;
                 let xn = r.getXml();
                 let newNode = doc.importNode(xn, true);
                 xel.appendChild(newNode);

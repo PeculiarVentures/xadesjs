@@ -3,7 +3,7 @@ namespace xadesjs {
     const RSA_SIGN_ALGORITHM = "RSASSA-PKCS1-v1_5";
     const RSA_HMAC_ALGORITHM = "HMAC";
 
-    export class RSASHA1 extends SignatureAlgorithm {
+    export class RsaSha1 extends SignatureAlgorithm {
         algorithm: any = {
             name: RSA_SIGN_ALGORITHM,
             hash: {
@@ -13,7 +13,7 @@ namespace xadesjs {
         xmlNamespace = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
     }
 
-    export class RSASHA224 extends SignatureAlgorithm {
+    export class RsaSha224 extends SignatureAlgorithm {
         algorithm: any = {
             name: RSA_SIGN_ALGORITHM,
             hash: {
@@ -23,7 +23,7 @@ namespace xadesjs {
         xmlNamespace = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha224";
     }
 
-    export class RSASHA256 extends SignatureAlgorithm {
+    export class RsaSha256 extends SignatureAlgorithm {
         algorithm: any = {
             name: RSA_SIGN_ALGORITHM,
             hash: {
@@ -33,7 +33,7 @@ namespace xadesjs {
         xmlNamespace = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
     }
 
-    export class RSASHA384 extends SignatureAlgorithm {
+    export class RsaSha384 extends SignatureAlgorithm {
         algorithm: any = {
             name: RSA_SIGN_ALGORITHM,
             hash: {
@@ -43,7 +43,7 @@ namespace xadesjs {
         xmlNamespace = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384";
     }
 
-    export class RSASHA512 extends SignatureAlgorithm {
+    export class RsaSha512 extends SignatureAlgorithm {
         algorithm: any = {
             name: RSA_SIGN_ALGORITHM,
             hash: {

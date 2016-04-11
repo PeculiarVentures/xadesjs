@@ -52,6 +52,7 @@ namespace xadesjs {
         CRYPTOGRAPHIC_NO_MODULE,
         CRYPTOGRAPHIC_UNKNOWN_TRANSFORM,
         ALGORITHM_NOT_SUPPORTED,
+        ALGORITHM_WRONG_NAME,
         XML_EXCEPTION,
     }
 
@@ -71,5 +72,6 @@ namespace xadesjs {
     xes[XE.CRYPTOGRAPHIC_NO_MODULE] = "WebCrypto module is not found";
     xes[XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM] = "Unknown transform %1";
     xes[XE.ALGORITHM_NOT_SUPPORTED] = "Algorithm is not supported '%1'";
+    xes[XE.ALGORITHM_WRONG_NAME] = "Algorith wrong name in use '%1'";
     xes[XE.XML_EXCEPTION] = "XML exception: %1";
 }

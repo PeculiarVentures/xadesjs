@@ -24,6 +24,8 @@ namespace xadesjs {
     }
 
     export interface IXmlSerializable {
+
+        Prefix: string;
         /**
          * Writes object to XML node
          * @returns Node
@@ -35,15 +37,23 @@ namespace xadesjs {
          * @returns void
          */
         loadXml(node: Node): void;
-        /**
-         * Reads XML from Node
-         * @param  {Node} node
-         * @returns void
-         */
-        loadXml(node: Node): void;
     }
 
     export abstract class XmlObject implements IXmlSerializable {
+
+        protected m_prefix = "";
+
+        get Prefix(): string {
+            return this.m_prefix;
+        }
+        set Prefix(value: string) {
+            this.m_prefix = value;
+        }
+
+        protected GetPrefix(): string {
+            return (this.Prefix) ? this.m_prefix + ":" : "";
+        }
+
         getXml(): Node;
         getXml(document: Document): Node;
         getXml(document: Document = null): Node {

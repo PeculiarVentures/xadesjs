@@ -1,5 +1,5 @@
 namespace xadesjs {
-    export class XmlDsigExcC14NTransform implements Transform {
+    export class XmlDsigExcC14NTransform extends AbstractTransform {
         protected includeComments = false;
 
         attrCompare(a: Node, b: Node): number {
@@ -123,14 +123,14 @@ namespace xadesjs {
             if ((node as any).data) // Text
                 return encodeSpecialCharactersInText((<Text>node).data);
 
-            let _node = <Element>node;
+            let _node: Element = (node as Document).documentElement ? (node as Document).documentElement : node as Element  ;
 
             let ns = this.renderNs(node, prefixesInScope, defaultNs, defaultNsForPrefix, inclusiveNamespacesPrefixList),
                 res = ["<", _node.tagName, ns.rendered, this.renderAttrs(node, ns.newDefaultNs), ">"];
 
-            for (let i = 0; i < node.childNodes.length; ++i) {
+            for (let i = 0; i < _node.childNodes.length; ++i) {
                 let pfxCopy = prefixesInScope.slice(0);
-                res.push(this.processInner(node.childNodes[i], pfxCopy, ns.newDefaultNs, defaultNsForPrefix, inclusiveNamespacesPrefixList));
+                res.push(this.processInner(_node.childNodes[i], pfxCopy, ns.newDefaultNs, defaultNsForPrefix, inclusiveNamespacesPrefixList));
             }
 
             res.push("</", _node.tagName, ">");

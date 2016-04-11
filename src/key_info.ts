@@ -1,10 +1,11 @@
 namespace xadesjs {
-    export class KeyInfo {
+    export class KeyInfo extends XmlObject {
 
         private Info: Array<KeyInfoClause>;
         private id: string;
 
         constructor() {
+            super();
             this.Info = [];
         }
 
@@ -39,12 +40,14 @@ namespace xadesjs {
         }
 
         getXml(): Node {
-            let doc = document.implementation.createDocument("", "", null);
-            let xel = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.KeyInfo);
+            let doc = CreateDocument();
+            let prefix = this.GetPrefix();
+            let xel = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.KeyInfo);
             // we add References afterward so we don't end up with extraneous
             // xmlns="..." in each reference elements.
             for (let i in this.Info) {
                 let kic = this.Info[i];
+                kic.Prefix = this.Prefix;
                 let xn = kic.getXml();
                 let newNode = doc.importNode(xn, true);
                 xel.appendChild(newNode);
@@ -71,17 +74,17 @@ namespace xadesjs {
                             let xnl = n.childNodes;
                             if (xnl.length > 0) {
                                 // we must now treat the whitespace !
-                                for (let j = 1; j < xnl.length; j++) {
+                                for (let j = 0; j < xnl.length; j++) {
                                     let m = xnl[j];
                                     switch (m.localName) {
-                                        case XmlSignature.ElementNames.DSAKeyValue:
-                                            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
-                                        // kic = new DSAKeyValue();
-                                        // break;
+                                        case XmlSignature.ElementNames.ECKeyValue:
+                                            kic = new EcdsaKeyValue();
+                                            n = m;
+                                            break;
                                         case XmlSignature.ElementNames.RSAKeyValue:
-                                            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
-                                        // kic = <KeyInfoClause>new RSAKeyValue();
-                                        // break;
+                                            kic = new RsaKeyValue();
+                                            n = m;
+                                            break;
                                     }
                                 }
                             }
@@ -95,12 +98,11 @@ namespace xadesjs {
                         // kic = <KeyInfoClause>new KeyInfoRetrievalMethod();
                         // break;
                         case XmlSignature.ElementNames.X509Data:
-                            kic = <KeyInfoClause>new KeyInfoX509Data();
+                            kic = new KeyInfoX509Data();
                             break;
                         case XmlSignature.ElementNames.RSAKeyValue:
-                            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
-                        // kic = <KeyInfoClause>new RSAKeyValue();
-                        // break;
+                            kic = new RsaKeyValue();
+                            break;
                         case XmlSignature.ElementNames.EncryptedKey:
                             throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
                         // kic = <KeyInfoClause>new KeyInfoEncryptedKey();
@@ -122,6 +124,9 @@ namespace xadesjs {
     }
 
     export interface KeyInfoClause extends IXmlSerializable {
+        Key: CryptoKey;
+        importKey(key: CryptoKey): Promise;
+        exportKey(alg: Algorithm): Promise;
     }
 
 }

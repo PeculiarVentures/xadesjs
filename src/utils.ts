@@ -1,5 +1,43 @@
 namespace xadesjs {
 
+    export const DEFAULT_ROOT_NAME = "xadesjs_root";
+
+    /**
+     * Creates new instance of XmlDocument with given name of root element
+     * @param  {string} root Name of root element
+     * @param  {string} namespaceUri
+     * @param  {string} prefix
+     * @returns Document
+     */
+    export function CreateDocument(root: string = DEFAULT_ROOT_NAME, namespaceUri: string = XmlSignature.NamespaceURI, prefix: string = XmlSignature.Prefix): Document {
+        let name_prefix = "",
+            ns_prefix = "",
+            namespace_uri = "";
+        // if (prefix) {
+        //     name_prefix = prefix + ":";
+        //     ns_prefix = ":" + prefix;
+        // }
+        // if (namespaceUri) {
+        //     namespace_uri = ` xmlns${ns_prefix}="${namespaceUri}"`;
+        // }
+        let name = `${name_prefix}${root}`;
+        let doc = new DOMParser().parseFromString(`<${name}${namespace_uri}></${name}>`, APPLICATION_XML);
+        return doc;
+    }
+
+    /**
+     * Returns signle Node from given Node
+     * @param  {Node} node 
+     * @param  {string} path
+     * @returns Node
+     */
+    export function SelectSingleNode(node: Node, path: string): Node {
+        let ns = select(node, path);
+        if (ns && ns.length > 0)
+            return ns[0];
+        return null;
+    }
+
     export type ISelectResult = Array<Node> | Node | boolean | number | string;
 
     export function findAttr(node: Node, localName: string, nameSpace?: string): Attr {

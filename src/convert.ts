@@ -9,7 +9,7 @@ namespace xadesjs {
             return this.ToBase64String(text).replace(/\+/g, "-").replace(/\//g, "_").replace(/\=/g, "");
         }
         static FromBase64UrlString(base64UrlText: string): string {
-            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
+            return this.FromBase64String(this.Base64UrlToBase64(base64UrlText));
         }
         static ToBase64String(text: string): string {
             if (typeof btoa !== "undefined") {
@@ -34,6 +34,22 @@ namespace xadesjs {
             else {
                 throw new XmlError(XE.CONVERTER_UNSUPPORTED);
             }
+        }
+
+        protected static Base64Padding(base64: string): string {
+            let padCount = 4 - (base64.length % 4);
+            if (padCount < 4)
+                for (let i = 0; i < padCount; i++)
+                    base64 += "=";
+            return base64;
+        }
+
+        static Base64UrlToBase64(base64url: string): string {
+            return this.Base64Padding(base64url.replace(/\-/g, "+").replace(/\_/g, "/"));
+        }
+
+        static Base64ToBase64Url(base64: string): string {
+            return base64.replace(/\+/g, "-").replace(/\//g, "_"));
         }
 
         static ToBufferUtf8String(text: string): Uint8Array {

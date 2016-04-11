@@ -71,21 +71,25 @@ namespace xadesjs {
             if (document == null)
                 document = document.implementation.createDocument("", "", null);
 
-            let xel = document.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.Signature);
+            let prefix = this.GetPrefix();
+
+            let xel = document.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.Signature);
             if (this.id != null)
                 xel.setAttribute(XmlSignature.AttributeNames.Id, this.id);
 
+            this.info.Prefix = this.Prefix;
             let xn = this.info.getXml();
             let newNode = document.importNode(xn, true);
             xel.appendChild(newNode);
 
             if (this.signature != null) {
-                let sv = document.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.SignatureValue);
+                let sv = document.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.SignatureValue);
                 sv.textContent = Convert.ToBase64String(Convert.FromBufferString(this.signature));
                 xel.appendChild(sv);
             }
 
             if (this.key != null) {
+                this.key.Prefix = this.Prefix;
                 xn = this.key.getXml();
                 newNode = document.importNode(xn, true);
                 xel.appendChild(newNode);
@@ -94,6 +98,7 @@ namespace xadesjs {
             if (this.list.length > 0) {
                 for (let i in this.list) {
                     let obj = this.list[i];
+                    obj.Prefix = this.Prefix;
                     xn = obj.getXml();
                     newNode = document.importNode(xn, true);
                     xel.appendChild(newNode);
@@ -187,11 +192,16 @@ namespace xadesjs {
             KeyInfo: "KeyInfo",
             KeyName: "KeyName",
             KeyValue: "KeyValue",
+            Modulus: "Modulus",
+            Exponent: "Exponent",
             Manifest: "Manifest",
             Object: "Object",
             Reference: "Reference",
             RetrievalMethod: "RetrievalMethod",
             RSAKeyValue: "RSAKeyValue",
+            ECKeyValue: "ECKeyValue",
+            NamedCurve: "NamedCurve",
+            PublicKey: "PublicKey",
             Signature: "Signature",
             SignatureMethod: "SignatureMethod",
             SignatureValue: "SignatureValue",

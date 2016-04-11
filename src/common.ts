@@ -24,4 +24,15 @@ if (!org) {
     org = merge(true, pkijs_1, x509schema).org;
 }
 
-let select: SelectNodes = (typeof module === "undefined") ? SelectNodes : require("xpath.js");
+function SelectNodesEx(node: Node, xpath: string): Node[] {
+    let doc: Document = node.ownerDocument == null ? node as Document : node.ownerDocument;
+    let nsResolver = document.createNSResolver(node.ownerDocument == null ? (node as Document).documentElement : node.ownerDocument.documentElement);
+    let personIterator = doc.evaluate(xpath, node, nsResolver, XPathResult.ANY_TYPE, null);
+    let ns: Node[] = [];
+    let n: Node;
+    while (n = personIterator.iterateNext())
+        ns.push(n);
+    return ns;
+}
+
+let select: SelectNodes = (typeof module === "undefined") ? SelectNodesEx : require("xpath.js");

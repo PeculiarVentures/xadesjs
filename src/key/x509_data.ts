@@ -12,7 +12,7 @@ namespace xadesjs {
         serialNumber: string;
     }
 
-    export class KeyInfoX509Data implements KeyInfoClause {
+    export class KeyInfoX509Data extends XmlObject implements KeyInfoClause {
 
         private x509crl: Uint8Array;
         private IssuerSerialList: X509IssuerSerial[];
@@ -24,6 +24,7 @@ namespace xadesjs {
         public constructor(rgbCert: Uint8Array);
         public constructor(cert: X509Certificate);
         public constructor(cert?: any, includeOptions?: X509IncludeOption) {
+            super();
             if (cert) {
                 if (cert instanceof Uint8Array)
                     this.AddCertificate(new X509Certificate(cert));

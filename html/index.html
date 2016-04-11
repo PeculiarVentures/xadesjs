@@ -15,7 +15,7 @@
     <div id="fixtures"></div>
     <script src="src/mocha.js"></script>
     <!--Lib-->
-    <script type="text/javascript" src="../node_modules/xpath.js/xpath.js"></script>
+    <!--<script type="text/javascript" src="../node_modules/xpath.js/xpath.js"></script>-->
     <script type="text/javascript" src="../node_modules/asn1js/org/pkijs/common.js"></script>
     <script type="text/javascript" src="../node_modules/asn1js/org/pkijs/asn1.js"></script>
     <script type="text/javascript" src="../node_modules/pkijs/org/pkijs/x509_schema.js"></script>
@@ -27,51 +27,56 @@
         mocha.setup('bdd')
     </script>
     <!--Test-->
-    <script src="test/test.js"></script>
+    <script src="test/signed-xml.js"></script>
     <script src="test/exc-c14n.js"></script>
+    <script src="test/test.js"></script>
     <script>
         var debug = false;
         if (!debug)
             mocha.run();
         else {
             // ================================ Verify signature =====================================
-            // function done(e){
-            //     console.log("Done", e);
-            // }
+            function done(e){
+                console.log("Done", e);
+            }
             
-            // function verifyXML(name, done) {
-            //     readXml("./test/static/"+name, function(xml) {
-            //         var signature = select(xml, "//*//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
-            //         var sig = new xadesjs.SignedXml();
-            //         sig.loadXml(signature);
-            //         sig.checkSignature(xml)
-            //             .then(function(v) {
-            //                 assert.equal(v, true, "Wrong signature verifing");
-            //                 done();
-            //             })
-            //             .catch(done);
-            //     })
-            // }
+            function verifyXML(name, done) {
+                readXml("./test/static/"+name, function(xml) {
+                    var signature = select(xml, "//*//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
+                    var sig = new xadesjs.SignedXml();
+                    sig.loadXml(signature);
+                    sig.checkSignature(xml)
+                        .then(function(v) {
+                            console.log("Sig checked");
+                            assert.equal(v, true, "Wrong signature verifing");
+                            done();
+                        })
+                        .catch(function(e){
+                            console.error(e);
+                        });
+                })
+            }
             
-            // verifyXML("valid_signature_with_reference_keyInfo.xml", done);
+            // verifyXML("valid_signature.xml", done);
+            verifyXML("test.xml", done);
             
             // ================================ create signature =====================================
             
-            var xml = "<library>" +
-                "<book>" +
-                  "<name>Harry Potter</name>" +
-                "</book>" +
-              "</library>"
+            // var xml = "<library>" +
+            //     "<book>" +
+            //       "<name>Harry Potter</name>" +
+            //     "</book>" +
+            //   "</library>"
 
-            var sig = new SignedXml()
-            sig.addReference("//*[local-name(.)='book']")    
-            sig.signingKey = fs.readFileSync("./test/static/client.pem")
-            sig.computeSignature(xml)      
+            // var sig = new SignedXml()
+            // sig.addReference("//*[local-name(.)='book']")    
+            // sig.signingKey = 
+            // sig.computeSignature(xml)      
             
-            var signed = sig.getSignedXml();
-            console.log(signed);
+            // var signed = sig.getSignedXml();
+            // console.log(signed);
             
-            var doc = new Dom().parseFromString(signed);
+            // var doc = new Dom().parseFromString(signed);
             
             
             // ================================ exc-c14n =====================================
@@ -93,6 +98,77 @@
         //     "<child xmlns=\"foo\"><inner xmlns=\"\">123</inner></child>",
         //     null,
         //     done)
+        
+            // ============================== Signing ===========================================
+            var privateKey, publicKey; 
+            xadesjs.Application.crypto.subtle.generateKey(
+                // {
+                //     name: "RSASSA-PKCS1-v1_5",
+                //     hash: { name: "SHA-1" },
+                //     publicExponent: new Uint8Array([1, 0, 1]),
+                //     modulusLength: 2048
+                // },
+                {
+                    name: "ECDSA",
+                    hash: { name: "SHA-256" },
+                    namedCurve: "P-256"
+                },
+                false,
+                ["sign", "verify"]
+            )
+                .then(function(keyPair) {
+                    privateKey = keyPair.privateKey;
+                    publicKey = keyPair.publicKey;
+                    return SignXml();
+                })
+                .then(function(){
+                    
+                })
+                .catch(function(e) {
+                    throw e;
+                });
+            
+            function SignXml(){
+                return new Promise(function(resolve, reject){
+                    var xmlStr = "<root><first/><second/></root>"
+                    var xmlDoc = new DOMParser().parseFromString(xmlStr, "application/xml");
+                    var signedXml = new xadesjs.SignedXml(xmlDoc);
+
+                    // Add the key to the SignedXml document.
+                    signedXml.SigningKey = privateKey;
+
+                    // Create a reference to be signed.
+                    let reference = new xadesjs.Reference();
+                    reference.Uri = "";
+
+                    // Add an enveloped transformation to the reference.
+                    reference.AddTransform(new xadesjs.XmlDsigEnvelopedSignatureTransform());
+                    reference.AddTransform(new xadesjs.XmlDsigExcC14NTransform());
+
+                    // Add the reference to the SignedXml object.
+                    signedXml.AddReference(reference);
+                    
+                    // Add KeyInfo
+                    signedXml.KeyInfo = new xadesjs.KeyInfo();
+                    let keyInfoClause = new xadesjs.EcdsaKeyValue();
+                    signedXml.KeyInfo.AddClause(keyInfoClause);
+
+                    // Compute the signature.
+                    signedXml.Prefix = "ds";
+                    signedXml.ComputeSignature({name: "ECDSA", hash: {name: "SHA-256"}})
+                        .then(function(){
+                            return keyInfoClause.importKey(publicKey);
+                        })
+                        .then(function(){
+                            var xmlDigitalSignature = signedXml.getXml();
+                            console.log("Signature", xmlDigitalSignature);
+                            xmlDoc.documentElement.appendChild(xmlDigitalSignature);
+                            console.log("Document", xmlDoc);
+                            return Promise.resolve(xmlDoc);
+                        })
+                        .then(resolve, reject);
+                })
+            }
 
         }
     </script>

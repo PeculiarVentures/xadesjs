@@ -34,25 +34,49 @@ namespace xadesjs {
     /**
     * Xml signature implementation
     */
-    export class SignedXml {
+    export class SignedXml extends XmlObject {
+
+        protected static XmlDsigCanonicalizationUrl = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
+        protected static XmlDsigCanonicalizationWithCommentsUrl = SignedXml.XmlDsigCanonicalizationUrl + "#WithComments";
+        protected static XmlDsigNamespaceUrl = "http://www.w3.org/2000/09/xmldsig#";
+        protected static XmlDsigDSAUrl = SignedXml.XmlDsigNamespaceUrl + "dsa-sha1";
+        protected static XmlDsigHMACSHA1Url = SignedXml.XmlDsigNamespaceUrl + "hmac-sha1";
+        protected static XmlDsigMinimalCanonicalizationUrl = SignedXml.XmlDsigNamespaceUrl + "minimal";
+        protected static XmlDsigRSASHA1Url = SignedXml.XmlDsigNamespaceUrl + "rsa-sha1";
+        protected static XmlDsigSHA1Url = SignedXml.XmlDsigNamespaceUrl + "sha1";
+
+        protected static XmlDecryptionTransformUrl = "http://www.w3.org/2002/07/decrypt#XML";
+        protected static XmlDsigBase64TransformUrl = SignedXml.XmlDsigNamespaceUrl + "base64";
+        protected static XmlDsigC14NTransformUrl = SignedXml.XmlDsigCanonicalizationUrl;
+        protected static XmlDsigC14NWithCommentsTransformUrl = SignedXml.XmlDsigCanonicalizationWithCommentsUrl;
+        protected static XmlDsigEnvelopedSignatureTransformUrl = SignedXml.XmlDsigNamespaceUrl + "enveloped-signature";
+        protected static XmlDsigExcC14NTransformUrl = "http://www.w3.org/2001/10/xml-exc-c14n#";
+        protected static XmlDsigExcC14NWithCommentsTransformUrl = SignedXml.XmlDsigExcC14NTransformUrl + "WithComments";
+        protected static XmlDsigXPathTransformUrl = "http://www.w3.org/TR/1999/REC-xpath-19991116";
+        protected static XmlDsigXsltTransformUrl = "http://www.w3.org/TR/1999/REC-xslt-19991116";
+        protected static XmlLicenseTransformUrl = "urn:mpeg:mpeg21:2003:01-REL-R-NS:licenseTransform";
+
         options: ISignedXmlOptions = {};
         idMode: string;
         references: IReference[] = [];
         id = 0;
         signingKey: string = null;
         // signatureAlgorithm = this.options.signatureAlgorithm || "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
-        keyInfoProvider: IKeyInfoProvider = null;
         // canonicalizationAlgorithm = "http://www.w3.org/2001/10/xml-exc-c14n#";
         signedXml = "";
         signatureXml = "";
-        signatureElement: Node = null;
-        m_signature: Signature = null;
+        protected signatureElement: Node = null;
+        protected m_signature: Signature = null;
+        protected m_signature_algorithm: ISignatureAlgorithm = null;
+        protected envdoc: Document = null;
         // SignatureValue = "";
         originalXmlWithIds = "";
         validationErrors: string[] = [];
         keyInfo: Element = null;
         key: CryptoKey = null;
         idAttributes = ["Id", "ID"];
+
+        private static whitespaceChars = [` `, `\r`, `\n`, `\t`];
 
         get KeyInfo(): KeyInfo {
             if (this.m_signature.KeyInfo == null)
@@ -65,6 +89,15 @@ namespace xadesjs {
 
         get Signature(): Signature {
             return this.m_signature;
+        }
+
+        set Prefix(value: string) {
+            console.log("Change prefix");
+            this.m_prefix = value;
+            this.SignedInfo.Prefix = this.m_prefix;
+        }
+        get Prefix(): string {
+            return this.m_prefix;
         }
 
         get SignatureLength(): number {
@@ -88,22 +121,33 @@ namespace xadesjs {
         }
 
         get SigningKey(): CryptoKey {
+            this.m_signature_algorithm = null;
             return this.key;
         }
         set SigningKey(value: CryptoKey) {
             this.key = value;
         }
 
-
         /**
          * @param {string} idMode. Value of "wssecurity" will create/validate id's with the ws-security namespace
          */
-        constructor(idMode: string, options: ISignedXmlOptions = {}) {
+        constructor();
+        constructor(node: Document);
+        constructor(node: Element);
+        constructor(node?: any) {
+            super();
+            // constructor();
             this.m_signature = new Signature();
             this.m_signature.SignedInfo = new SignedInfo();
-            this.options = options;
-            this.idMode = idMode;
-            if (this.options.idAttribute) this.idAttributes.splice(0, 0, this.options.idAttribute);
+            // this.hashes = new Hashtable(2); // 98% SHA1 for now
+            if (node && (node as Node).nodeType === XmlNodeType.Document) {
+                // constructor(node: Document);
+                this.envdoc = node;
+            }
+            else if (node && (node as Node).nodeType === XmlNodeType.Element) {
+                // constructor(node: Element);
+                this.envdoc = new DOMParser().parseFromString(node.outerHTML, APPLICATION_XML);
+            }
         }
 
         static CanonicalizationAlgorithms: { [index: string]: ICanonicalizationAlgorithmConstructable } = {
@@ -121,11 +165,16 @@ namespace xadesjs {
         };
 
         static SignatureAlgorithms: { [index: string]: ISignatureAlgorithmConstructable } = {
-            "http://www.w3.org/2000/09/xmldsig#rsa-sha1": RSASHA1,
-            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha224": RSASHA224,
-            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256": RSASHA256,
-            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384": RSASHA384,
-            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512": RSASHA512,
+            "http://www.w3.org/2000/09/xmldsig#rsa-sha1": RsaSha1,
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha224": RsaSha224,
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256": RsaSha256,
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384": RsaSha384,
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512": RsaSha512,
+            "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1": EcdsaSha1,
+            "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha224": EcdsaSha224,
+            "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256": EcdsaSha256,
+            "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384": EcdsaSha384,
+            "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512": EcdsaSha512,
             "http://www.w3.org/2000/09/xmldsig#hmac-sha1": HMACSHA1
         };
 
@@ -146,32 +195,20 @@ namespace xadesjs {
                 for (let kic of pkEnumerator) {
                     let key: CryptoKey = null;
 
-                    // if (kic instanceof DSAKeyValue)
-                    //     key = DSA.Create();
-                    // else if (kic instanceof RSAKeyValue)
-                    //     key = RSA.Create();
-
-                    // if (this.key != null) {
-                    //     this.key.FromXmlString(kic.GetXml().InnerXml);
-                    //     return resolve(this.key);
-                    // }
-
-                    if (kic instanceof KeyInfoX509Data) {
+                    if (kic instanceof RsaKeyValue || kic instanceof EcdsaKeyValue) {
+                        let alg = this.findSignatureAlgorithm(this.SignatureMethod);
+                        (kic as RsaKeyValue).exportKey(alg.algorithm)
+                            .then((key: CryptoKey) => {
+                                this.key = key;
+                                return Promise.resolve(key);
+                            })
+                            .then(resolve, reject);
+                    }
+                    else if (kic instanceof KeyInfoX509Data) {
                         let _x509Enumerator = (<KeyInfoX509Data>kic).Certificates;
                         for (let cert of _x509Enumerator) {
-                            let sig_alg = this.Signature.SignedInfo.SignatureMethod;
-                            let alg: any = null;
-                            switch (sig_alg) {
-                                case "http://www.w3.org/2000/09/xmldsig#rsa-sha1":
-                                    alg = { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-1" } };
-                                    break;
-                                case "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256":
-                                    alg = { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-256" } };
-                                    break;
-                                default:
-                                    throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, sig_alg);
-                            }
-                            return cert.exportKey(alg)
+                            let alg = this.findSignatureAlgorithm(this.SignatureMethod);
+                            return cert.exportKey(alg.algorithm)
                                 .then((key: CryptoKey) => {
                                     this.key = key;
                                     resolve(key);
@@ -180,6 +217,186 @@ namespace xadesjs {
                         }
                     }
                 }
+            });
+        }
+
+        AddReference(reference: Reference): void {
+            if (reference == null)
+                throw new XmlError(XE.PARAM_REQUIRED, "reference");
+            this.m_signature.SignedInfo.AddReference(reference);
+        }
+
+        private DigestReferences(): Promise {
+            return new Promise((resolve, reject) => {
+                let promise = Promise.resolve();
+                // we must tell each reference which hash algorithm to use 
+                // before asking for the SignedInfo XML !
+                for (let r of this.m_signature.SignedInfo.References) {
+                    // assume SHA-1 if nothing is specified
+                    if (r.DigestMethod == null)
+                        r.DigestMethod = new SHA1().xmlNamespace;
+                    promise = promise.then(() => {
+                        return this.GetReferenceHash(r, false);
+                    })
+                        .then((hashValue: ArrayBuffer) => {
+                            r.DigestValue = hashValue;
+                            return Promise.resolve();
+                        });
+                }
+                promise.then(resolve, reject);
+            });
+        }
+
+        private FixupNamespaceNodes(src: Element, dst: Element, ignoreDefault: boolean): void {
+            // add namespace nodes
+            let nodes = select(src, "namespace::*");
+            for (let i = 0; i < nodes.length; i++) {
+                let attr = nodes[i];
+                if (attr.LocalName === "xml")
+                    continue;
+                if (ignoreDefault && attr.LocalName === "xmlns")
+                    continue;
+                dst.setAttributeNode(dst.ownerDocument.importNode(attr, true) as Attr);
+            }
+        }
+
+        private GetReferenceHash(r: Reference, check_hmac: boolean): Promise {
+            return new Promise((resolve, reject) => {
+                let doc: Document = null;
+                let s: string = null;
+                if (!r.Uri) { // Empty
+                    doc = this.envdoc;
+                }
+                else {
+                    doc = CreateDocument();
+                    let objectName: string = null;
+
+                    if (r.Uri.indexOf("#xpointer") === 0) {
+                        let uri: string = r.Uri;
+                        SignedXml.whitespaceChars.forEach((c) => {
+                            uri = uri.substring(9).split(c).join("");
+                        });
+                        if (uri.length < 2 || uri[0] !== `(` || uri[uri.length - 1] !== `)`)
+                            // FIXME: how to handle invalid xpointer?
+                            uri = ""; // String.Empty
+                        else
+                            uri = uri.substring(1, uri.length - 2);
+                        if (uri === "/")
+                            doc = this.envdoc;
+                        else if (uri.length > 6 && uri.indexOf(`id(`) === 0 && uri[uri.length - 1] === `)`)
+                            // id('foo'), id("foo")
+                            objectName = uri.substring(4, uri.length - 6);
+                    }
+                    else if (r.Uri[0] === `#`) {
+                        objectName = r.Uri.substring(1);
+                    }
+                    if (objectName != null) {
+                        let found: Element = null;
+                        for (let i in this.m_signature.ObjectList) {
+                            let obj = this.m_signature.ObjectList[i];
+                            if (obj.Id === objectName) {
+                                found = obj.getXml();
+                                found.setAttribute("xmlns", SignedXml.XmlDsigNamespaceUrl);
+                                doc.appendChild(doc.importNode(found, true));
+                                // FIXME: there should be theoretical justification of copying namespace declaration nodes this way.
+                                for (let j = 0; j < found.childNodes.length; j++) {
+                                    let n = found.childNodes[j];
+                                    // Do not copy default namespace as it must be xmldsig namespace for "Object" element.
+                                    if (n.nodeType === XmlNodeType.Element)
+                                        this.FixupNamespaceNodes(n as Element, doc.documentElement, true);
+                                }
+                                break;
+
+                            }
+                        }
+                        if (found == null && this.envdoc != null) {
+                            found = this.GetIdElement(this.envdoc, objectName);
+                            if (found != null) {
+                                doc.appendChild(doc.importNode(found, true));
+                                this.FixupNamespaceNodes(found, doc.documentElement, false);
+                            }
+                        }
+                        if (found == null)
+                            throw new XmlError(XE.CRYPTOGRAPHIC, `Malformed reference object: ${objectName}`);
+                    }
+                }
+
+                if (r.TransformChain.length > 0) {
+                    for (let i in r.TransformChain) {
+                        let t = r.TransformChain[i];
+                        s = t.process(doc);
+                    }
+                }
+                else if (s == null) {
+                    // we must not C14N references from outside the document
+                    // e.g. non-xml documents
+                    if (r.Uri[0] !== `#`) {
+                        s = new XMLSerializer().serializeToString(doc);
+                    }
+                    else {
+                        // apply default C14N transformation
+                        s = new XmlDsigExcC14NTransform().process(doc);
+                    }
+                }
+                let digest = this.findHashAlgorithm(r.DigestMethod);
+                if (digest == null)
+                    resolve(null);
+                else {
+                    if (typeof s === "object")
+                        s = new XMLSerializer().serializeToString(s as any);
+                    digest.getHash(s)
+                        .then(resolve, reject);
+                }
+            });
+        }
+
+        private GetC14NMethod(): Transform {
+            let t = <Transform>CryptoConfig.CreateFromName(this.m_signature.SignedInfo.CanonicalizationMethod);
+            if (t == null)
+                throw new XmlError(XE.CRYPTOGRAPHIC, `Unknown Canonicalization Method ${this.m_signature.SignedInfo.CanonicalizationMethod}`);
+            return t;
+        }
+
+        private SignedInfoTransformed(): string {
+            let t = this.GetC14NMethod();
+
+            let doc = this.SignedInfo.getXml();
+            // TODO: xpath has error on "namespace::*", uncomment after fix it
+            if (this.envdoc != null)
+                for (let attr: Attr of select(this.envdoc.documentElement, "namespace::*")) {
+                    if (attr.localName === "xml")
+                        continue;
+                    if (attr.prefix === doc.documentElement.prefix)
+                        continue;
+                    doc.documentElement.setAttributeNode(doc.importNode(attr, true) as Attr);
+                }
+            return t.process(doc);
+        }
+
+        public ComputeSignature(algorithm: Algorithm): Promise {
+            return new Promise((resolve, reject) => {
+                if (this.key != null) {
+                    let alg = GetSignatureAlgorithm(algorithm);
+                    if (this.m_signature.SignedInfo.SignatureMethod == null)
+                        // required before hashing
+                        this.m_signature.SignedInfo.SignatureMethod = alg.xmlNamespace;
+                    else if (this.m_signature.SignedInfo.SignatureMethod !== alg.xmlNamespace)
+                        throw new XmlError(XE.CRYPTOGRAPHIC, "Specified SignatureAlgorithm is not supported by the signing key.");
+                    this.DigestReferences()
+                        .then(() => {
+                            // let si = this.getCanonXml([this.SignedInfo.CanonicalizationMethodObject], this.SignedInfo.getXml());
+                            let si = this.SignedInfoTransformed();
+                            alg.getSignature(si, this.key)
+                                .then((signature: Uint8Array) => {
+                                    this.m_signature.SignatureValue = signature;
+                                    resolve(signature);
+                                })
+                                .catch(reject);
+                        })
+                        .catch(reject);
+                }
+                else
+                    throw new XmlError(XE.CRYPTOGRAPHIC, "signing key is not specified");
             });
         }
 
@@ -209,7 +426,8 @@ namespace xadesjs {
             let signer: ISignatureAlgorithm;
             let signedInfoCanon: string;
             return new Promise((resolve, reject) => {
-                signedInfoCanon = this.getCanonXml([this.SignedInfo.CanonicalizationMethodObject], this.SignedInfo.getXml());
+                // signedInfoCanon = this.getCanonXml([this.SignedInfo.CanonicalizationMethodObject], this.SignedInfo.getXml());
+                signedInfoCanon = this.SignedInfoTransformed();
                 signer = this.findSignatureAlgorithm(this.SignatureMethod);
                 this.GetPublicKey()
                     .then((key: CryptoKey) => {
@@ -291,167 +509,6 @@ namespace xadesjs {
             });
         }
 
-        /**
-         * Compute the signature of the given xml (usign the already defined settings)
-         *
-         * Options:
-         *
-         * - `prefix` {String} Adds a prefix for the generated signature tags
-         * - `attrs` {Object} A hash of attributes and values `attrName: value` to add to the signature root node
-         * - `location` {{ reference: String, action: String }}
-         *   An object with a `reference` key which should
-         *   contain a XPath expression, an `action` key which
-         *   should contain one of the following values:
-         *   `append`, `prepend`, `before`, `after`
-         *
-         */
-        computeSignature(xml: string, opts: IComputeSignatureOptions = {}) {
-            let doc = new DOMParser().parseFromString(xml, APPLICATION_XML),
-                xmlNsAttr = "xmlns",
-                signatureAttrs: string[] = [],
-                location: ILocation,
-                prefix: string,
-                currentPrefix: string;
-
-            let validActions = ["append", "prepend", "before", "after"];
-
-            opts = opts || {};
-            prefix = opts.prefix;
-            let attrs: IAssocArray = opts.attrs || {};
-            location = <any>opts.location || {};
-            // defaults to the root node
-            location.reference = location.reference || "/*";
-            // defaults to append action
-            location.action = location.action || "append";
-
-            if (validActions.indexOf(location.action) === -1) {
-                throw new Error(`location.action option has an invalid action: ${location.action}, must be any of the following values: ${validActions.join(", ")}`);
-            }
-
-            // automatic insertion of `:`
-            if (prefix) {
-                xmlNsAttr += ":" + prefix;
-                currentPrefix = prefix + ":";
-            } else {
-                currentPrefix = "";
-            }
-
-            Object.keys(attrs).forEach((name) => {
-                if (name !== "xmlns" && name !== xmlNsAttr) {
-                    signatureAttrs.push(`${name}="${attrs[name]}"`);
-                }
-            });
-
-            // add the xml namespace attribute
-            signatureAttrs.push(`${xmlNsAttr}="http://www.w3.org/2000/09/xmldsig#"`);
-
-            this.signatureXml = `<${currentPrefix}Signature ${signatureAttrs.join(" ")}>`;
-
-            let signedInfo = this.createSignedInfo(doc, prefix);
-            this.signatureXml += signedInfo;
-            this.signatureXml += this.createSignature(signedInfo, prefix);
-            this.signatureXml += this.getKeyInfo(prefix);
-            this.signatureXml += `</${currentPrefix}Signature>`;
-
-            this.originalXmlWithIds = doc.toString();
-
-            let signatureDoc = new DOMParser().parseFromString(this.signatureXml, APPLICATION_XML);
-
-            let referenceNode = <Node[]>select(doc, location.reference);
-
-            if (!referenceNode || referenceNode.length === 0) {
-                throw new Error(`the following xpath cannot be used because it was not found: ${location.reference}`);
-            }
-
-            let node = referenceNode[0];
-
-            switch (location.action) {
-                case "append":
-                    node.appendChild(signatureDoc.documentElement);
-                    break;
-                case "prepend":
-                    node.insertBefore(signatureDoc.documentElement, node.firstChild);
-                    break;
-                case "before":
-                    node.parentNode.insertBefore(signatureDoc.documentElement, node);
-                case "after":
-                    node.parentNode.insertBefore(signatureDoc.documentElement, node.nextSibling);
-                    break;
-                default:
-                    throw new TypeError(`Unknnown location action in use '${location.action}'`);
-            }
-
-            this.signedXml = doc.toString();
-        }
-
-        getKeyInfo(prefix: string): string {
-            let res = "";
-
-            let currentPrefix = prefix || "";
-            currentPrefix = currentPrefix ? currentPrefix + ":" : currentPrefix;
-
-            if (this.keyInfoProvider) {
-                res += `<${currentPrefix}KeyInfo>${this.keyInfoProvider.getKeyInfo(this.signingKey, prefix)}</${currentPrefix}KeyInfo>`;
-            }
-            return res;
-        }
-
-        /**
-         * Generate the Reference nodes (as part of the signature process)
-         *
-         */
-        createReferences(doc: Node, prefix: string = ""): string {
-            let res = "";
-
-            prefix = prefix ? prefix + ":" : prefix;
-
-            for (let n in this.references) {
-                if (!this.references.hasOwnProperty(n))
-                    continue;
-
-                let ref = this.references[n],
-                    nodes = <Node[]>select(doc, ref.xpath);
-
-                if (nodes.length === 0) {
-                    throw new Error(`the following xpath cannot be signed because it was not found: ${ref.xpath}`);
-                }
-
-                for (let h in nodes) {
-                    if (!nodes.hasOwnProperty(h))
-                        continue;
-
-                    let node = nodes[h];
-                    if (ref.isEmptyUri) {
-                        res += `<${prefix}Reference URI="">`;
-                    }
-                    else {
-                        let id = this.ensureHasId(<Element>node);
-                        ref.uri = id;
-                        res += `<${prefix}Reference URI="#${id}">`;
-                    }
-                    res += `<${prefix}Transforms>`;
-                    for (let t in ref.transforms) {
-                        if (!ref.transforms.hasOwnProperty(t))
-                            continue;
-
-                        let trans = ref.transforms[t];
-                        let transform = this.findCanonicalizationAlgorithm(trans);
-                        res += `<${prefix}Transform Algorithm="${transform.getAlgorithmName()}"/>`;
-                    }
-
-                    let canonXml = this.getCanonXml(ref.transforms, node);
-
-                    let digestAlgorithm = this.findHashAlgorithm(ref.digestAlgorithm);
-                    res += `</${prefix}Transforms>` +
-                        `<${prefix}DigestMethod Algorithm="${digestAlgorithm.getAlgorithmName()}"/>` +
-                        `<${prefix}DigestValue>${digestAlgorithm.getHash(canonXml)}</${prefix}DigestValue>` +
-                        `</${prefix}Reference>`;
-                }
-            }
-
-            return res;
-        }
-
         getCanonXml(transforms: Transform[], node: Node, options?: IProcessOptions): string {
             options = options || {};
             options.defaultNsForPrefix = options.defaultNsForPrefix || SignedXml.defaultNsForPrefix;
@@ -480,130 +537,6 @@ namespace xadesjs {
         }
 
         /**
-         * Ensure an element has Id attribute. If not create it with unique value.
-         * Work with both normal and wssecurity Id flavour
-         */
-        ensureHasId(node: Element): string {
-            let attr: Attr;
-
-            if (this.idMode === "wssecurity") {
-                attr = findAttr(node,
-                    "Id",
-                    "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
-            }
-            else {
-                for (let index in this.idAttributes) {
-                    if (!this.idAttributes.hasOwnProperty(index)) continue;
-
-                    attr = findAttr(node, this.idAttributes[index], null);
-                    if (attr) break;
-                }
-            }
-
-            if (attr) return attr.value;
-
-            // add the attribute
-            let id = `_${this.id++}`;
-
-            if (this.idMode === "wssecurity") {
-                node.setAttributeNS("http://www.w3.org/2000/xmlns/",
-                    "xmlns:wsu",
-                    "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
-                node.setAttributeNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
-                    "wsu:Id",
-                    id);
-            }
-            else {
-                node.setAttribute("Id", id);
-            }
-
-            return id;
-        }
-
-        /**
-         * Create the SignedInfo element
-         */
-        createSignedInfo(doc: Node, prefix: string = ""): string {
-            let transform = this.findCanonicalizationAlgorithm(this.CanonicalizationMethod);
-            let algo = this.findSignatureAlgorithm(this.SignatureMethod);
-            let currentPrefix = prefix ? prefix + ":" : prefix;
-
-            let res = `<${currentPrefix}SignedInfo>`;
-            res += `<${currentPrefix}CanonicalizationMethod Algorithm="${transform.getAlgorithmName()}"/>` +
-                `<${currentPrefix}SignatureMethod Algorithm="${algo.getAlgorithmName()}"/>`;
-
-            res += this.createReferences(doc, prefix);
-            res += `</${currentPrefix}SignedInfo>`;
-            return res;
-        }
-
-        /**
-         * Create the Signature element
-         */
-        createSignature(signedInfo: string, prefix: string): string {
-            let xmlNsAttr = "xmlns";
-
-            if (prefix) {
-                xmlNsAttr += `:${prefix}`;
-                prefix += ":";
-            } else {
-                prefix = "";
-            }
-
-            // the canonicalization requires to get a valid xml node.
-            // we need to wrap the info in a dummy signature since it contains the default namespace.
-            let dummySignatureWrapper = `<${prefix}Signature ${xmlNsAttr}="http://www.w3.org/2000/09/xmldsig#">${signedInfo}</${prefix}Signature>`;
-
-            let xml = new DOMParser().parseFromString(dummySignatureWrapper, APPLICATION_XML);
-            // get the signedInfo
-            let node = xml.documentElement.firstChild;
-            let canAlgorithm = this.findCanonicalizationAlgorithm(this.CanonicalizationMethod);
-            let canonizedSignedInfo = canAlgorithm.process(node);
-            let signatureAlgorithm = this.findSignatureAlgorithm(this.SignatureMethod);
-            this.SignatureValue = signatureAlgorithm.getSignature(canonizedSignedInfo, this.key);
-            return `<${prefix}SignatureValue>${this.SignatureValue}</${prefix}SignatureValue>`;
-        }
-
-        // loadSignature(signature: Node): void;
-        // loadSignature(signature: string): void;
-        // loadSignature(signature: Node | string): void {
-        //     let _signature: Node;
-        //     if (typeof signature === "string") {
-        //         this.signatureElement = _signature = new DOMParser().parseFromString(<string>signature, APPLICATION_XML);
-        //     } else {
-        //         this.signatureElement = _signature = <Node>signature;
-        //     }
-
-        //     this.signatureXml = signature.toString();
-
-        //     let nodes: Node[] = <Node[]>select(_signature, ".//*[local-name(.)='CanonicalizationMethod']/@Algorithm");
-        //     if (nodes.length === 0) throw new Error("could not find CanonicalizationMethod/@Algorithm element");
-        //     this.CanonicalizationMethod = nodes[0].nodeValue;
-
-        //     this.SignatureMethod =
-        //         findFirst(_signature, ".//*[local-name(.)='SignatureMethod']/@Algorithm").nodeValue;
-
-        //     this.references = [];
-        //     let references: Node[] = <Node[]>select(_signature, ".//*[local-name(.)='SignedInfo']/*[local-name(.)='Reference']");
-        //     if (references.length === 0)
-        //         throw new Error("could not find any Reference elements");
-
-        //     for (let i in references) {
-        //         if (!references.hasOwnProperty(i))
-        //             continue;
-
-        //         this.loadReference(references[i]);
-        //     }
-
-        //     let signValue = <Text>findFirst(_signature, ".//*[local-name(.)='SignatureValue']/text()");
-        //     this.SignatureValue = signValue.data.replace(/\n/g, "");
-
-        //     this.keyInfo = select(_signature, ".//*[local-name(.)='KeyInfo']")[0] as Element;
-        //     this.key = new KeyInfo();
-        //     this.key.loadXml(this.keyInfo);
-        // }
-
-        /**
          * loadSignature
          */
         public loadXml(value: Element): void {
@@ -624,18 +557,83 @@ namespace xadesjs {
             // }
         }
 
+        protected GetIdElement(document: Document, idValue: string): Element {
+            if ((document == null) || (idValue == null))
+                return null;
 
-        getSignatureXml(): string {
-            return this.signatureXml;
+            // this works only if there's a DTD or XSD available to define the ID
+            let xel: Node = document.getElementById(idValue);
+            if (xel == null) {
+                // search an "undefined" ID
+                xel = SelectSingleNode(document, `//*[@Id='${idValue}']`);
+                if (xel == null) {
+                    xel = SelectSingleNode(document, `//*[@ID='${idValue}']`);
+                    if (xel == null) {
+                        xel = SelectSingleNode(document, `//*[@id='${idValue}']`);
+                    }
+                }
+            }
+            return xel as Element;
         }
 
-        getOriginalXmlWithIds(): string {
-            return this.originalXmlWithIds;
+        public getXml(): Element {
+            this.m_signature.Prefix = this.Prefix;
+            return this.m_signature.getXml(this.envdoc);
         }
 
-        getSignedXml(): string {
-            return this.signedXml;
-        }
+    }
 
+    function GetSignatureAlgorithm(algorithm: Algorithm): ISignatureAlgorithm {
+        if (algorithm.name.toUpperCase() === "RSASSA-PKCS1-V1_5") {
+            let hashName: string = (algorithm as any).hash.name;
+            let alg: ISignatureAlgorithm;
+            switch (hashName.toUpperCase()) {
+                case "SHA-1":
+                    alg = new RsaSha1();
+                    break;
+                case "SHA-224":
+                    alg = new RsaSha224();
+                    break;
+                case "SHA-256":
+                    alg = new RsaSha256();
+                    break;
+                case "SHA-384":
+                    alg = new RsaSha384();
+                    break;
+                case "SHA-512":
+                    alg = new RsaSha512();
+                    break;
+                default:
+                    throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
+            }
+            return alg;
+        }
+        else if (algorithm.name.toUpperCase() === "ECDSA") {
+            let hashName: string = (algorithm as any).hash.name;
+            let alg: ISignatureAlgorithm;
+            switch (hashName.toUpperCase()) {
+                case "SHA-1":
+                    alg = new EcdsaSha1();
+                    break;
+                case "SHA-224":
+                    alg = new EcdsaSha224();
+                    break;
+                case "SHA-256":
+                    alg = new EcdsaSha256();
+                    break;
+                case "SHA-384":
+                    alg = new EcdsaSha384();
+                    break;
+                case "SHA-512":
+                    alg = new EcdsaSha512();
+                    break;
+                default:
+                    throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
+            }
+            return alg;
+        }
+        else {
+            throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, algorithm.name);
+        }
     }
 }

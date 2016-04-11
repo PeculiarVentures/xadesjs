@@ -18,7 +18,7 @@ namespace xadesjs {
             super();
             // 
             this.chain = [];
-            this.digestMethod = XmlSignature.NamespaceURI + "sha1";
+            this.digestMethod = "http://www.w3.org/2001/04/xmlenc#sha256";
             if (typeof p === "string") {
                 this.uri = p;
             }
@@ -86,8 +86,10 @@ namespace xadesjs {
             if (this.digestValue == null)
                 throw new XmlError(XE.PARAM_REQUIRED, "DigestValue");
 
-            let doc = document.implementation.createDocument("", "", null);
-            let xel = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.Reference);
+            let prefix = this.GetPrefix();
+
+            let doc = CreateDocument();
+            let xel = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.Reference);
             if (this.id != null)
                 xel.setAttribute(XmlSignature.AttributeNames.Id, this.id);
             if (this.uri != null)
@@ -96,9 +98,10 @@ namespace xadesjs {
                 xel.setAttribute(XmlSignature.AttributeNames.Type, this.type);
 
             if (this.chain.length > 0) {
-                let ts = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.Transforms);
+                let ts = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.Transforms);
                 for (let i in this.chain) {
                     let t = this.chain[i];
+                    t.Prefix = this.Prefix;
                     let xn = t.getXml();
                     let newNode = doc.importNode(xn, true);
                     ts.appendChild(newNode);
@@ -106,11 +109,11 @@ namespace xadesjs {
                 xel.appendChild(ts);
             }
 
-            let dm = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.DigestMethod);
+            let dm = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.DigestMethod);
             dm.setAttribute(XmlSignature.AttributeNames.Algorithm, this.digestMethod);
             xel.appendChild(dm);
 
-            let dv = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.DigestValue);
+            let dv = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.DigestValue);
             dv.textContent = Convert.ToBase64String(Convert.FromBufferString(this.digestValue));
             xel.appendChild(dv);
 

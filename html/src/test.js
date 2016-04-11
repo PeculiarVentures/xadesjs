@@ -57,7 +57,5 @@ function readXml(path, cb) {
     xmlhttp.send(null);
 }
 
-var select = SelectNodes;
-
 console.log("Runing: Browser");
 console.log("WebCrypto: W3");
