@@ -25,13 +25,22 @@ They differ slightly based on what is included in the signature:
 
 - Variants in **BOLD** are currently supported by XAdESjs
  
-## ALGORITHM SUPPORT 
+## CRYPTOGRAPHIC ALGORITHM SUPPORT 
 
 |                   | SHA1 | SHA2-256 | SHA2-384 | SHA2-512 |
 |-------------------|------|----------|----------|----------|
 | RSASSA-PKCS1-v1_5 | X    | X        | X        | X        |
 | RSA-PSS           | X    | X        | X        | X        |
 | ECDSA             | X    | X        | X        | X        |
+
+### CANONICALIZATION ALGOROTHM SUPPORT
+
+- XmlDsigC14NTransform
+- XmlDsigC14NWithCommentsTransform
+- XmlDsigExcC14NTransform
+- XmlDsigExcC14NWithCommentsTransform
+- XmlDsigBase64Transform
+- XmlDsigEnvelopedSignatureTransform
 
  
 ## WARNING
