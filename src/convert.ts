@@ -49,7 +49,7 @@ namespace xadesjs {
         }
 
         static Base64ToBase64Url(base64: string): string {
-            return base64.replace(/\+/g, "-").replace(/\//g, "_"));
+            return base64.replace(/\+/g, "-").replace(/\//g, "_");
         }
 
         static ToBufferUtf8String(text: string): Uint8Array {

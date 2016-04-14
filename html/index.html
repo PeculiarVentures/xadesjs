@@ -27,18 +27,40 @@
         mocha.setup('bdd')
     </script>
     <!--Test-->
-    <script src="test/signed-xml.js"></script>
-    <script src="test/exc-c14n.js"></script>
-    <script src="test/test.js"></script>
+    <!--<script src="test/signed-xml.js"></script>-->
+    <!--<script src="test/exc-c14n.js"></script>-->
+    <script src="test/canon.js"></script>
+    <!--<script src="test/test.js"></script>-->
     <script>
-        var debug = false;
+        var debug = true;
         if (!debug)
             mocha.run();
         else {
             // ================================ Verify signature =====================================
+            
             function done(e){
                 console.log("Done", e);
             }
+            
+            function compare(xml, xpath, C14N, EXCC14N, done) {
+                var doc = new DOMParser().parseFromString(xml, "application/xml")
+                var elem = select(doc, xpath)[0]
+                var XmlC14N = new xadesjs.XmlCanonicalizer(false, false, []);
+                var result1 = XmlC14N.Canonicalize(elem);
+                assert.equal(result1, C14N);
+                var elem = select(doc, xpath)[0]
+                var XmlEXCC14N = new xadesjs.XmlCanonicalizer(false, true, []);
+                var result2 = XmlEXCC14N.Canonicalize(elem);
+                assert.equal(result2, EXCC14N);
+                done()
+            }
+            
+            compare(
+                '<root xmlns="ns1"><child xmlns="ns2"><inner xmlns="ns3">123</inner></child></root>',
+                '//*[local-name(.)="child"]',
+                '<child xmlns="ns2"><inner xmlns="ns3">123</inner></child>',
+                '<child xmlns="ns2"><inner xmlns="ns3">123</inner></child>',
+                done)
             
             function verifyXML(name, done) {
                 readXml("./test/static/"+name, function(xml) {

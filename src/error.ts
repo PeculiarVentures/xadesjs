@@ -30,13 +30,14 @@ namespace xadesjs {
     }
 
     export class XmlError extends Error {
+        stack: any;
         constructor(code: XE, ...args: any[]) {
             super();
             let _code = code;
             arguments[0] = xes[_code];
             let message = printf.apply(this, arguments);
             this.message = `XADESJS${padNum(_code, 4)}: ${message}`;
-            this.stack = (new Error(this.message)).stack;
+            this.stack = (new Error(this.message) as any).stack;
         }
     }
 
