@@ -33,7 +33,7 @@ They differ slightly based on what is included in the signature:
 | RSA-PSS           | X    | X        | X        | X        |
 | ECDSA             | X    | X        | X        | X        |
 
-## CANONICALIZATION ALGOROTHM SUPPORT
+## CANONICALIZATION ALGORITHM SUPPORT
 
 - XmlDsigC14NTransform
 - XmlDsigC14NWithCommentsTransform
