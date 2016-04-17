@@ -203,7 +203,7 @@ namespace xadesjs {
 
         private GetReferenceHash(r: Reference, check_hmac: boolean): Promise {
             return new Promise((resolve, reject) => {
-                let doc: Document = null;
+                let doc: Node = null;
                 let s: string = null;
                 if (!r.Uri) { // Empty
                     doc = this.envdoc;
@@ -238,13 +238,13 @@ namespace xadesjs {
                             if (obj.Id === objectName) {
                                 found = obj.getXml();
                                 found.setAttribute("xmlns", SignedXml.XmlDsigNamespaceUrl);
-                                doc.appendChild(doc.importNode(found, true));
+                                doc.appendChild((doc as Document).importNode(found, true));
                                 // FIXME: there should be theoretical justification of copying namespace declaration nodes this way.
                                 for (let j = 0; j < found.childNodes.length; j++) {
                                     let n = found.childNodes[j];
                                     // Do not copy default namespace as it must be xmldsig namespace for "Object" element.
                                     if (n.nodeType === XmlNodeType.Element)
-                                        this.FixupNamespaceNodes(n as Element, doc.documentElement, true);
+                                        this.FixupNamespaceNodes(n as Element, (doc as Document).documentElement, true);
                                 }
                                 break;
 
@@ -253,8 +253,8 @@ namespace xadesjs {
                         if (found == null && this.envdoc != null) {
                             found = this.GetIdElement(this.envdoc, objectName);
                             if (found != null) {
-                                doc.appendChild(doc.importNode(found, true));
-                                this.FixupNamespaceNodes(found, doc.documentElement, false);
+                                doc = (doc as Document).importNode(found, true);
+                                this.FixupNamespaceNodes(found, doc as Element, false);
                             }
                         }
                         if (found == null)
@@ -272,12 +272,12 @@ namespace xadesjs {
                 else if (s == null) {
                     // we must not C14N references from outside the document
                     // e.g. non-xml documents
-                    if (r.Uri[0] !== `#`) {
+                    if (r.Uri && r.Uri[0] !== `#`) {
                         s = new XMLSerializer().serializeToString(doc);
                     }
                     else {
                         // apply default C14N transformation
-                        let excC14N = new XmlDsigExcC14NTransform();
+                        let excC14N = new XmlDsigC14NTransform();
                         excC14N.LoadInnerXml(doc);
                         s = excC14N.GetOutput();
                     }
@@ -348,6 +348,7 @@ namespace xadesjs {
         CheckSignature(xml: Node): Promise {
             return new Promise((resolve, reject) => {
                 this.validationErrors = [];
+                this.envdoc = xml as Document;
                 // this.signedXml = xml;
 
                 // if (!this.keyInfoProvider) {
@@ -410,35 +411,9 @@ namespace xadesjs {
                 let refs = that.SignedInfo.References;
                 let promise = Promise.resolve();
                 for (let ref of refs) {
-                    // if (!this.references.hasOwnProperty(r)) continue;
-                    // let ref = this.references[r];
 
-                    let uri = ref.Uri[0] === "#" ? ref.Uri.substring(1) : ref.Uri;
-                    let elem: Node[] = [];
-
-                    if (uri === "") {
-                        elem = <Node[]>select(doc, "//*");
-                    }
-                    else {
-                        for (let index in that.idAttributes) {
-                            if (!that.idAttributes.hasOwnProperty(index))
-                                continue;
-
-                            elem = <Node[]>select(doc, `//*[@*[local-name(.)='${this.idAttributes[index]}']='${uri}']`);
-                            if (elem.length > 0) break;
-                        }
-                    }
-
-                    if (elem.length === 0) {
-                        let err_text = `invalid signature: the signature refernces an element with uri ${ref.Uri} but could not find such element in the xml`;
-                        this.validationErrors.push(err_text);
-                        throw new XmlError(XE.CRYPTOGRAPHIC, err_text);
-                    }
-                    let canonXml = this.getCanonXml(ref.TransformChain, elem[0]);
-
-                    let hash = this.findHashAlgorithm(ref.DigestMethod);
                     promise = promise.then(() => {
-                        return hash.getHash(canonXml);
+                        return this.GetReferenceHash(ref, false)
                     })
                         .then((digest: Uint8Array) => {
                             if (Convert.FromBufferString(digest) !== Convert.FromBufferString(ref.DigestValue)) {
