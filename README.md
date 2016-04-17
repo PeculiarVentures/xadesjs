@@ -17,7 +17,6 @@ They differ slightly based on what is included in the signature:
 |------------|----------------------------|----------------------------------|--------------------------------|--------------------------|------------------------------------------|
 | **XAdES-BES**  | Yes                        | No                               | No                             | No                       | No                                       |
 | XAdES-EPES | Yes                        | No                               | No                             | No                       | No                                       |
-
 | **XAdES-T**    | Yes                        | Yes                              | No                             | No                       | No                                       |
 | XAdES-C    | Yes                        | Yes                              | Yes                            | No                       | No                                       |
 | XAdES-X    | Yes                        | Yes                              | Yes                            | No                       | No                                       |
