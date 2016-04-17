@@ -16,7 +16,7 @@ They differ slightly based on what is included in the signature:
 |            | Provides Digital Signature | Includes Cryptographic Timestamp | Includes Revocation References | Includes Revocation Data | Allows Secure Timestamp Countersignature |
 |------------|----------------------------|----------------------------------|--------------------------------|--------------------------|------------------------------------------|
 | **XAdES-BES**  | Yes                        | No                               | No                             | No                       | No                                       |
-| XAdES-EPES | Yes                        | No                               | No                             | No                       | No                                       |
+| **XAdES-EPES** | Yes                        | No                               | No                             | No                       | No                                       |
 | **XAdES-T**    | Yes                        | Yes                              | No                             | No                       | No                                       |
 | XAdES-C    | Yes                        | Yes                              | Yes                            | No                       | No                                       |
 | XAdES-X    | Yes                        | Yes                              | Yes                            | No                       | No                                       |
@@ -82,6 +82,9 @@ sxml.CheckSignature();
 
 ```Javascript
 ```
+
+## THANKS AND ACKNOWLEDGEMENT
+This project takes inspiration (style, approach, design and code) from both the [Mono System.Security.Cryptography.Xml](https://github.com/mono/mono/tree/master/mcs/class/System.Security/System.Security.Cryptography.Xml) implementation as well as [xml-crypto](https://github.com/yaronn/xml-crypto).
 
 ## RELATED
 - [Why XML Security is Broken](https://www.cs.auckland.ac.nz/~pgut001/pubs/xmlsec.txt)
