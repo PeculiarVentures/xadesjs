@@ -1,6 +1,6 @@
 # XAdESjs
 
-[XAdES](https://en.wikipedia.org/wiki/XAdES) is short for "XML Advanced Electronic Signatures"). This library aims to provide a implementation of the associated standards in pure Javascript based on Web Crypto so it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl)).
+[XAdES](https://en.wikipedia.org/wiki/XAdES) is short for "XML Advanced Electronic Signatures". This library aims to provide an implementation of the associated standards in pure Javascript based on Web Crypto so it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl)).
 
 There are seven different profiles of XAdES, they are:
 - Basic Electronic Signature (XAdES-BES)
@@ -24,6 +24,24 @@ They differ slightly based on what is included in the signature:
 | XAdES-A    | Yes                        | Yes                              | Yes                            | Yes                      | Yes                                      |
 
 - Variants in **BOLD** are currently supported by XAdESjs
+ 
+## CRYPTOGRAPHIC ALGORITHM SUPPORT 
+
+|                   | SHA1 | SHA2-256 | SHA2-384 | SHA2-512 |
+|-------------------|------|----------|----------|----------|
+| RSASSA-PKCS1-v1_5 | X    | X        | X        | X        |
+| RSA-PSS           | X    | X        | X        | X        |
+| ECDSA             | X    | X        | X        | X        |
+
+## CANONICALIZATION ALGORITHM SUPPORT
+
+- XmlDsigC14NTransform
+- XmlDsigC14NWithCommentsTransform
+- XmlDsigExcC14NTransform
+- XmlDsigExcC14NWithCommentsTransform
+- XmlDsigBase64Transform
+- XmlDsigEnvelopedSignatureTransform
+
  
 ## WARNING
 
