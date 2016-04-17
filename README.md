@@ -1,6 +1,6 @@
 # XAdESjs
 
-[XAdES](https://en.wikipedia.org/wiki/XAdES) is short for "XML Advanced Electronic Signatures". This library aims to provide an implementation of the associated standards in pure Javascript based on Web Crypto so it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl)).
+[XAdES](https://en.wikipedia.org/wiki/XAdES) is short for "XML Advanced Electronic Signatures", it is a superset of XMLDSIG, which this library also supports. This library aims to provide an implementation XAdES in pure Javascript that uses Web Crypto for cryptographic operations so it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)).
 
 There are seven different profiles of XAdES, they are:
 - Basic Electronic Signature (XAdES-BES)
@@ -17,7 +17,7 @@ They differ slightly based on what is included in the signature:
 |------------|----------------------------|----------------------------------|--------------------------------|--------------------------|------------------------------------------|
 | **XAdES-BES**  | Yes                        | No                               | No                             | No                       | No                                       |
 | XAdES-EPES | Yes                        | No                               | No                             | No                       | No                                       |
-| XAdES-T    | Yes                        | Yes                              | No                             | No                       | No                                       |
+| **XAdES-T**    | Yes                        | Yes                              | No                             | No                       | No                                       |
 | XAdES-C    | Yes                        | Yes                              | Yes                            | No                       | No                                       |
 | XAdES-X    | Yes                        | Yes                              | Yes                            | No                       | No                                       |
 | XAdES-X-L  | Yes                        | Yes                              | Yes                            | Yes                      | No                                       |
