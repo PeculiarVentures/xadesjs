@@ -11,18 +11,25 @@ namespace xadesjs {
         AfterDocElement
     }
 
+    declare type XmlNamespace = {
+        prefix: string;
+        namespace: string;
+    }
+
     export class XmlNamespaceManager {
 
-        items: { [prefix: string]: string } = {};
+        protected items: XmlNamespace[] = [];
 
-        GetNamespaces(node: Node, prefixList: { [prefix: string]: string }): { [prefix: string]: string } {
+        GetNamespaces(node: Node, prefixList: XmlNamespace[]): XmlNamespace[] {
             node = node.nodeType === XmlNodeType.Document ? (node as Document).documentElement : node;
 
             if (node.attributes)
                 for (let i = 0; i < node.attributes.length; i++) {
                     let attribute = node.attributes[i];
-                    if (attribute.prefix === "xmlns")
-                        prefixList[attribute.localName] = attribute.nodeValue;
+                    prefixList.push({
+                        prefix: attribute.localName,
+                        namespace: attribute.nodeValue
+                    });
                 }
             if (node.childNodes)
                 for (let i = 0; i < node.childNodes.length; i++) {
@@ -33,6 +40,10 @@ namespace xadesjs {
             return prefixList;
         }
 
+        AddNamespace(prefix: string, value: string): void {
+            this.items.push({ prefix: prefix, namespace: value });
+        }
+
         constructor(doc?: Node) {
             if (doc) {
                 this.GetNamespaces(doc, this.items);
@@ -40,22 +51,31 @@ namespace xadesjs {
         }
 
         LookupPrefix(ns: string): string {
-            for (let i in this.items)
-                if (this.items[i] === ns)
-                    return i;
+            for (let i in this.items) {
+                let item = this.items[i];
+                if (item.namespace === ns)
+                    return item.prefix;
+            }
             return null;
         }
 
         LookupNamespace(prefix: string): string {
-            return this.items[prefix] || null;
+            for (let i in this.items) {
+                let item = this.items[i];
+                if (item.prefix === prefix)
+                    return item.namespace;
+            }
+            return null;
         }
+
     }
 
     export class XmlCanonicalizer {
         // c14n parameters
         private comments: boolean;
         private exclusive: boolean;
-        inclusiveNamespacesPrefixList: string;
+        protected inclusive: string[] = [];
+        protected inclusiveNamespacesPrefixList: string;
 
         // input/output
         private xnl: Node[];
@@ -69,7 +89,7 @@ namespace xadesjs {
         private propagatedNss: INamespace[];
         private namespaceManager: XmlNamespaceManager;
 
-        public constructor(withComments: boolean, excC14N: boolean, propagatedNamespaces: INamespace[]) {
+        public constructor(withComments: boolean, excC14N: boolean, propagatedNamespaces: INamespace[] = []) {
             this.res = [];
             this.comments = withComments;
             this.exclusive = excC14N;
@@ -105,6 +125,7 @@ namespace xadesjs {
         }
         set InclusiveNamespacesPrefixList(value: string) {
             this.inclusiveNamespacesPrefixList = value;
+            this.inclusive = value.split(" ");
         }
 
         CreateXmlns(n: Node): Attr {
@@ -132,7 +153,7 @@ namespace xadesjs {
                 for (let i = 0; i < n.attributes.length; i++) {
                     let a = n.attributes[i];
                     if (a.namespaceURI === "http://www.w3.org/2000/xmlns/")
-                        nsmgr.items[!a.prefix ? "" : a.localName] = a.nodeValue;
+                        nsmgr.AddNamespace(!a.prefix ? "" : a.localName, a.nodeValue);
                 }
             }
 
@@ -264,7 +285,7 @@ namespace xadesjs {
             this.prevVisibleNamespacesStart = savedPrevVisibleNamespacesStart;
             this.prevVisibleNamespacesEnd = savedPrevVisibleNamespacesEnd;
             if (this.visibleNamespaces.length > savedVisibleNamespacesSize) {
-                this.visibleNamespaces.map((item, index) => {
+                this.visibleNamespaces = this.visibleNamespaces.map((item, index) => {
                     // Remove range
                     if (!(index >= savedVisibleNamespacesSize && index <= this.visibleNamespaces.length - savedVisibleNamespacesSize))
                         return item;
@@ -310,9 +331,10 @@ namespace xadesjs {
                     if (prefix === "xml" && attribute.nodeValue === "http://www.w3.org/XML/1998/namespace")
                         continue;
 
+
                     // make sure that this is an active namespace
                     // for our node
-                    let ns = this.namespaceManager.items[prefix];
+                    let ns = GetNamespaceOfPrefix(node, prefix);
                     if (ns !== attribute.nodeValue)
                         continue;
 
@@ -325,7 +347,7 @@ namespace xadesjs {
 
                     // For exc-c14n, only visibly utilized
                     // namespaces are written.
-                    if (this.exclusive && !this.IsVisiblyUtilized(node as Element, attribute))
+                    if (this.exclusive && !this.IsVisiblyUtilized(node as Element, attribute) && this.IsInclusive(node, prefix))
                         continue;
 
                     // add to the visible namespaces stack
@@ -512,6 +534,10 @@ namespace xadesjs {
             }
         }
 
+        private IsInclusive(node: Node, prefix: string): boolean {
+            return this.inclusive.indexOf(prefix) === -1; // && node.prefix === prefix;
+        }
+
         // determines whether the node is in the node-set or not.
         private IsNodeVisible(node: Node): boolean {
             // if node list is empty then we process whole document
@@ -638,37 +664,24 @@ namespace xadesjs {
     }
 
     function XmlDsigC14NTransformAttributesComparer(x: Node, y: Node): number {
-        // simple cases
-        if (x == y)
-            return 0;
-        else if (x == null)
-            return -1;
-        else if (y == null)
-            return 1;
-        else if (x.prefix === y.prefix)
-            return x.localName.localeCompare(y.localName);
+        if (!x.namespaceURI && y.namespaceURI) { return -1; }
+        if (!y.namespaceURI && x.namespaceURI) { return 1; }
 
-        // Attributes in the default namespace are first
-        // because the default namespace is not applied to
-        // unqualified attributes
-        if (!x.prefix)
-            return -1;
-        else if (!y.prefix)
-            return 1;
+        let left = x.namespaceURI + x.localName;
+        let right = y.namespaceURI + y.localName;
 
-        let ret = x.namespaceURI.localeCompare(y.namespaceURI);
-        if (ret === 0)
-            ret = x.localName.localeCompare(y.localName);
-        return ret;
+        if (left === right) return 0;
+        else if (left < right) return -1;
+        else return 1;
     }
 
     function XmlDsigC14NTransformNamespacesComparer(x: Node, y: Node) {
         // simple cases
         if (x == y)
             return 0;
-        else if (x == null)
+        else if (!x)
             return -1;
-        else if (y == null)
+        else if (!y)
             return 1;
         else if (!x.prefix)
             return -1;
@@ -677,5 +690,27 @@ namespace xadesjs {
 
         return x.localName.localeCompare(y.localName);
     }
+
+    function GetNamespaceOfPrefix(node: Node, prefix: string): string {
+        let _node = node;
+        let nodePrefix = _node.prefix || prefix;
+
+        while (_node) {
+            if (nodePrefix === void 0) nodePrefix = node.prefix || "";
+            if (_node.attributes)
+                for (let i = 0; i < _node.attributes.length; i++) {
+                    let attribute = _node.attributes[i];
+                    let matches = /^(xmlns):?(.*)/.exec(attribute.nodeName);
+                    if (matches && matches[1] === "xmlns")
+                        if (IsEqualsEmptyStrings(matches[2], prefix) &&
+                            (IsEqualsEmptyStrings(matches[2], nodePrefix) || node === _node))
+                            return attribute.nodeValue;
+                }
+            _node = _node.parentNode;
+        }
+        return null;
+    }
+
+
 
 }
