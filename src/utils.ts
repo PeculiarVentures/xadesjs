@@ -5,7 +5,7 @@ namespace xadesjs {
     export function IsEqualsEmptyStrings(s1: string, s2: string): boolean {
         // If values is null or undefined, set valute to ""
         let _s1 = (s1) ? s1 : "";
-        let _s2 = (s1) ? s1 : "";
+        let _s2 = (s2) ? s2 : "";
         return _s1 === _s2;
     }
 
