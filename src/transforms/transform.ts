@@ -1,47 +1,51 @@
 /// <reference path="../common.ts" />
 
 namespace xadesjs {
-    export interface IRenderedNamespace {
-        rendered: string;
-        newDefaultNs: string;
-    }
 
     export interface Transform extends IXmlSerializable {
-        process(node: Node, options?: IProcessOptions): string;
-        getAlgorithmName(): string;
-        LoadInnerXml(nodeList: NodeList): void;
-        GetInnerXml(): Node[];
+        Algorithm: string;
+        LoadInnerXml(node: Node): void;
+        GetInnerXml(): Node;
+        GetOutput(): string;
     }
 
     export interface ICanonicalizationAlgorithmConstructable {
         new (): Transform;
     }
 
-    export abstract class AbstractTransform extends XmlObject implements Transform{
-        process(node: Node, options?: IProcessOptions): string {
+    export abstract class Transform extends XmlObject implements Transform {
+        protected innerXml: Node = null;
+        
+        GetOutput(): string{
             throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
         }
-        getAlgorithmName(): string {
-            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
+
+        LoadInnerXml(node: Node) {
+            if (!node)
+                throw new XmlError(XE.PARAM_REQUIRED, "node");
+            this.innerXml = node;
         }
-        LoadInnerXml(nodeList: NodeList): void {
-            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
+        
+        GetInnerXml(): Node{
+            return this.innerXml;
         }
-        GetInnerXml(): Node[] {
-            return null;
-        }
+        
+        loadXml(value: Node) {
+            if (value == null)
+                throw new XmlError(XE.PARAM_REQUIRED, "value");
+
+            if ((value.localName !== XmlSignature.ElementNames.Transform) || (value.namespaceURI !== XmlSignature.NamespaceURI))
+                throw new XmlError(XE.CRYPTOGRAPHIC, "value");
+                
+            let alg = (value as Element).getAttribute(XmlSignature.AttributeNames.Algorithm)
+            if (this.Algorithm !== alg)
+                throw new XmlError(XE.ALGORITHM_WRONG_NAME, alg);
+        } 
 
         getXml(): Element {
             let document = CreateDocument();
             let xel = document.createElementNS(XmlSignature.NamespaceURI, `${this.GetPrefix()}${XmlSignature.ElementNames.Transform}`);
-            xel.setAttribute(XmlSignature.AttributeNames.Algorithm, this.getAlgorithmName());
-            let xnl = this.GetInnerXml();
-            if (xnl != null) {
-                for (let xn of xnl) {
-                    let importedNode = document.importNode(xn, true);
-                    xel.appendChild(importedNode);
-                }
-            }
+            xel.setAttribute(XmlSignature.AttributeNames.Algorithm, this.Algorithm);
             return xel;
         }
     }

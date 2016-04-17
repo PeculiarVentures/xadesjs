@@ -175,9 +175,9 @@ namespace xadesjs {
                     if (t == null)
                         throw new XmlError(XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, a);
 
-                    if (xn.childNodes.length > 0) {
-                        t.LoadInnerXml(xn.childNodes);
-                    }
+                    // if (xn.childNodes.length > 0) {
+                    //     t.LoadInnerXml(xn.childNodes);
+                    // }
                     // ***workaround for validating windows mobile store signatures - it uses c14n but does not state it in the transforms
                     // if (transforms.length === 1 && transforms[0] === "http://www.w3.org/2000/09/xmldsig#enveloped-signature")
                     //     transforms.push("http://www.w3.org/2001/10/xml-exc-c14n#");

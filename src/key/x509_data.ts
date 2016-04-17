@@ -19,6 +19,7 @@ namespace xadesjs {
         private SubjectKeyIdList: Uint8Array[];
         private SubjectNameList: string[];
         private X509CertificateList: X509Certificate[];
+        private key: CryptoKey = null;
 
         public constructor();
         public constructor(rgbCert: Uint8Array);
@@ -47,6 +48,22 @@ namespace xadesjs {
                     }
                 }
             }
+        }
+
+        get Key(): CryptoKey {
+            return this.key;
+        }
+
+        importKey(key: CryptoKey): Promise {
+            return Promise.reject(new XmlError(XE.METHOD_NOT_SUPPORTED));
+        }
+
+        exportKey(alg: Algorithm): Promise {
+            return new Promise((resolve, reject) => {
+                if (this.Certificates.length)
+                    this.Certificates[0].exportKey(alg)
+                        .then(resolve, reject)
+            })
         }
 
         // this gets complicated because we must:
@@ -124,18 +141,21 @@ namespace xadesjs {
         }
 
         public getXml(): Element {
-            let doc = document.implementation.createDocument("", "", null);
+            let doc = CreateDocument();
             let xel = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.X509Data);
             // FIXME: hack to match MS implementation
             xel.setAttribute("xmlns", XmlSignature.NamespaceURI);
+
+            let prefix = this.GetPrefix();
+
             // <X509IssuerSerial>
             if ((this.IssuerSerialList != null) && (this.IssuerSerialList.length > 0)) {
                 for (let iser of this.IssuerSerialList) {
-                    let isl = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.X509IssuerSerial);
-                    let xin = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.X509IssuerName);
+                    let isl = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509IssuerSerial);
+                    let xin = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509IssuerName);
                     xin.textContent = iser.issuerName;
                     isl.appendChild(xin);
-                    let xsn = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.X509SerialNumber);
+                    let xsn = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SerialNumber);
                     xsn.textContent = iser.serialNumber;
                     isl.appendChild(xsn);
                     xel.appendChild(isl);
@@ -144,7 +164,7 @@ namespace xadesjs {
             // <X509SKI>
             if ((this.SubjectKeyIdList != null) && (this.SubjectKeyIdList.length > 0)) {
                 for (let skid of this.SubjectKeyIdList) {
-                    let ski = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.X509SKI);
+                    let ski = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SKI);
                     ski.textContent = Convert.ToBase64String(Convert.FromBufferString(skid));
                     xel.appendChild(ski);
                 }
@@ -152,7 +172,7 @@ namespace xadesjs {
             // <X509SubjectName>
             if ((this.SubjectNameList != null) && (this.SubjectNameList.length > 0)) {
                 for (let subject of this.SubjectNameList) {
-                    let sn = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.X509SubjectName);
+                    let sn = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SubjectName);
                     sn.textContent = subject;
                     xel.appendChild(sn);
                 }
@@ -160,14 +180,14 @@ namespace xadesjs {
             // <X509Certificate>
             if ((this.X509CertificateList != null) && (this.X509CertificateList.length > 0)) {
                 for (let x509 of this.X509CertificateList) {
-                    let cert = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.X509Certificate);
+                    let cert = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509Certificate);
                     cert.textContent = Convert.ToBase64String(Convert.FromBufferString(<Uint8Array>x509.GetRawCertData()));
                     xel.appendChild(cert);
                 }
             }
             // only one <X509CRL> 
             if (this.x509crl != null) {
-                let crl = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.X509CRL);
+                let crl = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509CRL);
                 crl.textContent = Convert.ToBase64String(Convert.FromBufferString(this.x509crl));
                 xel.appendChild(crl);
             }

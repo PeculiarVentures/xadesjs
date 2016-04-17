@@ -1,5 +1,13 @@
 namespace xadesjs {
-    export class XmlDsigEnvelopedSignatureTransform extends AbstractTransform {
+    export class XmlDsigEnvelopedSignatureTransform extends Transform {
+
+        Algorithm = "http://www.w3.org/2000/09/xmldsig#enveloped-signature";
+
+        GetOutput(): string {
+            let signature = select(this.innerXml, ".//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
+            if (signature) signature.parentNode.removeChild(signature);
+            return new XMLSerializer().serializeToString(this.innerXml);
+        }
 
         process(node: Node): string {
             if (node.nodeType === XmlNodeType.Document)

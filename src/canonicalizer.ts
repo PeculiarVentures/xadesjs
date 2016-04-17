@@ -202,8 +202,15 @@ namespace xadesjs {
             for (let i = 0; i < node.attributes.length; i++) {
                 let attribute = node.attributes[i];
 
-                if (!IsNamespaceNode(attribute))
+                if (!IsNamespaceNode(attribute)) {
+                    if (attribute.prefix && !this.IsNamespaceRendered(attribute.prefix, node.namespaceURI)) {
+                        let ns = { prefix: attribute.prefix, namespace: attribute.namespaceURI };
+                        list.push(ns);
+                        this.visibleNamespaces.push(ns);
+                        visibleNamespacesCount++;
+                    }
                     continue;
+                }
 
                 // get namespace prefix
                 let prefix: string;
@@ -241,7 +248,12 @@ namespace xadesjs {
             // sort nss
             list.sort(XmlDsigC14NTransformNamespacesComparer);
 
+            let prevPrefix: string = "";
             for (let n of list) {
+                if (n.prefix === prevPrefix) {
+                    continue;
+                }
+                prevPrefix = n.prefix
                 this.result.push(" xmlns");
                 if (n.prefix)
                     this.result.push(":" + n.prefix);

@@ -9,10 +9,15 @@ namespace xadesjs {
             this.publicKey = null;
 
             if (rawData) {
+                this.LoadFromRawData(rawData);
                 this.raw = rawData;
-                let asn1 = org.pkijs.fromBER(rawData.buffer);
-                this.cert_simpl = new org.pkijs.simpl.CERT({ schema: asn1.result });
             }
+        }
+
+        protected LoadFromRawData(rawData: Uint8Array) {
+            this.raw = rawData;
+            let asn1 = org.pkijs.fromBER(rawData.buffer);
+            this.cert_simpl = new org.pkijs.simpl.CERT({ schema: asn1.result });
         }
 
         get PublicKey(): CryptoKey {
@@ -65,14 +70,6 @@ namespace xadesjs {
                 Application.crypto.subtle.importKey("jwk", jwk, algorithm, true, ["verify"])
                     .then(resolve, reject);
             });
-        }
-
-        getXml(): Element {
-            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
-        }
-
-        loadXml(value: Element): void {
-            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
         }
     }
 }
