@@ -13,7 +13,7 @@ namespace xadesjs {
         }
 
         GetOutput(): string {
-            return this.xmlCanonicalizer.Canonicalize(this.innerXml)
+            return this.xmlCanonicalizer.Canonicalize(this.innerXml);
         }
 
     };

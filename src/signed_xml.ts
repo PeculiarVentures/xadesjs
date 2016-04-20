@@ -265,11 +265,11 @@ namespace xadesjs {
                 if (r.TransformChain.length > 0) {
                     for (let i in r.TransformChain) {
                         let t = r.TransformChain[i];
-                        t.LoadInnerXml(doc)
+                        t.LoadInnerXml(doc);
                         s = t.GetOutput();
                     }
                     // Apply C14N transform if Reference has only one transform EnvelopdeSignature
-                    if (r.TransformChain.length === 1 && r.TransformChain[0] instanceof XmlDsigEnvelopedSignatureTransform){
+                    if (r.TransformChain.length === 1 && r.TransformChain[0] instanceof XmlDsigEnvelopedSignatureTransform) {
                         let c14n = new XmlDsigC14NTransform();
                         c14n.LoadInnerXml(doc);
                         s = c14n.GetOutput();
@@ -419,7 +419,7 @@ namespace xadesjs {
                 for (let ref of refs) {
 
                     promise = promise.then(() => {
-                        return this.GetReferenceHash(ref, false)
+                        return this.GetReferenceHash(ref, false);
                     })
                         .then((digest: Uint8Array) => {
                             if (Convert.FromBufferString(digest) !== Convert.FromBufferString(ref.DigestValue)) {

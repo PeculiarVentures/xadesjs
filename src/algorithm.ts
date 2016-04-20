@@ -59,6 +59,3 @@ namespace xadesjs {
     }
 
 }
-
-/// <reference path="./algorithm/rsa_hash.ts" />
-/// <reference path="./algorithm/rsa_sign.ts" />

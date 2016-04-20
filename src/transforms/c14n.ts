@@ -6,7 +6,7 @@ namespace xadesjs {
         Algorithm = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
 
         GetOutput(): string {
-            return this.xmlCanonicalizer.Canonicalize(this.innerXml)
+            return this.xmlCanonicalizer.Canonicalize(this.innerXml);
         }
 
     };

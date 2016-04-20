@@ -62,7 +62,7 @@ namespace xadesjs {
             return new Promise((resolve, reject) => {
                 if (this.Certificates.length)
                     this.Certificates[0].exportKey(alg)
-                        .then(resolve, reject)
+                        .then(resolve, reject);
             })
         }
 
