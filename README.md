@@ -40,7 +40,6 @@ They differ slightly based on what is included in the signature:
 - XmlDsigC14NWithCommentsTransform
 - XmlDsigExcC14NTransform
 - XmlDsigExcC14NWithCommentsTransform
-- XmlDsigBase64Transform
 - XmlDsigEnvelopedSignatureTransform
 
  
