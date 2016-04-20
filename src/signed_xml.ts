@@ -27,12 +27,12 @@ namespace xadesjs {
         protected static XmlDsigXsltTransformUrl = "http://www.w3.org/TR/1999/REC-xslt-19991116";
         protected static XmlLicenseTransformUrl = "urn:mpeg:mpeg21:2003:01-REL-R-NS:licenseTransform";
 
-        
+
         protected m_element: Node = null;
         protected m_signature: Signature = null;
         protected m_signature_algorithm: ISignatureAlgorithm = null;
         protected envdoc: Document = null;
-        
+
         protected validationErrors: string[] = [];
         protected key: CryptoKey = null;
         protected idAttributes = ["Id", "ID"];
@@ -190,15 +190,15 @@ namespace xadesjs {
 
         private FixupNamespaceNodes(src: Element, dst: Element, ignoreDefault: boolean): void {
             // add namespace nodes
-            let nodes = select(src, "namespace::*");
-            for (let i = 0; i < nodes.length; i++) {
-                let attr = nodes[i];
-                if (attr.localName === "xml")
-                    continue;
-                if (ignoreDefault && attr.localName === "xmlns")
-                    continue;
-                dst.setAttributeNode(dst.ownerDocument.importNode(attr, true) as Attr);
-            }
+            // let nodes = select(src, "namespace::*");
+            // for (let i = 0; i < nodes.length; i++) {
+            //     let attr = nodes[i];
+            //     if (attr.localName === "xml")
+            //         continue;
+            //     if (ignoreDefault && attr.localName === "xmlns")
+            //         continue;
+            //     dst.setAttributeNode(dst.ownerDocument.importNode(attr, true) as Attr);
+            // }
         }
 
         private GetReferenceHash(r: Reference, check_hmac: boolean): Promise {
@@ -268,6 +268,12 @@ namespace xadesjs {
                         t.LoadInnerXml(doc)
                         s = t.GetOutput();
                     }
+                    // Apply C14N transform if Reference has only one transform EnvelopdeSignature
+                    if (r.TransformChain.length === 1 && r.TransformChain[0] instanceof XmlDsigEnvelopedSignatureTransform){
+                        let c14n = new XmlDsigC14NTransform();
+                        c14n.LoadInnerXml(doc);
+                        s = c14n.GetOutput();
+                    }
                 }
                 else if (s == null) {
                     // we must not C14N references from outside the document
@@ -307,13 +313,13 @@ namespace xadesjs {
             let doc = this.SignedInfo.getXml();
             // TODO: xpath has error on "namespace::*", uncomment after fix it
             if (this.envdoc != null)
-                for (let attr: Attr of select(this.envdoc.documentElement, "namespace::*")) {
-                    if (attr.localName === "xml")
-                        continue;
-                    if (attr.prefix === doc.documentElement.prefix)
-                        continue;
-                    doc.documentElement.setAttributeNode(doc.importNode(attr, true) as Attr);
-                }
+                // for (let attr: Attr of select(this.envdoc.documentElement, "namespace::*")) {
+                //     if (attr.localName === "xml")
+                //         continue;
+                //     if (attr.prefix === doc.documentElement.prefix)
+                //         continue;
+                //     doc.documentElement.setAttributeNode(doc.importNode(attr, true) as Attr);
+                // }
             t.LoadInnerXml(doc);
             return t.GetOutput();
         }
@@ -361,7 +367,7 @@ namespace xadesjs {
 
                 this.ValidateReferences(xml)
                     .then(() => {
-                        console.log("XADESJS: References checked");
+                        // console.log("XADESJS: References checked");
                         return this.validateSignatureValue();
                     })
                     .then(resolve, reject);
@@ -377,7 +383,7 @@ namespace xadesjs {
                 signer = this.findSignatureAlgorithm(this.SignatureMethod);
                 this.GetPublicKey()
                     .then((key: CryptoKey) => {
-                        console.log("XADESJS: Get public key for verification");
+                        // console.log("XADESJS: Get public key for verification");
                         return signer.verifySignature(signedInfoCanon, key, Convert.FromBufferString(this.SignatureValue));
                     })
                     .then(resolve, reject);

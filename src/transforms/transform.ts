@@ -15,8 +15,8 @@ namespace xadesjs {
 
     export abstract class Transform extends XmlObject implements Transform {
         protected innerXml: Node = null;
-        
-        GetOutput(): string{
+
+        GetOutput(): string {
             throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
         }
 
@@ -25,22 +25,22 @@ namespace xadesjs {
                 throw new XmlError(XE.PARAM_REQUIRED, "node");
             this.innerXml = node;
         }
-        
-        GetInnerXml(): Node{
+
+        GetInnerXml(): Node {
             return this.innerXml;
         }
-        
+
         loadXml(value: Node) {
             if (value == null)
                 throw new XmlError(XE.PARAM_REQUIRED, "value");
 
             if ((value.localName !== XmlSignature.ElementNames.Transform) || (value.namespaceURI !== XmlSignature.NamespaceURI))
                 throw new XmlError(XE.CRYPTOGRAPHIC, "value");
-                
-            let alg = (value as Element).getAttribute(XmlSignature.AttributeNames.Algorithm)
+
+            let alg = (value as Element).getAttribute(XmlSignature.AttributeNames.Algorithm);
             if (this.Algorithm !== alg)
                 throw new XmlError(XE.ALGORITHM_WRONG_NAME, alg);
-        } 
+        }
 
         getXml(): Element {
             let document = CreateDocument();

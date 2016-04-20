@@ -17,11 +17,15 @@ namespace xadesjs {
                 throw new XmlError(XE.CRYPTOGRAPHIC_NO_MODULE);
             return _crypto;
         }
+
+        static isNodePlugin(): boolean {
+            return (typeof module !== "undefined");
+        }
     }
 
     // set default w3 WebCrypto
     +function init() {
-        if (typeof window !== "undefined") {
+        if (!Application.isNodePlugin()) {
             Application.setEngine("W3 WebCrypto module", window.crypto);
         }
     } ();

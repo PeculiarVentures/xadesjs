@@ -50,7 +50,11 @@ namespace xadesjs {
         * Verify the given signature of the given string using key
         */
         verifySignature(signedInfo: string, key: CryptoKey, signatureValue: string): Promise {
-            return Application.crypto.subtle.verify(this.algorithm, key, Convert.ToBufferString(signatureValue), Convert.ToBufferUtf8String(signedInfo));
+            let _signatureValue = Convert.ToBufferString(signatureValue);
+            // console.log("SignatureValue:", Convert.ToBase64String(Convert.FromBufferString(_signatureValue)));
+            let _signedInfo = Convert.ToBufferUtf8String(signedInfo);
+            // console.log("SignedInfo:", Convert.FromBufferString(_signedInfo));
+            return Application.crypto.subtle.verify(this.algorithm, key, _signatureValue, _signedInfo);
         }
     }
 

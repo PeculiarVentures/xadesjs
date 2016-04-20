@@ -6,7 +6,8 @@ namespace xadesjs {
         GetOutput(): string {
             let signature = select(this.innerXml, ".//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
             if (signature) signature.parentNode.removeChild(signature);
-            return new XMLSerializer().serializeToString(this.innerXml);
+            let res = new XMLSerializer().serializeToString(this.innerXml); // .replace(/\r/g, "");
+            return res;
         }
 
         process(node: Node): string {

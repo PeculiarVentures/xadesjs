@@ -12,7 +12,7 @@ namespace xadesjs {
             super();
             this.references = new Array();
             // this.c14nMethod = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
-            this.c14nMethod = "http://www.w3.org/2001/10/xml-exc-c14n#";
+            this.c14nMethod = XmlSignature.AlgorithmNamespaces.XmlDsigC14NTransform;
         }
 
         get CanonicalizationMethod(): string {

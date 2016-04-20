@@ -38,7 +38,7 @@ namespace xadesjs {
         }
 
         public Canonicalize(node: Node): string {
-            if (!(node instanceof Node))
+            if (!node)
                 throw new XmlError(XE.CRYPTOGRAPHIC, "Parameter 1 is not Node");
             let _node: Node;
             if (node.nodeType === XmlNodeType.Document) {
@@ -54,7 +54,10 @@ namespace xadesjs {
 
             this.WriteNode(_node);
 
-            return this.result.join("");
+            let res = this.result.join("");
+            if (Application.isNodePlugin())
+                return res.replace(/\&\#xD\;/g, "\n");
+            return res;
         }
 
         protected WriteNode(node: Node) {
@@ -170,7 +173,7 @@ namespace xadesjs {
                 this.state = XmlCanonicalizerState.InsideDocElement;
 
             // open tag
-            this.result.push("<")
+            this.result.push("<");
             this.result.push(node.nodeName);
             // namespaces
             let visibleNamespacesCount = this.WriteNamespacesAxis(node);
@@ -183,7 +186,7 @@ namespace xadesjs {
             }
 
             // close tag
-            this.result.push("</")
+            this.result.push("</");
             this.result.push(node.nodeName);
             this.result.push(">");
 
@@ -193,7 +196,7 @@ namespace xadesjs {
             // remove added namespaces
             this.visibleNamespaces = this.visibleNamespaces.filter((item, index) =>
                 index < this.visibleNamespaces.length - visibleNamespacesCount
-            )
+            );
         }
 
         protected WriteNamespacesAxis(node: Node): number {
@@ -253,7 +256,7 @@ namespace xadesjs {
                 if (n.prefix === prevPrefix) {
                     continue;
                 }
-                prevPrefix = n.prefix
+                prevPrefix = n.prefix;
                 this.result.push(" xmlns");
                 if (n.prefix)
                     this.result.push(":" + n.prefix);

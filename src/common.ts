@@ -1,6 +1,6 @@
 /// <reference path="../typings/xmldom/xmldom.d.ts" />
 /// <reference path="./typings/promise.d.ts" />
-/// <reference path="./typings/xpath.d.ts" />
+/// <reference path="./typings/xpath.d.ts" /> 
 
 let XMLSerializer = XMLSerializer || require("xmldom").XMLSerializer;
 let DOMParser = DOMParser || require("xmldom").DOMParser;

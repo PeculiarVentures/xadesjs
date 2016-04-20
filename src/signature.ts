@@ -74,6 +74,11 @@ namespace xadesjs {
             let prefix = this.GetPrefix();
 
             let xel = document.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.Signature);
+            // add xmlns for xmldom
+            if (Application.isNodePlugin()) {
+                xel.setAttribute(`xmlns:${this.Prefix}`, XmlSignature.NamespaceURI);
+            }
+
             if (this.id != null)
                 xel.setAttribute(XmlSignature.AttributeNames.Id, this.id);
 
