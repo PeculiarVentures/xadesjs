@@ -173,6 +173,7 @@ This project takes inspiration (style, approach, design and code) from both the 
 - [ETSI EN 319 132-2 - XML Advanced Electronic Signatures (XAdES)](http://www.etsi.org/deliver/etsi_en/319100_319199/31913202/01.01.00_30/en_31913202v010100v.pdf)
 - [XML Signature Syntax and Processing](https://www.w3.org/TR/xmldsig-core/)
 - [XML Security Algorithm Cross-Reference](https://tools.ietf.org/html/rfc6931)
+- [XMLDSIG HTML Signing Profile](https://www.w3.org/2007/11/h6n/)
 - [Canonical XML](https://www.w3.org/TR/xml-c14n)
 - [Exclusive XML Canonicalization](https://www.w3.org/TR/xml-exc-c14n/)
 - [Internet X.509 Public Key Infrastructure Time-Stamp Protocol](https://www.ietf.org/rfc/rfc3161.txt)
