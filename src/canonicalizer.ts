@@ -182,6 +182,7 @@ namespace xadesjs {
             this.result.push(">");
 
             for (let n = node.firstChild; n != null; n = n.nextSibling) {
+                // if (!(n.nodeType === XmlNodeType.Text && node.childNodes.length > 1))
                 this.WriteNode(n);
             }
 
@@ -206,7 +207,8 @@ namespace xadesjs {
                 let attribute = node.attributes[i];
 
                 if (!IsNamespaceNode(attribute)) {
-                    if (attribute.prefix && !this.IsNamespaceRendered(attribute.prefix, node.namespaceURI)) {
+                    // render namespace for attribute, if needed
+                    if (attribute.prefix && attribute.prefix !== "xml" && !this.IsNamespaceRendered(attribute.prefix, node.namespaceURI)) {
                         let ns = { prefix: attribute.prefix, namespace: attribute.namespaceURI };
                         list.push(ns);
                         this.visibleNamespaces.push(ns);
@@ -304,11 +306,11 @@ namespace xadesjs {
                     sb.push("&amp;");
                 else if (ch === "\"" && type === XmlNodeType.Attribute)
                     sb.push("&quot;");
-                else if (ch === "\x09" && type === XmlNodeType.Attribute)
+                else if (ch === "\u0009" && type === XmlNodeType.Attribute)
                     sb.push("&#x9;");
-                else if (ch === "\x0A" && type === XmlNodeType.Attribute)
+                else if (ch === "\u000A" && type === XmlNodeType.Attribute)
                     sb.push("&#xA;");
-                else if (ch === "\x0D")
+                else if (ch === "\u000D")
                     sb.push("&#xD;");
                 else
                     sb.push(ch);
@@ -402,9 +404,9 @@ namespace xadesjs {
     }
 
     function IsNamespaceNode(node: Node): boolean {
-        if (node == null || node.nodeType !== XmlNodeType.Attribute)
-            return false;
-        return node.namespaceURI === "http://www.w3.org/2000/xmlns/";
+        if (node !== null && node.nodeType === xadesjs.XmlNodeType.Attribute && (node.prefix === "xmlns" || node.localName === "xmlns"))
+            return node.namespaceURI === "http://www.w3.org/2000/xmlns/";
+        return false;
     }
 
 }
