@@ -265,6 +265,10 @@ namespace xadesjs {
                 if (r.TransformChain.length > 0) {
                     for (let i in r.TransformChain) {
                         let t = r.TransformChain[i];
+                        if (t instanceof XmlDsigC14NWithCommentsTransform)
+                            t = new XmlDsigC14NTransform(); // TODO: Check RFC for it
+                        if (t instanceof XmlDsigExcC14NWithCommentsTransform)
+                            t = new XmlDsigExcC14NTransform(); // TODO: Check RFC for it
                         t.LoadInnerXml(doc);
                         s = t.GetOutput();
                     }
@@ -320,7 +324,7 @@ namespace xadesjs {
                 //         continue;
                 //     doc.documentElement.setAttributeNode(doc.importNode(attr, true) as Attr);
                 // }
-            t.LoadInnerXml(doc);
+                t.LoadInnerXml(doc);
             return t.GetOutput();
         }
 

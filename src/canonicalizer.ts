@@ -27,6 +27,7 @@ namespace xadesjs {
             this.exclusive = excC14N;
             this.propagatedNamespaces = propagatedNamespaces;
             this.result = [];
+            this.state = XmlCanonicalizerState.BeforeDocElement;
         }
 
         // See xml-enc-c14n specification
@@ -105,7 +106,9 @@ namespace xadesjs {
         }
 
         protected WriteDocumentNode(node: Node) {
-            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
+            this.state = XmlCanonicalizerState.BeforeDocElement;
+            for (let child = node.firstChild; child != null; child = child.nextSibling)
+                this.WriteNode(child);
         }
 
         // Text Nodes
@@ -123,14 +126,14 @@ namespace xadesjs {
             // Console.WriteLine ("Debug: comment node");
             if (this.withComments) {
                 if (this.state === XmlCanonicalizerState.AfterDocElement)
-                    this.result.push("\x0A<!--");
+                    this.result.push(String.fromCharCode(10) + "<!--");
                 else
                     this.result.push("<!--");
 
                 this.result.push(this.NormalizeString(node.nodeValue, XmlNodeType.Comment));
 
                 if (this.state === XmlCanonicalizerState.BeforeDocElement)
-                    this.result.push("-->\x0A");
+                    this.result.push("-->" + String.fromCharCode(10));
                 else
                     this.result.push("-->");
             }
@@ -150,7 +153,7 @@ namespace xadesjs {
             // console.log(`WriteProcessingInstructionNode: ${node.nodeName}`);
 
             if (this.state === XmlCanonicalizerState.AfterDocElement)
-                this.result.push("\x0A<?");
+                this.result.push("\u000A<?");
             else
                 this.result.push("<?");
 
@@ -161,7 +164,7 @@ namespace xadesjs {
             }
 
             if (this.state === XmlCanonicalizerState.BeforeDocElement)
-                this.result.push("?>\x0A");
+                this.result.push("?>\u000A");
             else
                 this.result.push("?>");
         }
