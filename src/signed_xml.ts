@@ -190,15 +190,15 @@ namespace xadesjs {
 
         private FixupNamespaceNodes(src: Element, dst: Element, ignoreDefault: boolean): void {
             // add namespace nodes
-            // let nodes = select(src, "namespace::*");
-            // for (let i = 0; i < nodes.length; i++) {
-            //     let attr = nodes[i];
-            //     if (attr.localName === "xml")
-            //         continue;
-            //     if (ignoreDefault && attr.localName === "xmlns")
-            //         continue;
-            //     dst.setAttributeNode(dst.ownerDocument.importNode(attr, true) as Attr);
-            // }
+            let namespaces = SelectNamespaces(src);
+            for (let i = 0; i < src.attributes.length; i++) {
+                let attr = src.attributes[i];
+                if (attr.localName === "xml")
+                    continue;
+                if (ignoreDefault && attr.localName === "xmlns")
+                    continue;
+                dst.setAttributeNode(dst.ownerDocument.importNode(attr, true) as Attr);
+            }
         }
 
         private GetReferenceHash(r: Reference, check_hmac: boolean): Promise {
@@ -314,17 +314,55 @@ namespace xadesjs {
         private SignedInfoTransformed(): string {
             let t = this.GetC14NMethod();
 
-            let doc = this.SignedInfo.getXml();
-            // TODO: xpath has error on "namespace::*", uncomment after fix it
-            if (this.envdoc != null)
-                // for (let attr: Attr of select(this.envdoc.documentElement, "namespace::*")) {
-                //     if (attr.localName === "xml")
-                //         continue;
-                //     if (attr.prefix === doc.documentElement.prefix)
-                //         continue;
-                //     doc.documentElement.setAttributeNode(doc.importNode(attr, true) as Attr);
-                // }
-                t.LoadInnerXml(doc);
+            // if (!this.SignatureValue) {
+            // when creating signatures
+            let xml = new XMLSerializer().serializeToString(this.m_signature.SignedInfo.getXml())
+            let doc = new DOMParser().parseFromString(xml, APPLICATION_XML);
+            if (this.envdoc) {
+                let namespaces = SelectNamespaces(this.envdoc.documentElement);
+                for (let attr of namespaces) {
+                    if (attr.localName === "xml")
+                        continue;
+                    if (attr.prefix == doc.documentElement.prefix)
+                        continue;
+                    doc.documentElement.setAttributeNode(doc.importNode(attr, true) as Attr);
+                }
+            }
+            t.LoadInnerXml(doc);
+            // }
+            // else {
+            //     // when verifying signatures
+            //     // TODO - check m_signature.SignedInfo.Id
+            //     let el = this.Signature.getXml().getElementsByTagNameNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.SignedInfo)[0] as Element;
+            //     let sw = new StringWriter();
+            //     let xtw = new XmlTextWriter(sw);
+            //     xtw.WriteStartElement(el.Prefix, el.LocalName, el.NamespaceURI);
+
+            //     // context namespace nodes (except for "xmlns:xml")
+            //     XmlNodeList nl = el.SelectNodes("namespace::*");
+            //     foreach(XmlAttribute attr in nl) {
+            //         if (attr.ParentNode == el)
+            //             continue;
+            //         if (attr.LocalName == "xml")
+            //             continue;
+            //         if (attr.Prefix == el.Prefix)
+            //             continue;
+            //         attr.WriteTo(xtw);
+            //     }
+            //     foreach(XmlNode attr in el.Attributes)
+            //     attr.WriteTo(xtw);
+            //     foreach(XmlNode n in el.ChildNodes)
+            //     n.WriteTo(xtw);
+
+            //     xtw.WriteEndElement();
+            //     byte[] si = Encoding.UTF8.GetBytes(sw.ToString());
+
+            //     MemoryStream ms = new MemoryStream();
+            //     ms.Write(si, 0, si.Length);
+            //     ms.Position = 0;
+
+            //     t.LoadInput(ms);
+            // }
             return t.GetOutput();
         }
 

@@ -211,7 +211,7 @@ namespace xadesjs {
 
                 if (!IsNamespaceNode(attribute)) {
                     // render namespace for attribute, if needed
-                    if (attribute.prefix && attribute.prefix !== "xml" && !this.IsNamespaceRendered(attribute.prefix, node.namespaceURI)) {
+                    if (attribute.prefix && !this.IsNamespaceRendered(attribute.prefix, attribute.namespaceURI)) {
                         let ns = { prefix: attribute.prefix, namespace: attribute.namespaceURI };
                         list.push(ns);
                         this.visibleNamespaces.push(ns);
@@ -222,11 +222,12 @@ namespace xadesjs {
 
                 // get namespace prefix
                 let prefix: string;
-                if (attribute.prefix === "xmlns")
-                    prefix = attribute.localName;
+                let matches: string[] = null;
+                if (matches = /xmlns:(\w+)/.exec(attribute.nodeName))
+                    prefix = matches[1];
 
                 let printable = true;
-                if (this.exclusive && attribute.prefix && !this.IsNamespaceInclusive(node, prefix)) {
+                if (this.exclusive && !this.IsNamespaceInclusive(node, prefix)) {
                     let used = IsNamespaceUsed(node, prefix);
                     if (used > 1)
                         printable = false;
@@ -346,6 +347,8 @@ namespace xadesjs {
             if (!prefix && !uri)
                 return true;
             uri = uri || "";
+            if (prefix === "xml" && uri === "http://www.w3.org/XML/1998/namespace")
+                return true;
             for (let i = this.visibleNamespaces.length - 1; i >= 0; i--) {
                 let node = this.visibleNamespaces[i];
                 // get namespace prefix
@@ -407,8 +410,9 @@ namespace xadesjs {
     }
 
     function IsNamespaceNode(node: Node): boolean {
-        if (node !== null && node.nodeType === xadesjs.XmlNodeType.Attribute && (node.prefix === "xmlns" || node.localName === "xmlns"))
-            return node.namespaceURI === "http://www.w3.org/2000/xmlns/";
+        let reg = /xmlns:/;
+        if (node !== null && node.nodeType === xadesjs.XmlNodeType.Attribute && (node.nodeName === "xmlns" || reg.test(node.nodeName)))
+            return true;
         return false;
     }
 
