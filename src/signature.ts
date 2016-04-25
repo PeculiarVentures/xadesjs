@@ -127,7 +127,7 @@ namespace xadesjs {
                 for (let i in this.list) {
                     let obj = this.list[i];
                     obj.Prefix = this.Prefix;
-                    xn = obj.getXml();
+                    xn = obj.GetXml();
                     newNode = document.importNode(xn, true);
                     xel.appendChild(newNode);
                 }
@@ -172,14 +172,13 @@ namespace xadesjs {
                     this.key.LoadXml(kinfo);
                 }
 
-                console.warn("TODO: xd:Object");
-                // let xnl = value.getElementsByTagNameNS(dsigNsmgr, "xd:Object");
-                // for (let i = 0; i < xnl.length; i++) {
-                //     let xn = xnl[i];
-                //     let obj = new DataObject();
-                //     obj.loadXml(xn);
-                //     this.AddObject(obj);
-                // }
+                let xnl = value.getElementsByTagNameNS(XmlSignature.NamespaceURI, "Object");
+                for (let i = 0; i < xnl.length; i++) {
+                    let xn = xnl[i];
+                    let obj = new DataObject();
+                    obj.LoadXml(xn);
+                    this.AddObject(obj);
+                }
             }
             else
                 throw new XmlError(XE.ELEMENT_MALFORMED, "Signature");
