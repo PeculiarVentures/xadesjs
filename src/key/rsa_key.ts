@@ -8,6 +8,9 @@ namespace xadesjs {
         ext: boolean;
     }
 
+    /**
+     * Represents the <RSAKeyValue> element of an XML signature.
+     */
     export class RsaKeyValue extends XmlObject implements KeyInfoClause {
 
         protected m_key: CryptoKey = null;
@@ -18,6 +21,9 @@ namespace xadesjs {
         protected m_exponent: Uint8Array = null;
         protected m_keyusage: string[] = null;
 
+        /**
+         * Gets or sets the instance of RSA that holds the public key.
+         */
         get Key(): CryptoKey {
             return this.m_key;
         }
@@ -25,14 +31,23 @@ namespace xadesjs {
             this.m_key = value;
         }
 
+        /**
+         * Gets the algorithm of the public key
+         */
         get Algorithm(): ISignatureAlgorithm {
             return this.m_algorithm;
         }
 
+        /**
+         * Gets the Modulus of the public key
+         */
         get Modulus(): Uint8Array {
             return this.m_modulus;
         }
 
+        /**
+         * Gets the Exponent of the public key
+         */
         get Exponent(): Uint8Array {
             return this.m_exponent;
         }
@@ -41,6 +56,11 @@ namespace xadesjs {
             super();
         }
 
+        /**
+         * Imports key to the RSAKeyValue object 
+         * @param  {CryptoKey} key
+         * @returns Promise
+         */
         importKey(key: CryptoKey): Promise {
             return new Promise((resolve, reject) => {
                 if (key.algorithm.name.toUpperCase() !== "RSASSA-PKCS1-V1_5")
@@ -58,6 +78,11 @@ namespace xadesjs {
             });
         }
 
+        /**
+         * Exports key from the RSAKeyValue object
+         * @param  {Algorithm} alg
+         * @returns Promise
+         */
         exportKey(alg: Algorithm): Promise {
             return new Promise((resolve, reject) => {
                 if (this.m_key)
@@ -95,7 +120,12 @@ namespace xadesjs {
             });
         }
 
-        getXml(): Element {
+
+        /**
+         * Returns the XML representation of the RSA key clause.
+         * @returns Element
+         */
+        GetXml(): Element {
             if (this.m_element)
                 return this.m_element;
 
@@ -123,7 +153,12 @@ namespace xadesjs {
             return xnKeyValue;
         }
 
-        loadXml(element: Element): void {
+        /**
+         * Loads an RSA key clause from an XML element.
+         * @param  {Element} element
+         * @returns void
+         */
+        LoadXml(element: Element): void {
             if ((element.localName !== XmlSignature.ElementNames.RSAKeyValue) || (element.namespaceURI !== XmlSignature.NamespaceURI))
                 throw new XmlError(XE.CRYPTOGRAPHIC, "element");
 

@@ -2,7 +2,9 @@
 
 namespace xadesjs {
 
-    // http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/Overview.html#sec-Reference
+    /**
+     * Represents the <reference> element of an XML signature.
+     */
     export class Reference extends XmlObject {
 
         private chain: Transform[];
@@ -12,7 +14,7 @@ namespace xadesjs {
         private uri: string;
         private type: string;
         private element: Element;
-        inclusiveNamespacesPrefixList: string;
+        private inclusiveNamespacesPrefixList: string;
 
         public constructor(p?: string) {
             super();
@@ -24,7 +26,9 @@ namespace xadesjs {
             }
         }
 
-        // default to SHA1
+        /**
+         * Gets or sets the digest method Uniform Resource Identifier (URI) of the current
+         */
         get DigestMethod(): string {
             return this.digestMethod;
         }
@@ -33,7 +37,9 @@ namespace xadesjs {
             this.digestMethod = value;
         }
 
-
+        /**
+         * Gets or sets the digest value of the current Reference.
+         */
         get DigestValue(): ArrayBuffer {
             return this.digestValue;
         }
@@ -42,6 +48,9 @@ namespace xadesjs {
             this.digestValue = value;
         }
 
+        /**
+         * Gets or sets the ID of the current Reference.
+         */
         get Id(): string {
             return this.id;
         }
@@ -50,6 +59,9 @@ namespace xadesjs {
             this.id = value;
         }
 
+        /**
+         * Gets the transform chain of the current Reference.
+         */
         get TransformChain(): Transform[] {
             return this.chain;
         }
@@ -57,6 +69,9 @@ namespace xadesjs {
             this.chain = value;
         }
 
+        /**
+         * Gets or sets the type of the object being signed.
+         */
         get Type(): string {
             return this.type;
         }
@@ -65,6 +80,9 @@ namespace xadesjs {
             this.type = value;
         }
 
+        /**
+         * Gets or sets the Uri of the current Reference.
+         */
         get Uri(): string {
             return this.uri;
         }
@@ -73,11 +91,21 @@ namespace xadesjs {
             this.uri = value;
         }
 
+        /**
+         * Adds a Transform object to the list of transforms to be performed 
+         * on the data before passing it to the digest algorithm.
+         * @param  {Transform} transform The transform to be added to the list of transforms.
+         * @returns void
+         */
         AddTransform(transform: Transform): void {
             this.chain.push(transform);
         }
 
-        getXml(): Element {
+        /**
+         * Returns the XML representation of the Reference.
+         * @returns Element
+         */
+        GetXml(): Element {
             if (this.element != null)
                 return this.element;
 
@@ -102,7 +130,7 @@ namespace xadesjs {
                 for (let i in this.chain) {
                     let t = this.chain[i];
                     t.Prefix = this.Prefix;
-                    let xn = t.getXml();
+                    let xn = t.GetXml();
                     let newNode = doc.importNode(xn, true);
                     ts.appendChild(newNode);
                 }
@@ -125,7 +153,11 @@ namespace xadesjs {
             return xel.hasAttribute(attribute) ? xel.getAttribute(attribute) : null;
         }
 
-        loadXml(value: Element) {
+        /**
+         * Loads a Reference state from an XML element.
+         * @param  {Element} value
+         */
+        LoadXml(value: Element) {
             if (value == null)
                 throw new XmlError(XE.PARAM_REQUIRED, "value");
 
@@ -142,35 +174,6 @@ namespace xadesjs {
                 for (let i = 0; i < xnl.length; i++) {
                     let xn = xnl[i];
                     let a = this.GetAttribute(<Element>xn, XmlSignature.AttributeNames.Algorithm);
-                    /*	This code is useful for debugging in VS.NET because using CryptoConfig
-                        (from MS mscorlib) would throw InvalidCastException because it's 
-                        Transform would come from MS System.Security.dll not Mono's.
-                                        switch (a) {
-                                            case "http://www.w3.org/2000/09/xmldsig#base64":
-                                                t = new XmlDsigBase64Transform ();
-                                                break;
-                                            case "http://www.w3.org/TR/2001/REC-xml-c14n-20010315":
-                                                t = new XmlDsigC14NTransform ();
-                                                break;
-                                            case "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments":
-                                                t = new XmlDsigC14NWithCommentsTransform ();
-                                                break;
-                                            case "http://www.w3.org/2000/09/xmldsig#enveloped-signature":
-                                                t = new XmlDsigEnvelopedSignatureTransform ();
-                                                break;
-                                            case "http://www.w3.org/TR/1999/REC-xpath-19991116":
-                                                t = new XmlDsigXPathTransform ();
-                                                break;
-                                            case "http://www.w3.org/TR/1999/REC-xslt-19991116":
-                                                t = new XmlDsigXsltTransform ();
-                                                break;
-                                            case "http://www.w3.org/2002/07/decrypt#XML":
-                                                t = new XmlDecryptionTransform ();
-                                                break;
-                                            default:
-                                                throw new NotSupportedException ();
-                                        }
-                    */
                     t = <Transform>CryptoConfig.CreateFromName(a);
                     if (t == null)
                         throw new XmlError(XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, a);
@@ -184,11 +187,6 @@ namespace xadesjs {
                     this.AddTransform(t);
 
                 }
-                // let inclusiveNamespaces = <Element[]>select(xn, "//*[local-name(.)='InclusiveNamespaces']");
-                // if (inclusiveNamespaces.length > 0) {
-                //     let t = inclusiveNamespaces[0];
-                //     inclusiveNamespacesPrefixList = inclusiveNamespaces[0].getAttribute("PrefixList");
-                // }
             }
             // get DigestMethod
             this.DigestMethod = XmlSignature.GetAttributeFromElement(value, XmlSignature.AttributeNames.Algorithm, XmlSignature.ElementNames.DigestMethod);

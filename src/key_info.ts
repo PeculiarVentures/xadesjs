@@ -1,4 +1,8 @@
 namespace xadesjs {
+
+    /**
+     * Represents an XML digital signature or XML encryption <KeyInfo> element.
+     */
     export class KeyInfo extends XmlObject {
 
         private Info: Array<KeyInfoClause>;
@@ -9,10 +13,16 @@ namespace xadesjs {
             this.Info = [];
         }
 
+        /**
+         * Gets the number of KeyInfoClause objects contained in the KeyInfo object.
+         */
         get length(): number {
             return this.Info.length;
         }
 
+        /**
+         * Gets or sets the key information identity.
+         */
         get Id(): string {
             return this.id;
         }
@@ -20,6 +30,10 @@ namespace xadesjs {
             this.id = value;
         }
 
+        /**
+         * Returns an enumerator of the KeyInfoClause objects in the KeyInfo object.
+         * @param  {any} requestedObjectType?
+         */
         GetEnumerator(): Array<KeyInfoClause>;
         GetEnumerator(requestedObjectType: any): Array<KeyInfoClause>;
         GetEnumerator(requestedObjectType?: any) {
@@ -35,11 +49,20 @@ namespace xadesjs {
             return TypeList;
         }
 
+        /**
+         * Returns an enumerator of the KeyInfoClause objects in the KeyInfo object.
+         * @param  {KeyInfoClause} clause The KeyInfoClause to add to the KeyInfo object.
+         * @returns void
+         */
         AddClause(clause: KeyInfoClause): void {
             this.Info.push(clause);
         }
 
-        getXml(): Node {
+        /**
+         * Returns the XML representation of the KeyInfo object.
+         * @returns Node
+         */
+        GetXml(): Node {
             let doc = CreateDocument();
             let prefix = this.GetPrefix();
             let xel = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.KeyInfo);
@@ -48,14 +71,19 @@ namespace xadesjs {
             for (let i in this.Info) {
                 let kic = this.Info[i];
                 kic.Prefix = this.Prefix;
-                let xn = kic.getXml();
+                let xn = kic.GetXml();
                 let newNode = doc.importNode(xn, true);
                 xel.appendChild(newNode);
             }
             return xel;
         }
 
-        loadXml(value: Element): void {
+        /**
+         * Loads a KeyInfo state from an XML element.
+         * @param  {Element} value
+         * @returns void
+         */
+        LoadXml(value: Element): void {
             if (value == null)
                 throw new XmlError(XE.PARAM_REQUIRED, "value");
 
@@ -114,7 +142,7 @@ namespace xadesjs {
                     }
 
                     if (kic != null) {
-                        kic.loadXml(<Element>n);
+                        kic.LoadXml(<Element>n);
                         this.AddClause(kic);
                     }
                 }

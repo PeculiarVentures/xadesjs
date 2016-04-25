@@ -12,6 +12,9 @@ namespace xadesjs {
         serialNumber: string;
     }
 
+    /**
+     * Represents an <X509Data> subelement of an XMLDSIG or XML Encryption <KeyInfo> element.
+     */
     export class KeyInfoX509Data extends XmlObject implements KeyInfoClause {
 
         private x509crl: Uint8Array;
@@ -50,6 +53,9 @@ namespace xadesjs {
             }
         }
 
+        /**
+         * Gets public key of the X509Data
+         */
         get Key(): CryptoKey {
             return this.key;
         }
@@ -58,6 +64,11 @@ namespace xadesjs {
             return Promise.reject(new XmlError(XE.METHOD_NOT_SUPPORTED));
         }
 
+        /**
+         * Exports key from X509Data object
+         * @param  {Algorithm} alg
+         * @returns Promise
+         */
         exportKey(alg: Algorithm): Promise {
             return new Promise((resolve, reject) => {
                 if (this.Certificates.length)
@@ -74,10 +85,16 @@ namespace xadesjs {
             throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
         }
 
+        /**
+         * Gets a list of the X.509v3 certificates contained in the KeyInfoX509Data object.
+         */
         public get Certificates(): X509Certificate[] {
             return this.X509CertificateList;
         }
 
+        /**
+         * Gets or sets the Certificate Revocation List (CRL) contained within the KeyInfoX509Data object.
+         */
         public get CRL(): Uint8Array {
             return this.x509crl;
         }
@@ -85,18 +102,32 @@ namespace xadesjs {
             this.x509crl = value;
         }
 
+        /**
+         * Gets a list of X509IssuerSerial structures that represent an issuer name and serial number pair.
+         */
         public get IssuerSerials(): X509IssuerSerial[] {
             return this.IssuerSerialList;
         }
 
+        /**
+         * Gets a list of the subject key identifiers (SKIs) contained in the KeyInfoX509Data object.
+         */
         public get SubjectKeyIds(): Uint8Array[] {
             return this.SubjectKeyIdList;
         }
 
+        /**
+         * Gets a list of the subject names of the entities contained in the KeyInfoX509Data object.
+         */
         public get SubjectNames(): string[] {
             return this.SubjectNameList;
         }
 
+        /**
+         * Adds the specified X.509v3 certificate to the KeyInfoX509Data.
+         * @param  {X509Certificate} certificate
+         * @returns void
+         */
         public AddCertificate(certificate: X509Certificate): void {
             if (certificate == null)
                 throw new XmlError(XE.PARAM_REQUIRED, "certificate");
@@ -105,6 +136,12 @@ namespace xadesjs {
             this.X509CertificateList.push(certificate);
         }
 
+        /**
+         * Adds the specified issuer name and serial number pair to the KeyInfoX509Data object.
+         * @param  {string} issuerName
+         * @param  {string} serialNumber
+         * @returns void
+         */
         public AddIssuerSerial(issuerName: string, serialNumber: string): void {
             if (issuerName == null)
                 throw new XmlError(XE.PARAM_REQUIRED, "issuerName");
@@ -115,6 +152,11 @@ namespace xadesjs {
             this.IssuerSerialList.push(xis);
         }
 
+        /**
+         * Adds the specified subject key identifier (SKI) to the KeyInfoX509Data object.
+         * @param  {string | Uint8Array} subjectKeyId
+         * @returns void
+         */
         public AddSubjectKeyId(subjectKeyId: string): void;
         public AddSubjectKeyId(subjectKeyId: Uint8Array): void;
         public AddSubjectKeyId(subjectKeyId: any): void {
@@ -133,6 +175,11 @@ namespace xadesjs {
 
         }
 
+        /**
+         * Adds the subject name of the entity that was issued an X.509v3 certificate to the KeyInfoX509Data object.
+         * @param  {string} subjectName
+         * @returns void
+         */
         public AddSubjectName(subjectName: string): void {
             if (this.SubjectNameList == null)
                 this.SubjectNameList = [];
@@ -140,7 +187,11 @@ namespace xadesjs {
             this.SubjectNameList.push(subjectName);
         }
 
-        public getXml(): Element {
+        /**
+         * Returns an XML representation of the KeyInfoX509Data object.
+         * @returns Element
+         */
+        public GetXml(): Element {
             let doc = CreateDocument();
             let xel = doc.createElementNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.X509Data);
             // FIXME: hack to match MS implementation
@@ -194,7 +245,12 @@ namespace xadesjs {
             return xel;
         }
 
-        public loadXml(element: Element): void {
+        /**
+         * Parses the input XmlElement object and configures the internal state of the KeyInfoX509Data object to match.
+         * @param  {Element} element
+         * @returns void
+         */
+        public LoadXml(element: Element): void {
             if (element == null)
                 throw new XmlError(XE.PARAM_REQUIRED, "element");
 

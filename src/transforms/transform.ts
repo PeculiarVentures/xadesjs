@@ -13,9 +13,16 @@ namespace xadesjs {
         new (): Transform;
     }
 
+    /**
+     * Represents the abstract base class from which all <Transform> elements 
+     * that can be used in an XML digital signature derive.
+     */
     export abstract class Transform extends XmlObject implements Transform {
         protected innerXml: Node = null;
 
+        /**
+         * When overridden in a derived class, returns the output of the current Transform object.
+         */
         GetOutput(): string {
             throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
         }
@@ -30,7 +37,7 @@ namespace xadesjs {
             return this.innerXml;
         }
 
-        loadXml(value: Node) {
+        LoadXml(value: Node) {
             if (value == null)
                 throw new XmlError(XE.PARAM_REQUIRED, "value");
 
@@ -42,7 +49,11 @@ namespace xadesjs {
                 throw new XmlError(XE.ALGORITHM_WRONG_NAME, alg);
         }
 
-        getXml(): Element {
+        /**
+         * Returns the XML representation of the current Transform object.
+         * @returns Element
+         */
+        GetXml(): Element {
             let document = CreateDocument();
             let xel = document.createElementNS(XmlSignature.NamespaceURI, `${this.GetPrefix()}${XmlSignature.ElementNames.Transform}`);
             xel.setAttribute(XmlSignature.AttributeNames.Algorithm, this.Algorithm);

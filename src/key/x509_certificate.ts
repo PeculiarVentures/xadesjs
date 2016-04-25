@@ -1,4 +1,8 @@
 namespace xadesjs {
+
+    /**
+     * Represents an <X509Certificate> element.
+     */
     export class X509Certificate {
 
         protected raw: Uint8Array;
@@ -14,20 +18,35 @@ namespace xadesjs {
             }
         }
 
+        /**
+         * Loads X509Certificate from DER data
+         * @param  {Uint8Array} rawData
+         */
         protected LoadFromRawData(rawData: Uint8Array) {
             this.raw = rawData;
             let asn1 = org.pkijs.fromBER(rawData.buffer);
             this.cert_simpl = new org.pkijs.simpl.CERT({ schema: asn1.result });
         }
 
+        /**
+         * Gets the public key from the X509Certificate
+         */
         get PublicKey(): CryptoKey {
             return this.publicKey;
         }
 
+        /**
+         * Returns DER raw of X509Certificate
+         */
         GetRawCertData(): Uint8Array {
             return this.raw;
         }
 
+        /**
+         * Returns public key from X509Certificate
+         * @param  {Algorithm} algorithm
+         * @returns Promise
+         */
         exportKey(algorithm: Algorithm): Promise {
             return new Promise((resolve, reject) => {
                 let asn1_publicKey = org.pkijs.fromBER(this.cert_simpl.subjectPublicKeyInfo.subjectPublicKey.value_block.value_hex);

@@ -1,6 +1,8 @@
-/// <reference path="./xml.ts" />
-
 namespace xadesjs {
+
+    /**
+     * Represents the <Signature> element of an XML signature.
+     */
     export class Signature extends XmlObject {
 
         private list: Array<DataObject>;
@@ -15,6 +17,9 @@ namespace xadesjs {
             this.list = [];
         }
 
+        /**
+         * Gets or sets the ID of the current Signature.
+         */
         set Id(value: string) {
             this.element = null;
             this.id = value;
@@ -23,6 +28,9 @@ namespace xadesjs {
             return this.id;
         }
 
+        /**
+         * Gets or sets the KeyInfo of the current Signature.
+         */
         get KeyInfo(): KeyInfo {
             return this.key;
         }
@@ -31,6 +39,9 @@ namespace xadesjs {
             this.key = value;
         }
 
+        /**
+         * Gets or sets a list of objects to be signed.
+         */
         get ObjectList(): Array<DataObject> {
             return this.list;
         }
@@ -38,7 +49,9 @@ namespace xadesjs {
             this.list = value;
         }
 
-
+        /**
+         * Gets or sets the value of the digital signature.
+         */
         get SignatureValue(): Uint8Array {
             return this.signature;
         }
@@ -47,6 +60,9 @@ namespace xadesjs {
             this.signature = value;
         }
 
+        /**
+         * Gets or sets the SignedInfo of the current Signature.
+         */
         get SignedInfo(): SignedInfo {
             return this.info;
         }
@@ -55,12 +71,20 @@ namespace xadesjs {
             this.info = value;
         }
 
+        /**
+         * Adds a DataObject to the list of objects to be signed.
+         * @param  {DataObject} dataObject The DataObject to be added to the list of objects to be signed.
+         * @returns void
+         */
         public AddObject(dataObject: DataObject): void {
             this.list.push(dataObject);
         }
 
-
-        getXml(document?: Document) {
+        /**
+         * Returns the XML representation of the Signature.
+         * @returns Element
+         */
+        GetXml(): Element {
             if (this.element != null)
                 return this.element;
 
@@ -68,8 +92,7 @@ namespace xadesjs {
                 throw new XmlError(XE.PARAM_REQUIRED, "SignedInfo");
             if (this.signature == null)
                 throw new XmlError(XE.PARAM_REQUIRED, "SignatureValue");
-            if (document == null)
-                document = document.implementation.createDocument("", "", null);
+            let document = CreateDocument();
 
             let prefix = this.GetPrefix();
 
@@ -83,7 +106,7 @@ namespace xadesjs {
                 xel.setAttribute(XmlSignature.AttributeNames.Id, this.id);
 
             this.info.Prefix = this.Prefix;
-            let xn = this.info.getXml();
+            let xn = this.info.GetXml();
             let newNode = document.importNode(xn, true);
             xel.appendChild(newNode);
 
@@ -95,7 +118,7 @@ namespace xadesjs {
 
             if (this.key != null) {
                 this.key.Prefix = this.Prefix;
-                xn = this.key.getXml();
+                xn = this.key.GetXml();
                 newNode = document.importNode(xn, true);
                 xel.appendChild(newNode);
             }
@@ -119,7 +142,12 @@ namespace xadesjs {
             return null;
         }
 
-        loadXml(value: Element): void {
+        /**
+         * Loads a Signature state from an XML element.
+         * @param  {Element} value
+         * @returns void
+         */
+        LoadXml(value: Element): void {
             if (value == null)
                 throw new XmlError(XE.PARAM_REQUIRED, "value");
 
@@ -130,7 +158,7 @@ namespace xadesjs {
                 let i = this.NextElementPos(value.childNodes, 0, XmlSignature.ElementNames.SignedInfo, XmlSignature.NamespaceURI, true);
                 let sinfo = <Element>value.childNodes[i];
                 this.info = new SignedInfo();
-                this.info.loadXml(sinfo);
+                this.info.LoadXml(sinfo);
 
                 i = this.NextElementPos(value.childNodes, ++i, XmlSignature.ElementNames.SignatureValue, XmlSignature.NamespaceURI, true);
                 let sigValue = <Element>value.childNodes[i];
@@ -141,7 +169,7 @@ namespace xadesjs {
                 if (i > 0) {
                     let kinfo = <Element>value.childNodes[i];
                     this.key = new KeyInfo();
-                    this.key.loadXml(kinfo);
+                    this.key.LoadXml(kinfo);
                 }
 
                 console.warn("TODO: xd:Object");

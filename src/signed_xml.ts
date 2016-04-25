@@ -3,32 +3,119 @@ namespace xadesjs {
     export const APPLICATION_XML = "application/xml";
 
     /**
-    * Xml signature implementation
+    * Provides a wrapper on a core XML signature object to facilitate creating XML signatures.
     */
     export class SignedXml extends XmlObject {
 
+        /**
+         * Represents the Uniform Resource Identifier (URI) for the standard canonicalization 
+         * algorithm for XML digital signatures. This field is constant.
+         */
         protected static XmlDsigCanonicalizationUrl = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
+
+        /**
+         * Represents the Uniform Resource Identifier (URI) for the standard canonicalization algorithm 
+         * for XML digital signatures and includes comments. This field is constant.
+         */
         protected static XmlDsigCanonicalizationWithCommentsUrl = SignedXml.XmlDsigCanonicalizationUrl + "#WithComments";
+
+        /**
+         * Represents the Uniform Resource Identifier (URI) for the standard namespace for XML digital signatures. 
+         * This field is constant.
+         */
         protected static XmlDsigNamespaceUrl = "http://www.w3.org/2000/09/xmldsig#";
         protected static XmlDsigDSAUrl = SignedXml.XmlDsigNamespaceUrl + "dsa-sha1";
+
+        /**
+         * Represents the Uniform Resource Identifier (URI) for the standard HMACSHA1 algorithm for XML digital signatures. 
+         * This field is constant.
+         */
         protected static XmlDsigHMACSHA1Url = SignedXml.XmlDsigNamespaceUrl + "hmac-sha1";
+
+        /**
+         * Represents the Uniform Resource Identifier (URI) for the standard minimal canonicalization algorithm 
+         * for XML digital signatures. This field is constant.
+         */
         protected static XmlDsigMinimalCanonicalizationUrl = SignedXml.XmlDsigNamespaceUrl + "minimal";
+
+        /**
+         * Represents the Uniform Resource Identifier (URI) for the standard RSA signature method 
+         * for XML digital signatures. This field is constant.
+         */
         protected static XmlDsigRSASHA1Url = SignedXml.XmlDsigNamespaceUrl + "rsa-sha1";
+
+        /**
+         * Represents the Uniform Resource Identifier (URI) for the standard SHA1 digest method for 
+         * XML digital signatures. This field is constant.
+         */
         protected static XmlDsigSHA1Url = SignedXml.XmlDsigNamespaceUrl + "sha1";
 
+        /**
+         * Represents the Uniform Resource Identifier (URI) for the XML mode 
+         * decryption transformation. This field is constant.
+         */
         protected static XmlDecryptionTransformUrl = "http://www.w3.org/2002/07/decrypt#XML";
+
+        /**
+         * Represents the Uniform Resource Identifier (URI) for the base 64 transformation. This field is constant.
+         */
         protected static XmlDsigBase64TransformUrl = SignedXml.XmlDsigNamespaceUrl + "base64";
+
+        /**
+         * Represents the Uniform Resource Identifier (URI) 
+         * for the Canonical XML transformation. This field is constant.
+         */
         protected static XmlDsigC14NTransformUrl = SignedXml.XmlDsigCanonicalizationUrl;
+
+        /**
+         * Represents the Uniform Resource Identifier (URI) for the Canonical XML transformation, 
+         * with comments. This field is constant.
+         */
         protected static XmlDsigC14NWithCommentsTransformUrl = SignedXml.XmlDsigCanonicalizationWithCommentsUrl;
+
+        /**
+         * Represents the Uniform Resource Identifier (URI) for enveloped signature transformation. 
+         * This field is constant.
+         */
         protected static XmlDsigEnvelopedSignatureTransformUrl = SignedXml.XmlDsigNamespaceUrl + "enveloped-signature";
+
+        /**
+         * Represents the Uniform Resource Identifier (URI) for exclusive XML canonicalization. 
+         * This field is constant.
+         */
         protected static XmlDsigExcC14NTransformUrl = "http://www.w3.org/2001/10/xml-exc-c14n#";
+
+        /**
+         * Represents the Uniform Resource Identifier (URI) for exclusive XML canonicalization, with comments. 
+         * This field is constant.
+         */
         protected static XmlDsigExcC14NWithCommentsTransformUrl = SignedXml.XmlDsigExcC14NTransformUrl + "WithComments";
+
+        /**
+         * Represents the Uniform Resource Identifier (URI) for the XML Path Language (XPath). 
+         * This field is constant.
+         */
         protected static XmlDsigXPathTransformUrl = "http://www.w3.org/TR/1999/REC-xpath-19991116";
+
+        /**
+         * Represents the Uniform Resource Identifier (URI) for XSLT transformations. 
+         * This field is constant.
+         */
         protected static XmlDsigXsltTransformUrl = "http://www.w3.org/TR/1999/REC-xslt-19991116";
+
+        /**
+         * Represents the Uniform Resource Identifier (URI) for the license transform algorithm 
+         * used to normalize XrML licenses for signatures.
+         */
         protected static XmlLicenseTransformUrl = "urn:mpeg:mpeg21:2003:01-REL-R-NS:licenseTransform";
 
+        // Internal properties
 
         protected m_element: Node = null;
+
+        /**
+         * Represents the Signature object of the current SignedXml object
+         */
         protected m_signature: Signature = null;
         protected m_signature_algorithm: ISignatureAlgorithm = null;
         protected envdoc: Document = null;
@@ -39,6 +126,9 @@ namespace xadesjs {
 
         private static whitespaceChars = [` `, `\r`, `\n`, `\t`];
 
+        /**
+         * Gets or sets the KeyInfo object of the current SignedXml object.
+         */
         get KeyInfo(): KeyInfo {
             if (this.m_signature.KeyInfo == null)
                 this.m_signature.KeyInfo = new KeyInfo();
@@ -48,12 +138,17 @@ namespace xadesjs {
             this.m_signature.KeyInfo = value;
         }
 
+        /**
+         * Gets the Signature object of the current SignedXml object.
+         */
         get Signature(): Signature {
             return this.m_signature;
         }
 
+        /**
+         * Gets or sets the prefix for the current SignedXml object.
+         */
         set Prefix(value: string) {
-            console.log("Change prefix");
             this.m_prefix = value;
             this.SignedInfo.Prefix = this.m_prefix;
         }
@@ -61,6 +156,9 @@ namespace xadesjs {
             return this.m_prefix;
         }
 
+        /**
+         * Gets the length of the signature for the current SignedXml object.
+         */
         get SignatureLength(): number {
             return this.m_signature.SignatureValue.length;
         }
@@ -69,24 +167,46 @@ namespace xadesjs {
             return this.m_signature.SignedInfo.SignatureMethod;
         }
 
+        /**
+         * Gets the signature value of the current SignedXml object.
+         */
         get SignatureValue(): ArrayBuffer {
             return this.m_signature.SignatureValue;
         }
 
+        /**
+         * Gets the CanonicalizationMethod of the current SignedXml object.
+         */
         get CanonicalizationMethod(): string {
             return this.m_signature.SignedInfo.CanonicalizationMethod;
         }
 
+        /**
+         * Gets the SignedInfo object of the current SignedXml object.
+         */
         get SignedInfo(): SignedInfo {
             return this.m_signature.SignedInfo;
         }
 
+        /**
+         * Gets or sets the asymmetric algorithm key used for signing a SignedXml object.
+         */
         get SigningKey(): CryptoKey {
             this.m_signature_algorithm = null;
             return this.key;
         }
         set SigningKey(value: CryptoKey) {
             this.key = value;
+        }
+
+        /**
+         * Gets or sets the name of the installed key to be used for signing the SignedXml object.
+         */
+        get SigningKeyName(): string {
+            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
+        }
+        set SigningKeyName(value: string) {
+            throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
         }
 
         /**
@@ -111,12 +231,6 @@ namespace xadesjs {
             }
         }
 
-        static CanonicalizationAlgorithms: { [index: string]: ICanonicalizationAlgorithmConstructable } = {
-            "http://www.w3.org/2001/10/xml-exc-c14n#": XmlDsigExcC14NTransform,
-            "http://www.w3.org/2001/10/xml-exc-c14n#WithComments": XmlDsigExcC14NWithCommentsTransform,
-            "http://www.w3.org/2000/09/xmldsig#enveloped-signature": XmlDsigEnvelopedSignatureTransform
-        };
-
         static HashAlgorithms: { [index: string]: IHashAlgorithmConstructable } = {
             "http://www.w3.org/2000/09/xmldsig#sha1": SHA1,
             "http://www.w3.org/2001/04/xmlenc#sha224": SHA224,
@@ -139,14 +253,14 @@ namespace xadesjs {
             "http://www.w3.org/2000/09/xmldsig#hmac-sha1": HMACSHA1
         };
 
+        /**
+         * Returns the public key of a signature.
+         */
         protected GetPublicKey(): Promise {
             return new Promise((resolve, reject) => {
                 if (this.key !== null)
                     return resolve(this.key);
 
-                // if (this.pkEnumerator == null) {
-                //     this.pkEnumerator = this.m_signature.KeyInfo.GetEnumerator();
-                // }
                 let pkEnumerator = this.KeyInfo.GetEnumerator();
 
                 for (let kic of pkEnumerator) {
@@ -161,6 +275,14 @@ namespace xadesjs {
             });
         }
 
+
+        /**
+         * Adds a Reference object to the SignedXml object that describes a digest method, 
+         * digest value, and transform to use for creating an XML digital signature.
+         * @param  {Reference} reference The Reference object that describes a digest method, digest value, 
+         * and transform to use for creating an XML digital signature.
+         * @returns void
+         */
         AddReference(reference: Reference): void {
             if (reference == null)
                 throw new XmlError(XE.PARAM_REQUIRED, "reference");
@@ -316,7 +438,7 @@ namespace xadesjs {
 
             // if (!this.SignatureValue) {
             // when creating signatures
-            let xml = new XMLSerializer().serializeToString(this.m_signature.SignedInfo.getXml())
+            let xml = new XMLSerializer().serializeToString(this.m_signature.SignedInfo.GetXml())
             let doc = new DOMParser().parseFromString(xml, APPLICATION_XML);
             if (this.envdoc) {
                 let namespaces = SelectNamespaces(this.envdoc.documentElement);
@@ -366,6 +488,11 @@ namespace xadesjs {
             return t.GetOutput();
         }
 
+        /**
+         * Computes an XML digital signature using the specified algorithm.
+         * @param  {Algorithm} algorithm Specified WebCrypto Algoriithm
+         * @returns Promise
+         */
         public ComputeSignature(algorithm: Algorithm): Promise {
             return new Promise((resolve, reject) => {
                 if (this.key != null) {
@@ -393,6 +520,11 @@ namespace xadesjs {
             });
         }
 
+        /**
+         * Determines whether the SignedXml.Signature property verifies using the public key in the signature.
+         * @param  {Node} xml Verifing XML document 
+         * @returns Promise
+         */
         CheckSignature(xml: Node): Promise {
             return new Promise((resolve, reject) => {
                 this.validationErrors = [];
@@ -409,7 +541,6 @@ namespace xadesjs {
 
                 this.ValidateReferences(xml)
                     .then(() => {
-                        // console.log("XADESJS: References checked");
                         return this.validateSignatureValue();
                     })
                     .then(resolve, reject);
@@ -420,12 +551,10 @@ namespace xadesjs {
             let signer: ISignatureAlgorithm;
             let signedInfoCanon: string;
             return new Promise((resolve, reject) => {
-                // signedInfoCanon = this.getCanonXml([this.SignedInfo.CanonicalizationMethodObject], this.SignedInfo.getXml());
                 signedInfoCanon = this.SignedInfoTransformed();
                 signer = this.findSignatureAlgorithm(this.SignatureMethod);
                 this.GetPublicKey()
                     .then((key: CryptoKey) => {
-                        // console.log("XADESJS: Get public key for verification");
                         return signer.verifySignature(signedInfoCanon, key, Convert.FromBufferString(this.SignatureValue));
                     })
                     .then(resolve, reject);
@@ -477,7 +606,7 @@ namespace xadesjs {
             });
         }
 
-        getCanonXml(transforms: Transform[], node: Node): string {
+        protected getCanonXml(transforms: Transform[], node: Node): string {
             let res = "";
             let canonXml = node;
 
@@ -494,14 +623,16 @@ namespace xadesjs {
         }
 
         /**
-         * loadSignature
+         * Loads a SignedXml state from an XML element.
+         * @param  {Element} value The XML element to load the SignedXml state from.
+         * @returns void
          */
-        public loadXml(value: Element): void {
+        public LoadXml(value: Element): void {
             if (value == null)
                 throw new XmlError(XE.PARAM_REQUIRED, "value");
 
             this.m_element = value;
-            this.m_signature.loadXml(value);
+            this.m_signature.LoadXml(value);
             // Need to give the EncryptedXml object to the 
             // XmlDecryptionTransform to give it a fighting 
             // chance at decrypting the document.
@@ -532,9 +663,13 @@ namespace xadesjs {
             return xel as Element;
         }
 
-        public getXml(): Element {
+        /**
+         * Returns the XML representation of a SignedXml object.
+         * @returns Element
+         */
+        public GetXml(): Element {
             this.m_signature.Prefix = this.Prefix;
-            return this.m_signature.getXml(this.envdoc);
+            return this.m_signature.GetXml();
         }
 
     }

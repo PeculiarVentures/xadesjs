@@ -10,6 +10,9 @@ namespace xadesjs {
         ext: boolean;
     }
 
+    /**
+     * Represents the <ECKeyValue> element of an XML signature.
+     */
     export class EcdsaKeyValue extends XmlObject implements KeyInfoClause {
 
         protected m_key: CryptoKey = null;
@@ -21,6 +24,9 @@ namespace xadesjs {
         protected m_curve: NamedCurve = null;
         protected m_keyusage: string[] = null;
 
+        /**
+         * Gets or sets the instance of ECDSA that holds the public key.
+         */
         get Key(): CryptoKey {
             return this.m_key;
         }
@@ -28,18 +34,30 @@ namespace xadesjs {
             this.m_key = value;
         }
 
+        /**
+         * Gets the algorithm of the public key
+         */
         get Algorithm(): ISignatureAlgorithm {
             return this.m_algorithm;
         }
 
+        /**
+         * Gets the X point value of then public key
+         */
         get X(): Uint8Array {
             return this.m_x;
         }
 
+        /**
+         * Gets the Y point value of then public key
+         */
         get Y(): Uint8Array {
             return this.m_y;
         }
 
+        /**
+         * Gets the NamedCurve value of then public key
+         */
         get NamedCurve(): NamedCurve {
             return this.m_curve;
         }
@@ -48,6 +66,11 @@ namespace xadesjs {
             super();
         }
 
+        /**
+         * Imports key to the ECKeyValue object 
+         * @param  {CryptoKey} key
+         * @returns Promise
+         */
         importKey(key: CryptoKey): Promise {
             return new Promise((resolve, reject) => {
                 if (key.algorithm.name.toUpperCase() !== "ECDSA")
@@ -66,6 +89,11 @@ namespace xadesjs {
             });
         }
 
+        /**
+         * Exports key from the ECKeyValue object
+         * @param  {Algorithm} alg
+         * @returns Promise
+         */
         exportKey(alg: Algorithm): Promise {
             return new Promise((resolve, reject) => {
                 if (this.m_key)
@@ -87,7 +115,11 @@ namespace xadesjs {
             });
         }
 
-        getXml(): Element {
+        /**
+         * Returns the XML representation of the ECDSA key clause.
+         * @returns Element
+         */
+        GetXml(): Element {
             if (this.m_element)
                 return this.m_element;
 
@@ -124,7 +156,12 @@ namespace xadesjs {
             return xnKeyValue;
         }
 
-        loadXml(element: Element): void {
+        /**
+         * Loads an ECDSA key clause from an XML element.
+         * @param  {Element} element
+         * @returns void
+         */
+        LoadXml(element: Element): void {
             if ((element.localName !== XmlSignature.ElementNames.ECKeyValue) || (element.namespaceURI !== XmlSignature.NamespaceURI))
                 throw new XmlError(XE.CRYPTOGRAPHIC, "element");
 

@@ -1,4 +1,9 @@
 namespace xadesjs {
+
+    /**
+     * The SignedInfo class represents the <SignedInfo> element 
+     * of an XML signature defined by the XML digital signature specification
+     */
     export class SignedInfo extends XmlObject {
 
         private references: Reference[];
@@ -15,6 +20,10 @@ namespace xadesjs {
             this.c14nMethod = XmlSignature.AlgorithmNamespaces.XmlDsigC14NTransform;
         }
 
+        /**
+         * Gets or sets the canonicalization algorithm that is used before signing 
+         * for the current SignedInfo object.
+         */
         get CanonicalizationMethod(): string {
             return this.c14nMethod;
         }
@@ -23,15 +32,24 @@ namespace xadesjs {
             this.element = null;
         }
 
+        /**
+         * Gets a Transform object used for canonicalization.
+         * @returns Transform
+         */
         get CanonicalizationMethodObject(): Transform {
             return CryptoConfig.CreateFromName(this.CanonicalizationMethod);
         }
 
-        // documented as not supported (and throwing exception)
-        public length(): number {
-            throw new XmlError(XE.METHOD_NOT_SUPPORTED);
+        /**
+         * Gets the number of references in the current SignedInfo object.
+         */
+        get Count(): number {
+            return this.References.length;
         }
 
+        /**
+         * Gets or sets the ID of the current SignedInfo object.
+         */
         get Id(): string {
             return this.id;
         }
@@ -40,32 +58,44 @@ namespace xadesjs {
             this.id = value;
         }
 
-        // documented as not supported (and throwing exception)
+        /**
+         * Gets a value that indicates whether the collection is read-only.
+         * @returns boolean
+         */
         get IsReadOnly(): boolean {
             throw new XmlError(XE.METHOD_NOT_SUPPORTED);
         }
 
-        // documented as not supported (and throwing exception)
+        /**
+         * Gets a value that indicates whether the collection is synchronized.
+         * @returns boolean
+         */
         get IsSynchronized(): boolean {
             throw new XmlError(XE.METHOD_NOT_SUPPORTED);
         }
 
-        // Manipulating this array never affects GetXml() when 
-        // LoadXml() was used. 
-        // (Actually, there is no way to detect modification.)
+        /**
+         * Gets a list of the Reference objects of the current SignedInfo object.
+         */
         get References(): Reference[] {
             return this.references;
         }
 
+        /**
+         * Gets or sets the length of the signature for the current SignedInfo object.
+         */
         get SignatureLength(): string {
             return this.signatureLength;
         }
         set SignatureLength(value: string) {
             this.element = null;
             this.signatureLength = value;
-
         }
 
+        /**
+         * Gets or sets the name of the algorithm used for signature generation 
+         * and validation for the current SignedInfo object.
+         */
         get SignatureMethod(): string {
             return this.signatureMethod;
         }
@@ -74,21 +104,37 @@ namespace xadesjs {
             this.signatureMethod = value;
         }
 
-        // documented as not supported (and throwing exception)
+        /**
+         * Gets an object to use for synchronization.
+         */
         get SyncRoot(): any {
             throw new XmlError(XE.METHOD_NOT_SUPPORTED);
         }
 
-        AddReference(reference: Reference): void {
+        /**
+         * Adds a Reference object to the list of references to digest and sign.
+         * @param  {Reference} reference The reference to add to the list of references.
+         * @returns void
+         */
+        public AddReference(reference: Reference): void {
             this.references.push(reference);
         }
 
-        // documented as not supported (and throwing exception)
+        /**
+         * Copies the elements of this instance into an Array object, starting at a specified index in the array.
+         * @param  {any[]} array
+         * @param  {number} index
+         * @returns void
+         */
         public CopyTo(array: any[], index: number): void {
             throw new XmlError(XE.METHOD_NOT_SUPPORTED);
         }
 
-        getXml(): Node {
+        /**
+         * Returns the XML representation of the SignedInfo object.
+         * @returns Node
+         */
+        GetXml(): Node {
             if (this.element != null)
                 return this.element;
 
@@ -129,7 +175,7 @@ namespace xadesjs {
             for (let i in this.references) {
                 let r = this.references[i];
                 r.Prefix = this.Prefix;
-                let xn = r.getXml();
+                let xn = r.GetXml();
                 let newNode = doc.importNode(xn, true);
                 xel.appendChild(newNode);
             }
@@ -137,13 +183,18 @@ namespace xadesjs {
             return xel;
         }
 
-        GetAttribute(xel: Element, attribute: string): string {
+        protected GetAttribute(xel: Element, attribute: string): string {
             if (!xel.hasAttribute(attribute))
                 return null;
             return xel.getAttribute(attribute);
         }
 
-        loadXml(value: Element): void {
+        /**
+         * Loads a SignedInfo state from an XML element.
+         * @param  {Element} value
+         * @returns void
+         */
+        LoadXml(value: Element): void {
             if (value == null)
                 throw new XmlError(XE.PARAM_REQUIRED, "value");
 
@@ -168,7 +219,7 @@ namespace xadesjs {
                     n.localName === XmlSignature.ElementNames.Reference &&
                     n.namespaceURI === XmlSignature.NamespaceURI) {
                     let r = new Reference();
-                    r.loadXml(<Element>n);
+                    r.LoadXml(<Element>n);
                     this.AddReference(r);
                 }
             }

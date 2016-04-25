@@ -126,4 +126,15 @@ namespace xadesjs {
             });
     }
 
+    export function SelectNamespaces(node: Element): Node[] {
+        let attrs: Node[] = [];
+        for (let i = 0; i < node.attributes.length; i++) {
+            let attr = node.attributes[i];
+            if (attr.localName === "xml" || attr.prefix === "xml" ||
+                attr.localName === "xmlns" || attr.prefix === "xmlns")
+                attrs.push(attr);
+        }
+        return attrs;
+    }
+
 }

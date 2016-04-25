@@ -30,13 +30,13 @@ namespace xadesjs {
          * Writes object to XML node
          * @returns Node
          */
-        getXml(): Node;
+        GetXml(): Node;
         /**
          * Reads XML from string
          * @param  {Node} node
          * @returns void
          */
-        loadXml(node: Node): void;
+        LoadXml(node: Node): void;
     }
 
     export abstract class XmlObject implements IXmlSerializable {
@@ -54,18 +54,18 @@ namespace xadesjs {
             return (this.Prefix) ? this.m_prefix + ":" : "";
         }
 
-        getXml(): Node;
-        getXml(document: Document): Node;
-        getXml(document: Document = null): Node {
+        GetXml(): Node;
+        GetXml(document: Document): Node;
+        GetXml(document: Document = null): Node {
             throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
         }
 
-        loadXml(node: Node): void {
+        LoadXml(node: Node): void {
             throw new XmlError(XE.METHOD_NOT_IMPLEMENTED);
         }
 
         toString(): string {
-            let xml = this.getXml();
+            let xml = this.GetXml();
             return new XMLSerializer().serializeToString(xml);
         }
 
