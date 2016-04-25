@@ -397,7 +397,7 @@ namespace xadesjs {
         if (node.attributes)
             for (let i = 0; i < node.attributes.length; i++) {
                 let attr = node.attributes[i];
-                if (!IsNamespaceNode(attr) && node.attributes[i].prefix === prefix)
+                if (!IsNamespaceNode(attr) && prefix && node.attributes[i].prefix === prefix)
                     return ++result;
             }
         // check prefix of Element

@@ -28,6 +28,7 @@
         "src/transforms/c14n.ts",
         "src/transforms/exc_c14n.ts",
         "src/crypto_config.ts",
+        "src/data_object.ts",
         "src/reference.ts",
         "src/key_info.ts",
         "src/signature.ts",

@@ -125,7 +125,7 @@ function SignXml(xmlString, key, algorithm) {
             })
             .then(function () {
                 // Append signature
-                var xmlDigitalSignature = signedXml.getXml();
+                var xmlDigitalSignature = signedXml.GetXml();
                 xmlDoc.documentElement.appendChild(xmlDigitalSignature);
 
                 // Serialize XML document
@@ -155,7 +155,7 @@ var xmlDoc = parser.parseFromString(ref, "application/xml");
 var xmlSignature = xmlDoc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 
 var sxml = new xadesjs.SignedXml(xmlDoc);
-sxml.loadXml(xmlSignature[0]);
+sxml.LoadXml(xmlSignature[0]);
 sxml.CheckSignature();
 ```
 
