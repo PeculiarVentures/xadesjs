@@ -323,6 +323,20 @@ namespace xadesjs {
             }
         }
 
+        protected findById(element: Element, id: string): Element {
+            if (element.nodeType !== xadesjs.XmlNodeType.Element)
+                return null;
+            if (element.hasAttribute("Id") && element.getAttribute("Id") === id)
+                return element;
+            if (element.childNodes && element.childNodes.length)
+                for (let i = 0; i < element.childNodes.length; i++) {
+                    let el = this.findById(element.childNodes[i] as Element, id);
+                    if (el)
+                        return el;
+                }
+            return null;
+        }
+
         private GetReferenceHash(r: Reference, check_hmac: boolean): Promise {
             return new Promise((resolve, reject) => {
                 let doc: Node = null;
@@ -357,19 +371,18 @@ namespace xadesjs {
                         let found: Element = null;
                         for (let i in this.m_signature.ObjectList) {
                             let obj = this.m_signature.ObjectList[i];
-                            if (obj.Id === objectName) {
-                                found = obj.GetXml();
+                            found = this.findById((obj as any).element, objectName);
+                            if (found) {
                                 found.setAttribute("xmlns", SignedXml.XmlDsigNamespaceUrl);
-                                doc.appendChild((doc as Document).importNode(found, true));
+                                doc = (doc as Document).importNode(found, true);
                                 // FIXME: there should be theoretical justification of copying namespace declaration nodes this way.
                                 for (let j = 0; j < found.childNodes.length; j++) {
                                     let n = found.childNodes[j];
                                     // Do not copy default namespace as it must be xmldsig namespace for "Object" element.
-                                    if (n.nodeType === XmlNodeType.Element)
-                                        this.FixupNamespaceNodes(n as Element, (doc as Document).documentElement, true);
+                                    if (n.nodeType === xadesjs.XmlNodeType.Element)
+                                        this.FixupNamespaceNodes(n, doc, true);
                                 }
                                 break;
-
                             }
                         }
                         if (found == null && this.envdoc != null) {

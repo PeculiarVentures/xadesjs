@@ -69,5 +69,11 @@ namespace xadesjs {
             return new XMLSerializer().serializeToString(xml);
         }
 
+        protected getAttribute(xel: Element, attribute: string): string {
+            if (xel.hasAttribute(attribute))
+                return xel.getAttribute(attribute);
+            return null;
+        }
+
     }
 }

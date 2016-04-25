@@ -136,12 +136,6 @@ namespace xadesjs {
             return xel;
         }
 
-        private getAttribute(xel: Element, attribute: string): string {
-            if (xel.hasAttribute(attribute))
-                return xel.getAttribute(attribute);
-            return null;
-        }
-
         /**
          * Loads a Signature state from an XML element.
          * @param  {Element} value
