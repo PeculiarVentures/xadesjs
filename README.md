@@ -1,6 +1,6 @@
 # XAdESjs
 
-[XAdES](https://en.wikipedia.org/wiki/XAdES) is short for "XML Advanced Electronic Signatures", it is a superset of XMLDSIG, which this library also supports. This library aims to provide an implementation XAdES in pure Javascript that uses Web Crypto for cryptographic operations so it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)).
+[XAdES](https://en.wikipedia.org/wiki/XAdES) is short for "XML Advanced Electronic Signatures", it is a superset of XMLDSIG. This library aims to provide an implementation of both XMLDSIG and XAdES (not yet) in pure Javascript that uses Web Crypto for cryptographic operations so it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)).
 
 There are seven different profiles of XAdES, they are:
 - Basic Electronic Signature (XAdES-BES)
@@ -15,9 +15,9 @@ They differ slightly based on what is included in the signature:
 
 |            | Provides Digital Signature | Includes Cryptographic Timestamp | Includes Revocation References | Includes Revocation Data | Allows Secure Timestamp Countersignature |
 |------------|----------------------------|----------------------------------|--------------------------------|--------------------------|------------------------------------------|
-| **XAdES-BES**  | Yes                        | No                               | No                             | No                       | No                                       |
-| **XAdES-EPES** | Yes                        | No                               | No                             | No                       | No                                       |
-| **XAdES-T**    | Yes                        | Yes                              | No                             | No                       | No                                       |
+| XAdES-BES  | Yes                        | No                               | No                             | No                       | No                                       |
+| XAdES-EPES | Yes                        | No                               | No                             | No                       | No                                       |
+| XAdES-T    | Yes                        | Yes                              | No                             | No                       | No                                       |
 | XAdES-C    | Yes                        | Yes                              | Yes                            | No                       | No                                       |
 | XAdES-X    | Yes                        | Yes                              | Yes                            | No                       | No                                       |
 | XAdES-X-L  | Yes                        | Yes                              | Yes                            | Yes                      | No                                       |
@@ -51,9 +51,7 @@ They differ slightly based on what is included in the signature:
 
 ## EXAMPLES
 
-### Create XAdES-BES Signature
-
-HTML
+### Declaring Dependencies
 ```html
 <script type="text/javascript" src="../node_modules/asn1js/org/pkijs/common.js"></script>
 <script type="text/javascript" src="../node_modules/asn1js/org/pkijs/asn1.js"></script>
@@ -61,6 +59,8 @@ HTML
 <script type="text/javascript" src="../node_modules/pkijs/org/pkijs/x509_simpl.js"></script>
 <script src="../built/xades.js"></script>
 ```
+
+### Create XMLDSIG Signature
 
 ```javascript
 // Generate RSA key pair
@@ -137,7 +137,7 @@ function SignXml(xmlString, key, algorithm) {
 }
 ```
 
-### Check XAdES-BES Signature 
+### Check XMLDSIG Signature 
 
 ```javascript
 var xadesjs = require("../built/xades.js");
@@ -157,11 +157,6 @@ var xmlSignature = xmlDoc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmld
 var sxml = new xadesjs.SignedXml(xmlDoc);
 sxml.LoadXml(xmlSignature[0]);
 sxml.CheckSignature();
-```
-
-### Validate XAdES-BES Signature
-
-```Javascript
 ```
 
 ## THANKS AND ACKNOWLEDGEMENT
