@@ -140,6 +140,8 @@ function SignXml(xmlString, key, algorithm) {
 ### Check XMLDSIG Signature 
 
 ```javascript
+var xadesjs = require("../built/xades.js");
+
 var XMLSerializer = require("xmldom").XMLSerializer;
 var DOMParser = require("xmldom").DOMParser;
 var DOMImplementation = require("xmldom").DOMImplementation;
