@@ -534,27 +534,46 @@ namespace xadesjs {
         }
 
         /**
-         * Determines whether the SignedXml.Signature property verifies using the public key in the signature.
-         * @param  {Node} xml Verifing XML document 
+         * Determines whether the SignedXml.Signature property verifies using the public key in the signature. 
          * @returns Promise
          */
-        CheckSignature(xml: Node): Promise {
+        CheckSignature(): Promise;
+        CheckSignature(key: CryptoKey): Promise;
+        CheckSignature(cert: X509Certificate): Promise;
+        CheckSignature(param?: any): Promise {
             return new Promise((resolve, reject) => {
                 this.validationErrors = [];
-                this.envdoc = xml as Document;
-                // this.signedXml = xml;
 
-                // if (!this.keyInfoProvider) {
-                //     throw new Error("cannot validate signature since no key info resolver was provided");
-                // }
-                // this.signingKey = this.keyInfoProvider.getKey(this.keyInfo);
-                // if (!this.signingKey) throw new Error(`key info provider could not resolve key info ${this.keyInfo}`);
-
-                // let doc = new DOMParser().parseFromString(xml, APPLICATION_XML);
+                let xml = this.envdoc;
 
                 this.ValidateReferences(xml)
                     .then(() => {
-                        return this.validateSignatureValue();
+                        if (param) {
+                            let signer = this.findSignatureAlgorithm(this.SignatureMethod);
+                            if (!signer)
+                                return reject(new XmlError(XE.ALGORITHM_NOT_SUPPORTED, this.SignedInfo.SignatureMethod));
+                            let promise = Promise.resolve();
+                            let key: CryptoKey = param;
+                            if (param instanceof X509Certificate) {
+                                // certificate
+                                let cert = param as X509Certificate;
+                                promise = promise
+                                    .then(() => {
+                                        return cert.exportKey(signer.algorithm);
+                                    })
+                                    .then((ckey: CryptoKey) => {
+                                        key = ckey;
+                                        return Promise.resolve();
+                                    });
+                            }
+                            let signedInfoCanon: string;
+                            return promise.then(() => {
+                                signedInfoCanon = this.SignedInfoTransformed();
+                                return signer.verifySignature(signedInfoCanon, key, Convert.FromBufferString(this.SignatureValue));
+                            });
+                        }
+                        else
+                            return this.validateSignatureValue();
                     })
                     .then(resolve, reject);
             });
