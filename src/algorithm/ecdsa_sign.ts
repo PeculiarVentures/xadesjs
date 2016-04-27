@@ -6,7 +6,7 @@ namespace xadesjs {
         algorithm: any = {
             name: ECDSA_SIGN_ALGORITHM,
             hash: {
-                name: "SHA-1"
+                name: SHA1
             }
         };
         xmlNamespace = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1";
@@ -16,7 +16,7 @@ namespace xadesjs {
         algorithm: any = {
             name: ECDSA_SIGN_ALGORITHM,
             hash: {
-                name: "SHA-224"
+                name: SHA224
             }
         };
         xmlNamespace = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha224";
@@ -26,7 +26,7 @@ namespace xadesjs {
         algorithm: any = {
             name: ECDSA_SIGN_ALGORITHM,
             hash: {
-                name: "SHA-256"
+                name: SHA256
             }
         };
         xmlNamespace = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256";
@@ -36,7 +36,7 @@ namespace xadesjs {
         algorithm: any = {
             name: ECDSA_SIGN_ALGORITHM,
             hash: {
-                name: "SHA-384"
+                name: SHA384
             }
         };
         xmlNamespace = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384";
@@ -46,7 +46,7 @@ namespace xadesjs {
         algorithm: any = {
             name: ECDSA_SIGN_ALGORITHM,
             hash: {
-                name: "SHA-512"
+                name: SHA512
             }
         };
         xmlNamespace = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512";

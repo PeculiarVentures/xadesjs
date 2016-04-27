@@ -63,7 +63,7 @@ namespace xadesjs {
          */
         importKey(key: CryptoKey): Promise {
             return new Promise((resolve, reject) => {
-                if (key.algorithm.name.toUpperCase() !== "RSASSA-PKCS1-V1_5")
+                if (key.algorithm.name.toUpperCase() !== RSA_PKCS1.toUpperCase())
                     throw new XmlError(XE.ALGORITHM_WRONG_NAME, key.algorithm.name);
                 this.m_key = key;
                 Application.crypto.subtle.exportKey("jwk", key)

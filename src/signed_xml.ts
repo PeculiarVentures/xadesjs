@@ -232,25 +232,25 @@ namespace xadesjs {
         }
 
         static HashAlgorithms: { [index: string]: IHashAlgorithmConstructable } = {
-            "http://www.w3.org/2000/09/xmldsig#sha1": SHA1,
-            "http://www.w3.org/2001/04/xmlenc#sha224": SHA224,
-            "http://www.w3.org/2001/04/xmlenc#sha256": SHA256,
-            "http://www.w3.org/2001/04/xmlenc#sha384": SHA384,
-            "http://www.w3.org/2001/04/xmlenc#sha512": SHA512
+            "http://www.w3.org/2000/09/xmldsig#sha1": Sha1,
+            "http://www.w3.org/2001/04/xmlenc#sha224": Sha224,
+            "http://www.w3.org/2001/04/xmlenc#sha256": Sha256,
+            "http://www.w3.org/2001/04/xmlenc#sha384": Sha384,
+            "http://www.w3.org/2001/04/xmlenc#sha512": Sha512
         };
 
         static SignatureAlgorithms: { [index: string]: ISignatureAlgorithmConstructable } = {
-            "http://www.w3.org/2000/09/xmldsig#rsa-sha1": RsaSha1,
-            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha224": RsaSha224,
-            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256": RsaSha256,
-            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384": RsaSha384,
-            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512": RsaSha512,
+            "http://www.w3.org/2000/09/xmldsig#rsa-sha1": RsaPkcs1Sha1,
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha224": RsaPkcs1Sha224,
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256": RsaPkcs1Sha256,
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384": RsaPkcs1Sha384,
+            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512": RsaPkcs1Sha512,
             "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1": EcdsaSha1,
             "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha224": EcdsaSha224,
             "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256": EcdsaSha256,
             "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384": EcdsaSha384,
             "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512": EcdsaSha512,
-            "http://www.w3.org/2000/09/xmldsig#hmac-sha1": HMACSHA1
+            "http://www.w3.org/2000/09/xmldsig#hmac-sha1": HmacSha1
         };
 
         /**
@@ -297,7 +297,7 @@ namespace xadesjs {
                 for (let r of this.m_signature.SignedInfo.References) {
                     // assume SHA-1 if nothing is specified
                     if (r.DigestMethod == null)
-                        r.DigestMethod = new SHA1().xmlNamespace;
+                        r.DigestMethod = new Sha1().xmlNamespace;
                     promise = promise.then(() => {
                         return this.GetReferenceHash(r, false);
                     })
@@ -707,24 +707,24 @@ namespace xadesjs {
     }
 
     function GetSignatureAlgorithm(algorithm: Algorithm): ISignatureAlgorithm {
-        if (algorithm.name.toUpperCase() === "RSASSA-PKCS1-V1_5") {
+        if (algorithm.name.toUpperCase() === RSA_PKCS1.toUpperCase()) {
             let hashName: string = (algorithm as any).hash.name;
             let alg: ISignatureAlgorithm;
             switch (hashName.toUpperCase()) {
-                case "SHA-1":
-                    alg = new RsaSha1();
+                case SHA1:
+                    alg = new RsaPkcs1Sha1();
                     break;
-                case "SHA-224":
-                    alg = new RsaSha224();
+                case SHA224:
+                    alg = new RsaPkcs1Sha224();
                     break;
-                case "SHA-256":
-                    alg = new RsaSha256();
+                case SHA256:
+                    alg = new RsaPkcs1Sha256();
                     break;
-                case "SHA-384":
-                    alg = new RsaSha384();
+                case SHA384:
+                    alg = new RsaPkcs1Sha384();
                     break;
-                case "SHA-512":
-                    alg = new RsaSha512();
+                case SHA512:
+                    alg = new RsaPkcs1Sha512();
                     break;
                 default:
                     throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
@@ -735,19 +735,19 @@ namespace xadesjs {
             let hashName: string = (algorithm as any).hash.name;
             let alg: ISignatureAlgorithm;
             switch (hashName.toUpperCase()) {
-                case "SHA-1":
+                case SHA1:
                     alg = new EcdsaSha1();
                     break;
-                case "SHA-224":
+                case SHA224:
                     alg = new EcdsaSha224();
                     break;
-                case "SHA-256":
+                case SHA256:
                     alg = new EcdsaSha256();
                     break;
-                case "SHA-384":
+                case SHA384:
                     alg = new EcdsaSha384();
                     break;
-                case "SHA-512":
+                case SHA512:
                     alg = new EcdsaSha512();
                     break;
                 default:
