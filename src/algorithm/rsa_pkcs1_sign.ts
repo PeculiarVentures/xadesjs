@@ -2,6 +2,12 @@ namespace xadesjs {
 
     export const RSA_PKCS1 = "RSASSA-PKCS1-v1_5";
 
+    export const RSA_PKCS1_SHA1_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
+    export const RSA_PKCS1_SHA224_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha224";
+    export const RSA_PKCS1_SHA256_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+    export const RSA_PKCS1_SHA384_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384";
+    export const RSA_PKCS1_SHA512_NAMESPACE = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
+
     export class RsaPkcs1Sha1 extends SignatureAlgorithm {
         algorithm: any = {
             name: RSA_PKCS1,
@@ -9,7 +15,7 @@ namespace xadesjs {
                 name: SHA1
             }
         };
-        xmlNamespace = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
+        xmlNamespace = RSA_PKCS1_SHA1_NAMESPACE;
     }
 
     export class RsaPkcs1Sha224 extends SignatureAlgorithm {
@@ -19,7 +25,7 @@ namespace xadesjs {
                 name: SHA224
             }
         };
-        xmlNamespace = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha224";
+        xmlNamespace = RSA_PKCS1_SHA224_NAMESPACE;
     }
 
     export class RsaPkcs1Sha256 extends SignatureAlgorithm {
@@ -29,7 +35,7 @@ namespace xadesjs {
                 name: SHA256
             }
         };
-        xmlNamespace = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+        xmlNamespace = RSA_PKCS1_SHA256_NAMESPACE;
     }
 
     export class RsaPkcs1Sha384 extends SignatureAlgorithm {
@@ -39,7 +45,7 @@ namespace xadesjs {
                 name: SHA384
             }
         };
-        xmlNamespace = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384";
+        xmlNamespace = RSA_PKCS1_SHA384_NAMESPACE;
     }
 
     export class RsaPkcs1Sha512 extends SignatureAlgorithm {
@@ -49,7 +55,7 @@ namespace xadesjs {
                 name: SHA512
             }
         };
-        xmlNamespace = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
+        xmlNamespace = RSA_PKCS1_SHA512_NAMESPACE;
     }
 
 }

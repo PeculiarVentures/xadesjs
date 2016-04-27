@@ -231,28 +231,6 @@ namespace xadesjs {
             }
         }
 
-        static HashAlgorithms: { [index: string]: IHashAlgorithmConstructable } = {
-            "http://www.w3.org/2000/09/xmldsig#sha1": Sha1,
-            "http://www.w3.org/2001/04/xmlenc#sha224": Sha224,
-            "http://www.w3.org/2001/04/xmlenc#sha256": Sha256,
-            "http://www.w3.org/2001/04/xmlenc#sha384": Sha384,
-            "http://www.w3.org/2001/04/xmlenc#sha512": Sha512
-        };
-
-        static SignatureAlgorithms: { [index: string]: ISignatureAlgorithmConstructable } = {
-            "http://www.w3.org/2000/09/xmldsig#rsa-sha1": RsaPkcs1Sha1,
-            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha224": RsaPkcs1Sha224,
-            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256": RsaPkcs1Sha256,
-            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384": RsaPkcs1Sha384,
-            "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512": RsaPkcs1Sha512,
-            "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1": EcdsaSha1,
-            "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha224": EcdsaSha224,
-            "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256": EcdsaSha256,
-            "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384": EcdsaSha384,
-            "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512": EcdsaSha512,
-            "http://www.w3.org/2000/09/xmldsig#hmac-sha1": HmacSha1
-        };
-
         /**
          * Returns the public key of a signature.
          */
@@ -264,7 +242,7 @@ namespace xadesjs {
                 let pkEnumerator = this.KeyInfo.GetEnumerator();
 
                 for (let kic of pkEnumerator) {
-                    let alg = this.findSignatureAlgorithm(this.SignatureMethod);
+                    let alg = CryptoConfig.CreateSignatureAlgorithm(this.SignatureMethod);
                     kic.exportKey(alg.algorithm)
                         .then((key: CryptoKey) => {
                             this.key = key;
@@ -427,7 +405,7 @@ namespace xadesjs {
                         s = excC14N.GetOutput();
                     }
                 }
-                let digest = this.findHashAlgorithm(r.DigestMethod);
+                let digest = CryptoConfig.CreateHashAlgorithm(r.DigestMethod);
                 if (digest == null)
                     resolve(null);
                 else {
@@ -549,7 +527,7 @@ namespace xadesjs {
                 this.ValidateReferences(xml)
                     .then(() => {
                         if (param) {
-                            let signer = this.findSignatureAlgorithm(this.SignatureMethod);
+                            let signer = CryptoConfig.CreateSignatureAlgorithm(this.SignatureMethod);
                             if (!signer)
                                 return reject(new XmlError(XE.ALGORITHM_NOT_SUPPORTED, this.SignedInfo.SignatureMethod));
                             let promise = Promise.resolve();
@@ -584,7 +562,7 @@ namespace xadesjs {
             let signedInfoCanon: string;
             return new Promise((resolve, reject) => {
                 signedInfoCanon = this.SignedInfoTransformed();
-                signer = this.findSignatureAlgorithm(this.SignatureMethod);
+                signer = CryptoConfig.CreateSignatureAlgorithm(this.SignatureMethod);
                 this.GetPublicKey()
                     .then((key: CryptoKey) => {
                         return signer.verifySignature(signedInfoCanon, key, Convert.FromBufferString(this.SignatureValue));
@@ -593,25 +571,11 @@ namespace xadesjs {
             });
         }
 
-        protected findSignatureAlgorithm(name: string): ISignatureAlgorithm {
-            let algo = SignedXml.SignatureAlgorithms[name];
-            if (algo)
-                return new algo();
-            else throw new Error(`signature algorithm '${name}' is not supported`);
-        }
-
         protected findCanonicalizationAlgorithm(name: string): Transform {
             let algo = (<any>SignedXml).CanonicalizationAlgorithms[name];
             if (algo)
                 return new algo();
             else throw new Error(`canonicalization algorithm '${name}' is not supported`);
-        }
-
-        protected findHashAlgorithm(name: string): IHashAlgorithm {
-            let algo = SignedXml.HashAlgorithms[name];
-            if (algo)
-                return new algo();
-            else throw new Error("hash algorithm '" + name + "' is not supported");
         }
 
         protected ValidateReferences(doc: Node): Promise {
