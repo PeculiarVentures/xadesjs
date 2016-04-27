@@ -32,7 +32,7 @@ They differ slightly based on what is included in the signature:
 | RSASSA-PKCS1-v1_5 | X    | X        | X        | X        |
 | RSA-PSS           | X    | X        | X        | X        |
 | ECDSA             | X    | X        | X        | X        |
-| HMAC              | X    |          |          |          |
+| HMAC              | X    | X        | X        | X        |
 
 ## CANONICALIZATION ALGORITHM SUPPORT
 
