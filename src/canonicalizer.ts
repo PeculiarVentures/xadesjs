@@ -56,8 +56,6 @@ namespace xadesjs {
             this.WriteNode(_node);
 
             let res = this.result.join("");
-            if (Application.isNodePlugin())
-                return res.replace(/\&\#xD\;/g, "\n");
             return res;
         }
 
