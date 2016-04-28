@@ -6,11 +6,11 @@ namespace xadesjs {
     SignatureAlgorithms[RSA_PKCS1_SHA256_NAMESPACE] = RsaPkcs1Sha256;
     SignatureAlgorithms[RSA_PKCS1_SHA384_NAMESPACE] = RsaPkcs1Sha384;
     SignatureAlgorithms[RSA_PKCS1_SHA512_NAMESPACE] = RsaPkcs1Sha512;
-    SignatureAlgorithms[RSA_PSS_SHA1_NAMESPACE] = RsaPssSha1;
-    SignatureAlgorithms[RSA_PSS_SHA224_NAMESPACE] = RsaPssSha224;
-    SignatureAlgorithms[RSA_PSS_SHA256_NAMESPACE] = RsaPssSha256;
-    SignatureAlgorithms[RSA_PSS_SHA384_NAMESPACE] = RsaPssSha384;
-    SignatureAlgorithms[RSA_PSS_SHA512_NAMESPACE] = RsaPssSha512;
+    SignatureAlgorithms[RSA_PSS_WITH_PARAMS_MGF1_NAMESPACE] = RsaPssSha1;
+    SignatureAlgorithms[RSA_PSS_WITH_PARAMS_MGF1_NAMESPACE] = RsaPssSha224;
+    SignatureAlgorithms[RSA_PSS_WITH_PARAMS_MGF1_NAMESPACE] = RsaPssSha256;
+    SignatureAlgorithms[RSA_PSS_WITH_PARAMS_MGF1_NAMESPACE] = RsaPssSha384;
+    SignatureAlgorithms[RSA_PSS_WITH_PARAMS_MGF1_NAMESPACE] = RsaPssSha512;
     SignatureAlgorithms[ECDSA_SHA1_NAMESPACE] = EcdsaSha1;
     SignatureAlgorithms[ECDSA_SHA224_NAMESPACE] = EcdsaSha224;
     SignatureAlgorithms[ECDSA_SHA256_NAMESPACE] = EcdsaSha256;

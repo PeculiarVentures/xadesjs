@@ -215,6 +215,9 @@ namespace xadesjs {
             DSAKeyValue: "DSAKeyValue",
             EncryptedKey: "EncryptedKey",
             HMACOutputLength: "HMACOutputLength",
+            RSAPSSParams: "RSAPSSParams",
+            MaskGenerationFunction: "MaskGenerationFunction",
+            SaltLength: "SaltLength",
             KeyInfo: "KeyInfo",
             KeyName: "KeyName",
             KeyValue: "KeyValue",
@@ -273,6 +276,8 @@ namespace xadesjs {
         },
 
         NamespaceURI: "http://www.w3.org/2000/09/xmldsig#",
+        NamespaceURIMore: "http://www.w3.org/2007/05/xmldsig-more#",
+        NamespaceURIPss: "http://www.example.org/xmldsig-pss/#",
         Prefix: "ds",
 
         GetChildElement: function GetChildElement(xel: Node, element: string, ns: string): Element {

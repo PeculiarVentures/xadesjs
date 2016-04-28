@@ -10,6 +10,7 @@ namespace xadesjs {
         private c14nMethod: string;
         private id: string;
         private signatureMethod: string;
+        private signatureParams: XmlObject;
         private signatureLength: string;
         private element: Element;
         private signedXml: SignedXml = null;
@@ -106,6 +107,15 @@ namespace xadesjs {
             this.signatureMethod = value;
         }
 
+
+        public get SignatureParams(): XmlObject {
+            return this.signatureParams;
+        }
+
+        public set SignatureParams(v: XmlObject) {
+            this.signatureParams = v;
+        }
+
         /**
          * Gets an object to use for synchronization.
          */
@@ -160,11 +170,20 @@ namespace xadesjs {
             if (this.signatureMethod) {
                 let sm = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.SignatureMethod);
                 sm.setAttribute(XmlSignature.AttributeNames.Algorithm, this.signatureMethod);
-                // HMAC
-                if (this.signedXml && this.signedXml.SigningKey &&  this.signedXml.SigningKey.algorithm.name === "HMAC") {
-                    let hmac = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.HMACOutputLength);
-                    hmac.textContent = (this.signedXml.SigningKey.algorithm as any).length;
-                    sm.appendChild(hmac);
+                if (this.signedXml && this.signedXml.SigningKey) {
+                    // HMAC
+                    if (this.signedXml.SigningKey.algorithm.name === HMAC_ALGORITHM) {
+                        let hmac = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.HMACOutputLength);
+                        hmac.textContent = (this.signedXml.SigningKey.algorithm as any).length;
+                        sm.appendChild(hmac);
+                    }
+                    // RSA-PSS 
+                    else if (this.signedXml.SigningKey.algorithm.name === RSA_PSS) {
+                        this.signatureParams.Prefix = "pss";
+                        (this.signatureParams as any).dsPrefix = this.Prefix;
+                        let pss = this.signatureParams.GetXml();
+                        sm.appendChild(pss);
+                    }
                 }
                 xel.appendChild(sm);
             }
@@ -210,6 +229,13 @@ namespace xadesjs {
             let sm = XmlSignature.GetChildElement(value, XmlSignature.ElementNames.SignatureMethod, XmlSignature.NamespaceURI);
             if (sm !== null) {
                 this.signatureMethod = sm.getAttribute(XmlSignature.AttributeNames.Algorithm);
+                if (sm.hasChildNodes){
+                    let pss = XmlSignature.GetChildElement(sm, XmlSignature.ElementNames.RSAPSSParams, XmlSignature.NamespaceURIPss);
+                    if (pss){
+                        this.signatureParams = new PssAlgorithmParams();
+                        this.signatureParams.LoadXml(pss);
+                    }
+                }
                 // let length = XmlSignature.GetChildElement(sm, XmlSignature.ElementNames.HMACOutputLength, XmlSignature.NamespaceURI);
                 // if (length != null) {
                 //     this.signatureLength = length.textContent;

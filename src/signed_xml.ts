@@ -492,11 +492,29 @@ namespace xadesjs {
                         this.m_signature.SignedInfo.SignatureMethod = alg.xmlNamespace;
                     else if (this.m_signature.SignedInfo.SignatureMethod !== alg.xmlNamespace)
                         throw new XmlError(XE.CRYPTOGRAPHIC, "Specified SignatureAlgorithm is not supported by the signing key.");
+                    if (this.key.algorithm.name.toUpperCase() === RSA_PSS) {
+                        let pss = this.SignedInfo.SignatureParams = new PssAlgorithmParams();
+                        pss.SaltLength = (algorithm as any).saltLength;
+                        switch ((this.key.algorithm as any).hash.name.toUpperCase()) {
+                            case SHA1:
+                                pss.DigestMethod = SHA1_NAMESPACE;
+                                break;
+                            case SHA256:
+                                pss.DigestMethod = SHA256_NAMESPACE;
+                                break;
+                            case SHA384:
+                                pss.DigestMethod = SHA384_NAMESPACE;
+                                break;
+                            case SHA512:
+                                pss.DigestMethod = SHA512_NAMESPACE;
+                                break;
+                        }
+                    }
                     this.DigestReferences()
                         .then(() => {
                             // let si = this.getCanonXml([this.SignedInfo.CanonicalizationMethodObject], this.SignedInfo.getXml());
                             let si = this.SignedInfoTransformed();
-                            alg.getSignature(si, this.key)
+                            alg.getSignature(si, this.key, algorithm)
                                 .then((signature: Uint8Array) => {
                                     this.m_signature.SignatureValue = signature;
                                     resolve(signature);
@@ -546,7 +564,14 @@ namespace xadesjs {
                             let signedInfoCanon: string;
                             return promise.then(() => {
                                 signedInfoCanon = this.SignedInfoTransformed();
-                                return signer.verifySignature(signedInfoCanon, key, Convert.FromBufferString(this.SignatureValue));
+                                let alg: any = null;
+                                if (this.SignedInfo.SignatureParams && this.SignatureMethod === RSA_PSS_WITH_PARAMS_MGF1_NAMESPACE) {
+                                    let sp = this.SignedInfo.SignatureParams as PssAlgorithmParams;
+                                    alg = { name: RSA_PSS };
+                                    if (sp.SaltLength)
+                                        alg.saltLength = sp.SaltLength;
+                                }
+                                return signer.verifySignature(signedInfoCanon, key, Convert.FromBufferString(this.SignatureValue), alg);
                             });
                         }
                         else
@@ -694,6 +719,30 @@ namespace xadesjs {
             }
             return alg;
         }
+        else if (algorithm.name.toUpperCase() === RSA_PSS.toUpperCase()) {
+            let hashName: string = (algorithm as any).hash.name;
+            let alg: ISignatureAlgorithm;
+            switch (hashName.toUpperCase()) {
+                case SHA1:
+                    alg = new RsaPssSha1();
+                    break;
+                case SHA224:
+                    alg = new RsaPssSha224();
+                    break;
+                case SHA256:
+                    alg = new RsaPssSha256();
+                    break;
+                case SHA384:
+                    alg = new RsaPssSha384();
+                    break;
+                case SHA512:
+                    alg = new RsaPssSha512();
+                    break;
+                default:
+                    throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
+            }
+            return alg;
+        }
         else if (algorithm.name.toUpperCase() === "ECDSA") {
             let hashName: string = (algorithm as any).hash.name;
             let alg: ISignatureAlgorithm;
@@ -718,7 +767,7 @@ namespace xadesjs {
             }
             return alg;
         }
-        else if (algorithm.name.toUpperCase() === "HMAC") {
+        else if (algorithm.name.toUpperCase() === HMAC_ALGORITHM) {
             let hashName: string = (algorithm as any).hash.name;
             let alg: ISignatureAlgorithm;
             switch (hashName.toUpperCase()) {

@@ -91,21 +91,33 @@ namespace xadesjs {
                 let modulus = Convert.ToBase64UrlString(Convert.FromBufferString(this.m_modulus));
                 let exponent = Convert.ToBase64UrlString(Convert.FromBufferString(this.m_exponent));
                 let algJwk: string = null;
+                switch (alg.name.toUpperCase()) {
+                    case RSA_PKCS1.toUpperCase():
+                        algJwk = "R";
+                        break;
+                    case RSA_PSS.toUpperCase():
+                        algJwk = "P";
+                        break;
+                    default:
+                        throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, alg.name);
+                }
+
+                // Convert hash to JWK name
                 switch ((alg as any).hash.name.toUpperCase()) {
-                    case "SHA-1":
-                        algJwk = "RS1";
+                    case SHA1:
+                        algJwk += "S1";
                         break;
-                    case "SHA-224":
-                        algJwk = "RS224";
+                    case SHA224:
+                        algJwk += "S224";
                         break;
-                    case "SHA-256":
-                        algJwk = "RS256";
+                    case SHA256:
+                        algJwk += "S256";
                         break;
-                    case "SHA-384":
-                        algJwk = "RS384";
+                    case SHA384:
+                        algJwk += "S384";
                         break;
-                    case "SHA-512":
-                        algJwk = "RS512";
+                    case SHA512:
+                        algJwk += "S512";
                         break;
                 }
                 let jwk: IJwkRsa = {
