@@ -12,11 +12,13 @@ namespace xadesjs {
         private signatureMethod: string;
         private signatureLength: string;
         private element: Element;
+        private signedXml: SignedXml = null;
 
-        public constructor() {
+        public constructor(signedXml?: SignedXml) {
             super();
+            if (signedXml)
+                this.signedXml = signedXml;
             this.references = new Array();
-            // this.c14nMethod = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
             this.c14nMethod = XmlSignature.AlgorithmNamespaces.XmlDsigC14NTransform;
         }
 
@@ -150,17 +152,18 @@ namespace xadesjs {
             if (this.id != null)
                 xel.setAttribute(XmlSignature.AttributeNames.Id, this.id);
 
-            if (this.c14nMethod != null) {
+            if (this.c14nMethod) {
                 let c14n = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.CanonicalizationMethod);
                 c14n.setAttribute(XmlSignature.AttributeNames.Algorithm, this.c14nMethod);
                 xel.appendChild(c14n);
             }
-            if (this.signatureMethod != null) {
+            if (this.signatureMethod) {
                 let sm = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.SignatureMethod);
                 sm.setAttribute(XmlSignature.AttributeNames.Algorithm, this.signatureMethod);
-                if (this.signatureLength != null) {
+                // HMAC
+                if (this.signedXml && this.signedXml.SigningKey &&  this.signedXml.SigningKey.algorithm.name === "HMAC") {
                     let hmac = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.HMACOutputLength);
-                    hmac.textContent = this.signatureLength;
+                    hmac.textContent = (this.signedXml.SigningKey.algorithm as any).length;
                     sm.appendChild(hmac);
                 }
                 xel.appendChild(sm);
@@ -207,10 +210,10 @@ namespace xadesjs {
             let sm = XmlSignature.GetChildElement(value, XmlSignature.ElementNames.SignatureMethod, XmlSignature.NamespaceURI);
             if (sm !== null) {
                 this.signatureMethod = sm.getAttribute(XmlSignature.AttributeNames.Algorithm);
-                let length = XmlSignature.GetChildElement(sm, XmlSignature.ElementNames.HMACOutputLength, XmlSignature.NamespaceURI);
-                if (length != null) {
-                    this.signatureLength = length.textContent;
-                }
+                // let length = XmlSignature.GetChildElement(sm, XmlSignature.ElementNames.HMACOutputLength, XmlSignature.NamespaceURI);
+                // if (length != null) {
+                //     this.signatureLength = length.textContent;
+                // }
             }
 
             for (let i = 0; i < value.childNodes.length; i++) {

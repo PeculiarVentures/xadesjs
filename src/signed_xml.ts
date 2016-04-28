@@ -192,7 +192,6 @@ namespace xadesjs {
          * Gets or sets the asymmetric algorithm key used for signing a SignedXml object.
          */
         get SigningKey(): CryptoKey {
-            this.m_signature_algorithm = null;
             return this.key;
         }
         set SigningKey(value: CryptoKey) {
@@ -219,7 +218,7 @@ namespace xadesjs {
             super();
             // constructor();
             this.m_signature = new Signature();
-            this.m_signature.SignedInfo = new SignedInfo();
+            this.m_signature.SignedInfo = new SignedInfo(this);
             // this.hashes = new Hashtable(2); // 98% SHA1 for now
             if (node && (node as Node).nodeType === XmlNodeType.Document) {
                 // constructor(node: Document);
@@ -487,7 +486,7 @@ namespace xadesjs {
         public ComputeSignature(algorithm: Algorithm): Promise {
             return new Promise((resolve, reject) => {
                 if (this.key != null) {
-                    let alg = GetSignatureAlgorithm(algorithm);
+                    let alg = GetSignatureAlgorithm((this.key.algorithm as any).hash ? this.key.algorithm : algorithm);
                     if (this.m_signature.SignedInfo.SignatureMethod == null)
                         // required before hashing
                         this.m_signature.SignedInfo.SignatureMethod = alg.xmlNamespace;
@@ -713,6 +712,27 @@ namespace xadesjs {
                     break;
                 case SHA512:
                     alg = new EcdsaSha512();
+                    break;
+                default:
+                    throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
+            }
+            return alg;
+        }
+        else if (algorithm.name.toUpperCase() === "HMAC") {
+            let hashName: string = (algorithm as any).hash.name;
+            let alg: ISignatureAlgorithm;
+            switch (hashName.toUpperCase()) {
+                case SHA1:
+                    alg = new HmacSha1();
+                    break;
+                case SHA256:
+                    alg = new HmacSha256();
+                    break;
+                case SHA384:
+                    alg = new HmacSha384();
+                    break;
+                case SHA512:
+                    alg = new HmacSha512();
                     break;
                 default:
                     throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, `${algorithm.name}:${hashName}`);
