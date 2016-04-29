@@ -32,7 +32,7 @@ namespace xadesjs {
                 name: SHA256
             }
         };
-        xmlNamespace = RSA_PSS_WITH_PARAMS_NAMESPACE;
+        xmlNamespace = RSA_PSS_WITH_PARAMS_MGF1_NAMESPACE;
     }
 
     export class RsaPssSha384 extends SignatureAlgorithm {

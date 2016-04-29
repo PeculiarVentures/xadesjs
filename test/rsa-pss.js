@@ -46,7 +46,6 @@ describe("xadesjs", function () {
     before(function (done) {
         generateRsaKey("SHA-1")
             .then(function (k) {
-                console.log("rsaKeySHA512", k);
                 rsaKeySHA1 = k;
                 return generateRsaKey("SHA-256");
             })
@@ -110,8 +109,19 @@ describe("xadesjs", function () {
     }
 
     it("Sign/verify RSA-PSS SHA1", function (done) {
-        console.log("Sign/verify");
         Test(rsaKeySHA1, "RSA-PSS-SHA1", done);
+    })
+    
+    it("Sign/verify RSA-PSS SHA256", function (done) {
+        Test(rsaKeySHA256, "RSA-PSS-SHA256", done);
+    })
+    
+    it("Sign/verify RSA-PSS SHA384", function (done) {
+        Test(rsaKeySHA384, "RSA-PSS-SHA384", done);
+    })
+    
+    it("Sign/verify RSA-PSS SHA512", function (done) {
+        Test(rsaKeySHA512, "RSA-PSS-SHA512", done);
     })
 
 })
