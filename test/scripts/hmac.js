@@ -1,10 +1,11 @@
-var select, xadesjs, DOMParser, readXml, assert;
+var select, xadesjs, DOMParser, XMLSerializer, readXml, assert;
 
 if (typeof module !== "undefined") {
     var config = require("./config");
     select = config.select;
     xadesjs = config.xadesjs;
     DOMParser = config.DOMParser;
+    XMLSerializer = config.XMLSerializer;
     assert = config.assert;
     readXml = config.readXml;
 }
@@ -35,7 +36,7 @@ describe("HMAC", function () {
         };
         if (length != void 0)
             alg.length = length;
-        return window.crypto.subtle.generateKey(
+        return xadesjs.Application.crypto.subtle.generateKey(
             alg,
             false,
             ["sign", "verify"]

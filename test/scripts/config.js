@@ -4,6 +4,7 @@ var fs = require("fs");
 var assert = require("assert");
 var select = require("xpath.js");
 var DOMParser = require("xmldom").DOMParser;
+var XMLSerializer = require("xmldom").XMLSerializer;
 xadesjs = require("../../built/xades.js");
 
 var WebCrypto = require("node-webcrypto-ossl").default;
@@ -25,6 +26,7 @@ module.exports = {
     select: select,
     xadesjs: xadesjs,
     DOMParser: DOMParser,
+    XMLSerializer: XMLSerializer,
     readXml: readXml,
     assert: assert
 }

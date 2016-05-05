@@ -1,9 +1,7 @@
 var select, xadesjs, DOMParser, XMLSerializer, readXml, assert;
 
-
 if (typeof module !== "undefined") {
-    // If NodeJS, then import modules
-    var config = require("./config");
+    var config = require("./scripts/config");
     select = config.select;
     xadesjs = config.xadesjs;
     DOMParser = config.DOMParser;
@@ -12,66 +10,84 @@ if (typeof module !== "undefined") {
     readXml = config.readXml;
 }
 
-// Generate RSA key pair
-var privateKey, publicKey;
-xadesjs.Application.crypto.subtle.generateKey(
-    {
-        name: "RSASSA-PKCS1-v1_5",
-        hash: { name: "SHA-1" },
-        publicExponent: new Uint8Array([1, 0, 1]),
-        modulusLength: 1024
-    },
-    false,
-    ["sign", "verify"]
-)
-    .then(function (keyPair) {
-        // Push ganerated keys to global variable
-        privateKey = keyPair.privateKey;
-        publicKey = keyPair.publicKey;
+function done(e) {
+    if (e)
+        console.log("Errro", e);
+    else
+        console.log("Success");
+}
 
-        // Call sign function
-        var xmlString = '<player bats="left" id="10012" throws="right">\n\t<!-- Here\'s a comment -->\n\t<name>Alfonso Soriano</name>\n\t<position>2B</position>\n\t<team>New York Yankees</team>\n</player>';
-        return SignXml(xmlString, privateKey, { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-1" } });
+
+function CheckSignature(xmlString, key) {
+    return new Promise(function (resolve, reject) {
+        var xml = new DOMParser().parseFromString(xmlString, "application/xml");
+        var signature = select(xml, "//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
+        var sig = new xadesjs.SignedXml(xml);
+        sig.LoadXml(signature);
+        sig.CheckSignature(key)
+            .then(resolve, reject);
     })
-    .then(function (signedDocument) {
-        console.log("Signed document:\n\n", signedDocument);
+}
+
+var rsaKeySHA1 = null;
+var rsaKeySHA256 = null;
+var rsaKeySHA384 = null;
+var rsaKeySHA512 = null;
+
+function generateRsaKey(hash) {
+    var alg = {
+        name: "RSASSA-PKCS1-v1_5",
+        modulusLength: 1024,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: { name: hash }
+    };
+    return xadesjs.Application.crypto.subtle.generateKey(
+        alg,
+        false,
+        ["sign", "verify"]
+    );
+}
+
+
+generateRsaKey("SHA-1")
+    .then(function (k) {
+        rsaKeySHA1 = k;
+        return generateRsaKey("SHA-256");
     })
-    .catch(function (e) {
-        console.error(e);
-    });
+    .then(function (k) {
+        rsaKeySHA256 = k;
+        return generateRsaKey("SHA-384");
+    })
+    .then(function (k) {
+        rsaKeySHA384 = k;
+        return generateRsaKey("SHA-512");
+    })
+    .then(function (k) {
+        rsaKeySHA512 = k;
+        Test(rsaKeySHA1, "RSA-PKCS1-SHA1", done);
+        return Promise.resolve();
+    })
+    .then(done, done);
 
 
 function SignXml(xmlString, key, algorithm) {
     return new Promise(function (resolve, reject) {
         var xmlDoc = new DOMParser().parseFromString(xmlString, "application/xml");
         var signedXml = new xadesjs.SignedXml(xmlDoc);
-
         // Add the key to the SignedXml document.
         signedXml.SigningKey = key;
-
         // Create a reference to be signed.
         var reference = new xadesjs.Reference();
         reference.Uri = "";
-
         // Add an enveloped transformation to the reference.
         reference.AddTransform(new xadesjs.XmlDsigEnvelopedSignatureTransform());
-
         // Add the reference to the SignedXml object.
         signedXml.AddReference(reference);
-
-        // Add KeyInfo
-        signedXml.KeyInfo = new xadesjs.KeyInfo();
-        var keyInfoClause = new xadesjs.RsaKeyValue();
-        signedXml.KeyInfo.AddClause(keyInfoClause);
-
         // Set prefix for Signature namespace
         signedXml.Prefix = "ds";
 
         // Compute the signature.
         signedXml.ComputeSignature(algorithm)
-            .then(function () {
-                return keyInfoClause.importKey(publicKey);
-            })
             .then(function () {
                 // Append signature
                 var xmlDigitalSignature = signedXml.GetXml();
@@ -84,3 +100,17 @@ function SignXml(xmlString, key, algorithm) {
             .then(resolve, reject);
     })
 }
+
+function Test(key, keyName, done, length) {
+    SignXml("<root><child1/><child2/><child3/></root>", key.privateKey, { name: "RSASSA-PKCS1-v1_5", saltLength: 12 })
+        .then(function (xmlSig) {
+            assert.equal(!!xmlSig, true, "Empty XML signature string for " + keyName);
+            return CheckSignature(xmlSig, key.publicKey);
+        })
+        .then(function (v) {
+            assert.equal(v, true, "Wrong signature verification for " + keyName);
+            return Promise.resolve();
+        })
+        .then(done, done);
+}
+
