@@ -28,6 +28,7 @@ function getXmlHttp() {
 function readFile(path, cb) {
     var xmlhttp = getXmlHttp()
     xmlhttp.open('GET', path, true);
+    // xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=ISO-8859-1');
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4) {
             if (xmlhttp.status == 200) {
@@ -47,7 +48,8 @@ function readXml(path, cb) {
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4) {
             if (xmlhttp.status == 200) {
-                cb(xmlhttp.responseXML);
+                assert.equal(!!xmlhttp.responseXML, true, `Can not get XML from ${path}`);
+                    cb(xmlhttp.responseXML);
             }
             else {
                 assert.equal(false, true, "Error on XML reading " + path);

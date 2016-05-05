@@ -1,6 +1,6 @@
 namespace xadesjs {
 
-    interface IJwkRsa {
+    export interface IJwkRsa {
         alg: string;
         kty: string;
         e: string;

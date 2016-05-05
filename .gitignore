@@ -3,3 +3,5 @@
 /typings
 /.vscode
 npm-debug.log
+/test/static
+/test/test.js

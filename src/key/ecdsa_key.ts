@@ -1,8 +1,8 @@
 namespace xadesjs {
 
-    declare type NamedCurve = "P-256" | "P-384" | "P-521";
+    export declare type NamedCurve = "P-256" | "P-384" | "P-521";
 
-    interface IJwkEcdsa {
+    export interface IJwkEcdsa {
         crv: NamedCurve;
         kty: "EC";
         x: string;

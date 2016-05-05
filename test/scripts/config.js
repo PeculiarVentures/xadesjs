@@ -4,7 +4,7 @@ var fs = require("fs");
 var assert = require("assert");
 var select = require("xpath.js");
 var DOMParser = require("xmldom").DOMParser;
-xadesjs = require("../built/xades.js");
+xadesjs = require("../../built/xades.js");
 
 var WebCrypto = require("node-webcrypto-ossl").default;
 xadesjs.Application.setEngine("OpenSSL", new WebCrypto());

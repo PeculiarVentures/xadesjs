@@ -1,11 +1,11 @@
 namespace xadesjs {
 
-    declare type XmlNamespace = {
+    export declare type XmlNamespace = {
         prefix: string;
         namespace: string;
     }
 
-    enum XmlCanonicalizerState {
+    export enum XmlCanonicalizerState {
         BeforeDocElement,
         InsideDocElement,
         AfterDocElement

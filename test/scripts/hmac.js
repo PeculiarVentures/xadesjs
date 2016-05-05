@@ -9,7 +9,7 @@ if (typeof module !== "undefined") {
     readXml = config.readXml;
 }
 
-describe("xadesjs", function () {
+describe("HMAC", function () {
 
     function CheckSignature(xmlString, key) {
         return new Promise(function (resolve, reject) {
@@ -22,17 +22,16 @@ describe("xadesjs", function () {
         })
     }
 
-    var rsaKeySHA1 = null;
-    var rsaKeySHA256 = null;
-    var rsaKeySHA384 = null;
-    var rsaKeySHA512 = null;
+    var hmacKeySHA1 = null;
+    var hmacKeySHA256 = null;
+    var hmacKeySHA256Length128 = null;
+    var hmacKeySHA384 = null;
+    var hmacKeySHA512 = null;
 
-    function generateRsaKey(hash) {
+    function generateHmacKey(hash, length) {
         var alg = {
-            name: "RSA-PSS",
-            modulusLength: 1024,
-            publicExponent: new Uint8Array([1, 0, 1]),
-            hash: { name: hash }
+            name: "HMAC",
+            hash: { name: hash },
         };
         if (length != void 0)
             alg.length = length;
@@ -44,21 +43,25 @@ describe("xadesjs", function () {
     }
 
     before(function (done) {
-        generateRsaKey("SHA-1")
+        generateHmacKey("SHA-1")
             .then(function (k) {
-                rsaKeySHA1 = k;
-                return generateRsaKey("SHA-256");
+                hmacKeySHA1 = k;
+                return generateHmacKey("SHA-256")
             })
             .then(function (k) {
-                rsaKeySHA256 = k;
-                return generateRsaKey("SHA-384");
+                hmacKeySHA256 = k;
+                return generateHmacKey("SHA-384")
             })
             .then(function (k) {
-                rsaKeySHA384 = k;
-                return generateRsaKey("SHA-512");
+                hmacKeySHA384 = k;
+                return generateHmacKey("SHA-512")
             })
             .then(function (k) {
-                rsaKeySHA512 = k;
+                hmacKeySHA512 = k;
+                return generateHmacKey("SHA-256", 128)
+            })
+            .then(function (k) {
+                hmacKeySHA256Length128 = k;
                 return Promise.resolve();
             })
             .then(done, done);
@@ -96,10 +99,10 @@ describe("xadesjs", function () {
     }
 
     function Test(key, keyName, done, length) {
-        SignXml("<root><child1/><child2/><child3/></root>", key.privateKey, { name: "RSA-PSS", saltLength: 12 })
+        SignXml("<root><child1/><child2/><child3/></root>", key, { name: "HMAC" })
             .then(function (xmlSig) {
                 assert.equal(!!xmlSig, true, "Empty XML signature string for " + keyName);
-                return CheckSignature(xmlSig, key.publicKey);
+                return CheckSignature(xmlSig, key);
             })
             .then(function (v) {
                 assert.equal(v, true, "Wrong signature verification for " + keyName);
@@ -108,20 +111,20 @@ describe("xadesjs", function () {
             .then(done, done);
     }
 
-    it("Sign/verify RSA-PSS SHA1", function (done) {
-        Test(rsaKeySHA1, "RSA-PSS-SHA1", done);
+    it("Sign/verify HMAC SHA1", function (done) {
+        Test(hmacKeySHA1, "HMAC-SHA1", done);
     })
     
-    it("Sign/verify RSA-PSS SHA256", function (done) {
-        Test(rsaKeySHA256, "RSA-PSS-SHA256", done);
+    it("Sign/verify HMAC SHA256", function (done) {
+        Test(hmacKeySHA1, "HMAC-SHA256", done);
     })
     
-    it("Sign/verify RSA-PSS SHA384", function (done) {
-        Test(rsaKeySHA384, "RSA-PSS-SHA384", done);
+    it("Sign/verify HMAC SHA384", function (done) {
+        Test(hmacKeySHA1, "HMAC-SHA384", done);
     })
     
-    it("Sign/verify RSA-PSS SHA512", function (done) {
-        Test(rsaKeySHA512, "RSA-PSS-SHA512", done);
+    it("Sign/verify HMAC SHA512", function (done) {
+        Test(hmacKeySHA1, "HMAC-SHA512", done);
     })
 
 })

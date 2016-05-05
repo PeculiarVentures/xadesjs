@@ -1,67 +1,86 @@
-var select, xadesjs, DOMParser, readXml, assert;
+var select, xadesjs, DOMParser, XMLSerializer, readXml, assert;
+
 
 if (typeof module !== "undefined") {
+    // If NodeJS, then import modules
     var config = require("./config");
     select = config.select;
     xadesjs = config.xadesjs;
     DOMParser = config.DOMParser;
+    XMLSerializer = config.XMLSerializer;
     assert = config.assert;
     readXml = config.readXml;
 }
 
-describe("xadesjs", function() {
+// Generate RSA key pair
+var privateKey, publicKey;
+xadesjs.Application.crypto.subtle.generateKey(
+    {
+        name: "RSASSA-PKCS1-v1_5",
+        hash: { name: "SHA-1" },
+        publicExponent: new Uint8Array([1, 0, 1]),
+        modulusLength: 1024
+    },
+    false,
+    ["sign", "verify"]
+)
+    .then(function (keyPair) {
+        // Push ganerated keys to global variable
+        privateKey = keyPair.privateKey;
+        publicKey = keyPair.publicKey;
 
-    function verifyXML(name, done, res) {
-        if (res === void 0) res = true;
-        readXml("./test/static/" + name, function(xml) {
-            var signature = select(xml, "//*//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
-            var sig = new xadesjs.SignedXml();
-            sig.loadXml(signature);
-            sig.checkSignature(xml)
-                .then(function(v) {
-                    assert.equal(v, res, "Wrong signature verifing");
-                    done();
-                })
-                .catch(done);
-        })
-    }
+        // Call sign function
+        var xmlString = '<player bats="left" id="10012" throws="right">\n\t<!-- Here\'s a comment -->\n\t<name>Alfonso Soriano</name>\n\t<position>2B</position>\n\t<team>New York Yankees</team>\n</player>';
+        return SignXml(xmlString, privateKey, { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-1" } });
+    })
+    .then(function (signedDocument) {
+        console.log("Signed document:\n\n", signedDocument);
+    })
+    .catch(function (e) {
+        console.error(e);
+    });
 
-    it("Verify valid-signature.xml EXEC-C14N RSA-SHA1", function(done) {
-        // test validating SAML response
-        verifyXML("valid_signature.xml", done)
-    })
 
-    it("Verify valid_signature_utf8.xml EXEC-C14N RSA-SHA256", function(done) {
-        verifyXML("valid_signature_utf8.xml", done)
-    })
+function SignXml(xmlString, key, algorithm) {
+    return new Promise(function (resolve, reject) {
+        var xmlDoc = new DOMParser().parseFromString(xmlString, "application/xml");
+        var signedXml = new xadesjs.SignedXml(xmlDoc);
 
-    it("Verify valid_saml.xml SAML EXEC C14N RSA-SHA1", function(done) {
-        verifyXML("valid_saml.xml", done)
-    })
+        // Add the key to the SignedXml document.
+        signedXml.SigningKey = key;
 
-    it("test validating SAML response WithComments", function(done) {
-        console.warn("This doesn't matter, just want to make sure that we don't fail due to unknown algorithm");
-        verifyXML("valid_saml_with_comments.xml", done, false);
-    })
+        // Create a reference to be signed.
+        var reference = new xadesjs.Reference();
+        reference.Uri = "";
 
-    it("test validating SAML response where a namespace is defined outside the signed element", function(done) {
-        verifyXML("saml_external_ns.xml", done);
-    })
-    
-    it("Verify valid_signature_wsu.xml", function(done) {
-        verifyXML("valid_signature_wsu.xml", done)
-    })
+        // Add an enveloped transformation to the reference.
+        reference.AddTransform(new xadesjs.XmlDsigEnvelopedSignatureTransform());
 
-    it("Verify valid_signature_with_reference_keyInfo.xml", function(done) {
-        verifyXML("valid_signature_with_reference_keyInfo.xml", done)
-    })
+        // Add the reference to the SignedXml object.
+        signedXml.AddReference(reference);
 
-    it("Verify valid_signature_with_root_level_sig_namespace.xml", function(done) {
-        verifyXML("valid_signature_with_root_level_sig_namespace.xml", done)
-    })
-    
-    it("test validating WS-Fed Metadata", function(done) {
-        verifyXML("wsfederation_metadata.xml", done)
-    })
+        // Add KeyInfo
+        signedXml.KeyInfo = new xadesjs.KeyInfo();
+        var keyInfoClause = new xadesjs.RsaKeyValue();
+        signedXml.KeyInfo.AddClause(keyInfoClause);
 
-})
+        // Set prefix for Signature namespace
+        signedXml.Prefix = "ds";
+
+        // Compute the signature.
+        signedXml.ComputeSignature(algorithm)
+            .then(function () {
+                return keyInfoClause.importKey(publicKey);
+            })
+            .then(function () {
+                // Append signature
+                var xmlDigitalSignature = signedXml.GetXml();
+                xmlDoc.documentElement.appendChild(xmlDigitalSignature);
+
+                // Serialize XML document
+                var signedDocument = new XMLSerializer().serializeToString(xmlDoc);
+                return Promise.resolve(signedDocument);
+            })
+            .then(resolve, reject);
+    })
+}

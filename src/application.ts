@@ -1,6 +1,6 @@
 namespace xadesjs {
 
-    interface CryptoEx extends Crypto {
+    export interface CryptoEx extends Crypto {
         name: string;
     }
 

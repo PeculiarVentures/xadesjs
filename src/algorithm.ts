@@ -1,7 +1,7 @@
 namespace xadesjs {
     export type BASE64 = string;
 
-    interface IAlgorithm {
+    export interface IAlgorithm {
         algorithm: Algorithm;
         xmlNamespace: string;
         getAlgorithmName(): string;
@@ -15,7 +15,7 @@ namespace xadesjs {
         new (): IHashAlgorithm;
     }
 
-    abstract class XmlAlgorithm implements IAlgorithm {
+    export abstract class XmlAlgorithm implements IAlgorithm {
         algorithm: Algorithm;
         xmlNamespace: string;
         getAlgorithmName(): string {

@@ -290,8 +290,8 @@ namespace xadesjs {
         private FixupNamespaceNodes(src: Element, dst: Element, ignoreDefault: boolean): void {
             // add namespace nodes
             let namespaces = SelectNamespaces(src);
-            for (let i = 0; i < src.attributes.length; i++) {
-                let attr = src.attributes[i];
+            for (let i = 0; i < namespaces.length; i++) {
+                let attr = namespaces[i];
                 if (attr.localName === "xml")
                     continue;
                 if (ignoreDefault && attr.localName === "xmlns")
