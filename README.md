@@ -49,11 +49,11 @@ They differ slightly based on what is included in the signature:
 
 ### PLATFORM SUPPORT
 
-XAdESjs works with any browser that suppports the Web Crypto. 
+XAdESjs works with any browser that suppports  Web Crypto. 
 
-For Nodejs you will need to use [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11).
+For Node you will need to use [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11).
 
-Unless you are working with a PKCS#11 device you probably want [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl), to install it:
+Unless you are working with a PKCS #11 device you probably want [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl), to install it:
 
 ```
 npm install node-webcrypto-ossl
