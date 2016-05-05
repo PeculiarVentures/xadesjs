@@ -83,13 +83,13 @@ xadesjs.Application.setEngine("PKCS11", new WebCrypto({
 }));
 ```
 
-There are also two bugs in (xmldom)[https://github.com/jindw/xmldom] that we had to fix to make canonicalization work correctly on Node. We have submited two pull requests for these fixes but they have not been accepted yet. 
+There are also two bugs in (xmldom)[https://github.com/jindw/xmldom] that we had to fix to make canonicalization work correctly on Node. We have submitted two pull requests for these fixes but they have not been accepted yet. 
 
-This means that you will have to use [our fork of xmldom](https://github.com/peculiarventures/xmldom). Right now the package.json reffers to the official xmldom distribution, this means you will need to do a git clone of our fork ontop of that package to work in node.
+This means that you will have to use [our fork of xmldom](https://github.com/peculiarventures/xmldom). Right now the package.json reffers to the official xmldom distribution, this means you will need to do a git clone of our fork on-top  of that package to work in node.
 
 ## WARNING
 
-**Using XMLDSIG is a bit like running with scissors, that said it is needed for interopability with a number of systems, for this reason we have done this implementation.** 
+**Using XMLDSIG is a bit like running with scissors, that said it is needed for interoperability with a number of systems, for this reason, we have done this implementation.** 
 
 **Given the nuances in handling XMLDSIG securely at this time you should consider this solution suitable for research and experimentation, further code and security review is needed before utilization in a production application.**
 
