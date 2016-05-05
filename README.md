@@ -83,7 +83,7 @@ xadesjs.Application.setEngine("PKCS11", new WebCrypto({
 }));
 ```
 
-There are also two bugs in (xmldom)[https://github.com/jindw/xmldom] that we had to fix to make canonicalization work correctly on Node. We have submitted two pull requests ((1)[https://github.com/PeculiarVentures/xmldom/commit/a84fcbdc26eb98d4b2b9d28be35e216d266a7c21],(2)[https://github.com/PeculiarVentures/xmldom/commit/79e2d8c3d691510a6be8891b60e5768cf466f2f7])for these fixes but they have not been accepted yet. 
+There are also two bugs in (xmldom)[https://github.com/jindw/xmldom] that we had to fix to make canonicalization work correctly on Node. We have submitted two pull requests (1)[https://github.com/PeculiarVentures/xmldom/commit/a84fcbdc26eb98d4b2b9d28be35e216d266a7c21],(2)[https://github.com/PeculiarVentures/xmldom/commit/79e2d8c3d691510a6be8891b60e5768cf466f2f7]for these fixes but they have not been accepted yet. 
 
 This means that you will have to use [our fork of xmldom](https://github.com/peculiarventures/xmldom). Right now the package.json reffers to the official xmldom distribution, this means you will need to do a git clone of our fork on-top  of that package to work in node.
 
