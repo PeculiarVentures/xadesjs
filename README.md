@@ -83,21 +83,6 @@ xadesjs.Application.setEngine("PKCS11", new WebCrypto({
 }));
 ```
 
-## TESTING
-
-To run test for NodeJS:
-
-```
-npm test
-```
-
-To run the browser test you need to run the server, from the test directory run: 
-```
-npm start
-```
-
-And the then browse to `http://localhost:3000'.
-
 ## WARNING
 
 **Using XMLDSIG is a bit like running with scissors, that said it is needed for interopability with a number of systems, for this reason we have done this implementation.** 
@@ -214,6 +199,21 @@ var sxml = new xadesjs.SignedXml(xmlDoc);
 sxml.LoadXml(xmlSignature[0]);
 sxml.CheckSignature();
 ```
+
+## TESTING
+
+To run test for NodeJS:
+
+```
+npm test
+```
+
+To run the browser test you need to run the server, from the test directory run: 
+```
+npm start
+```
+
+And the then browse to `http://localhost:3000'.
 
 ## THANKS AND ACKNOWLEDGEMENT
 This project takes inspiration (style, approach, design and code) from both the [Mono System.Security.Cryptography.Xml](https://github.com/mono/mono/tree/master/mcs/class/System.Security/System.Security.Cryptography.Xml) implementation as well as [xml-crypto](https://github.com/yaronn/xml-crypto).
