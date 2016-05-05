@@ -51,7 +51,7 @@ They differ slightly based on what is included in the signature:
 
 XAdESjs works with any browser that suppports  Web Crypto. 
 
-For Node you will need to use [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11).
+For Node you will need to use a polyfill for Web Crypto such as [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11).
 
 Unless you are working with a PKCS #11 device you probably want [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl), to install it:
 
@@ -82,6 +82,10 @@ xadesjs.Application.setEngine("PKCS11", new WebCrypto({
 	pin: "token pin"
 }));
 ```
+
+There are also two bugs in (xmldom)[https://github.com/jindw/xmldom] that we had to fix to make canonicalization work correctly on Node. We have submited two pull requests for these fixes but they have not been accepted yet. 
+
+This means that you will have to use [our fork of xmldom](https://github.com/peculiarventures/xmldom). Right now the package.json reffers to the official xmldom distribution, this means you will need to do a git clone of our fork ontop of that package to work in node.
 
 ## WARNING
 
