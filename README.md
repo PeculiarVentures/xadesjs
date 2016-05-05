@@ -27,7 +27,9 @@ They differ slightly based on what is included in the signature:
 
 - Variants in **BOLD** are currently supported by XAdESjs
  
-## CRYPTOGRAPHIC ALGORITHM SUPPORT 
+## COMPATABILITY
+
+### CRYPTOGRAPHIC ALGORITHM SUPPORT 
 
 |                   | SHA1 | SHA2-256 | SHA2-384 | SHA2-512 |
 |-------------------|------|----------|----------|----------|
@@ -36,7 +38,7 @@ They differ slightly based on what is included in the signature:
 | ECDSA             | X    | X        | X        | X        |
 | HMAC              | X    | X        | X        | X        |
 
-## CANONICALIZATION ALGORITHM SUPPORT
+### CANONICALIZATION ALGORITHM SUPPORT
 
 - XmlDsigC14NTransform
 - XmlDsigC14NWithCommentsTransform
@@ -44,31 +46,21 @@ They differ slightly based on what is included in the signature:
 - XmlDsigExcC14NWithCommentsTransform
 - XmlDsigEnvelopedSignatureTransform
 
- 
-## WARNING
 
-**Using XMLDSIG is a bit like running with scissors, that said it is needed for interopability with a number of systems, for this reason we have done this implementation.** 
+### PLATFORM SUPPORT
 
-**Given the nuances in handling XMLDSIG securely at this time you should consider this solution suitable for research and experimentation, further code and security review is needed before utilization in a production application.**
+XAdESjs works with any browser that suppports the Web Crypto. 
 
-## Web browser supporting
+For Nodejs you will need to use [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11).
 
-xadesjs no need crypto engine, it uses W3 WebCrypto module
+Unless you are working with a PKCS#11 device you probably want [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl), to install it:
 
-## NodeJS supporting
-NodeJS hasn't got nodejs implementation. You can use for it [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11).
-
-To install node-webcrypto-ossl
 ```
 npm install node-webcrypto-ossl
 ```
 
-To install node-webcrypto-p11
-```
-npm install node-webcrypto-p11
-```
+With [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) installed you need to specify you want to use it, that looks like this:
 
-To apply OSSL
 ```javascript
 var xadesjs = require("xadesjs");
 var WebCrypto = require("node-webcrypto-ossl").default;
@@ -76,7 +68,8 @@ var WebCrypto = require("node-webcrypto-ossl").default;
 xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
 ```
 
-To apply PKCS11
+The [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11) will work the same way you just have to specify the details about your PKCS #11 device when you instansiate it:
+
 ```javascript
 var xadesjs = require("xadesjs");
 var WebCrypto = require("node-webcrypto-p11").WebCrypto;
@@ -90,18 +83,27 @@ xadesjs.Application.setEngine("PKCS11", new WebCrypto({
 }));
 ```
 
-## Testing
+## TESTING
 
-To run test for NodeJS
+To run test for NodeJS:
+
 ```
 npm test
 ```
 
-To run express server for browser test
+To run the browser test you need to run the server, from the test directory run: 
 ```
 npm start
 ```
-- Current command starts web server on localhost:3000.
+
+And the then browse to `http://localhost:3000'.
+
+## WARNING
+
+**Using XMLDSIG is a bit like running with scissors, that said it is needed for interopability with a number of systems, for this reason we have done this implementation.** 
+
+**Given the nuances in handling XMLDSIG securely at this time you should consider this solution suitable for research and experimentation, further code and security review is needed before utilization in a production application.**
+
 
 ## EXAMPLES
 
