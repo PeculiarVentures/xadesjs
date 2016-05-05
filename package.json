@@ -1,7 +1,7 @@
 {
   "name": "xadesjs",
   "version": "1.0.0",
-  "description": "A JavaScript library for XAdES signature",
+  "description": "A pure Javascript implementation of XMLDSIG and XAdES based on Web Crypto ",
   "main": "index.js",
   "scripts": {
     "test": "mocha test/scripts",
@@ -18,8 +18,8 @@
     "rsa",
     "ec"
   ],
-  "author": "Peculiar Ventures",
-  "license": "MID",
+  "author": "Peculiar Ventures, Inc.",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/PeculiarVentures/xadesjs/issues"
   },
