@@ -218,6 +218,9 @@ namespace xadesjs {
                     continue;
                 }
 
+                if (attribute.localName === "xmlns")
+                    continue;
+
                 // get namespace prefix
                 let prefix: string;
                 let matches: string[] = null;
