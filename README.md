@@ -51,6 +51,58 @@ They differ slightly based on what is included in the signature:
 
 **Given the nuances in handling XMLDSIG securely at this time you should consider this solution suitable for research and experimentation, further code and security review is needed before utilization in a production application.**
 
+## Web browser supporting
+
+xadesjs no need crypto engine, it uses W3 WebCrypto module
+
+## NodeJS supporting
+NodeJS hasn't got nodejs implementation. You can use for it [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11).
+
+To install node-webcrypto-ossl
+```
+npm install node-webcrypto-ossl
+```
+
+To install node-webcrypto-p11
+```
+npm install node-webcrypto-p11
+```
+
+To apply OSSL
+```javascript
+var xadesjs = require("xadesjs");
+var WebCrypto = require("node-webcrypto-ossl").default;
+
+xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
+```
+
+To apply PKCS11
+```javascript
+var xadesjs = require("xadesjs");
+var WebCrypto = require("node-webcrypto-p11").WebCrypto;
+
+xadesjs.Application.setEngine("OpenSSL", new WebCrypto({
+    library: "/puth/to/pkcs11.so",
+	name: "Name of PKCS11 lib",
+	slot: 0,
+    sessionFlags: 2 | 4, // RW_SESSION | SERIAL_SESSION
+	pin: "token pin"
+}));
+```
+
+## Testing
+
+To run test for NodeJS
+```
+npm test
+```
+
+To run express server for browser test
+```
+npm start
+```
+- Current command starts web server on localhost:3000.
+
 ## EXAMPLES
 
 ### Declaring Dependencies
