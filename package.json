@@ -2,7 +2,7 @@
   "name": "xadesjs",
   "version": "1.0.0",
   "description": "A pure Javascript implementation of XMLDSIG and XAdES based on Web Crypto ",
-  "main": "index.js",
+  "main": "built/xades.js",
   "scripts": {
     "test": "mocha test/scripts",
     "start": "node test/html/server.js"
