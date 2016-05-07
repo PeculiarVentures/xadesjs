@@ -56,7 +56,16 @@ For Node you will need to use a polyfill for Web Crypto such as [node-webcrypto-
 Unless you are working with a PKCS #11 device you probably want [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl), to install it:
 
 ```
-npm install node-webcrypto-ossl
+git clone https://github.com/PeculiarVentures/node-webcrypto-ossl
+cd node-webcrypto-ossl
+npm install node-gyp -g
+npm install typescript -g
+npm install tsd -g
+npm install mocha -g
+npm install
+tsd install
+tsc
+node-gyp configure build
 ```
 
 With [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) installed you need to specify you want to use it, that looks like this:
