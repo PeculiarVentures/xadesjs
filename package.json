@@ -1,6 +1,6 @@
 {
   "name": "xadesjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A pure Javascript implementation of XMLDSIG and XAdES based on Web Crypto ",
   "main": "built/xades.js",
   "scripts": {
@@ -27,7 +27,7 @@
   "dependencies": {
     "co": "^4.6.0",
     "node.extend": "^1.1.5",
-    "xmldom": "^0.1.22",
+    "xmldom": "https://github.com/PeculiarVentures/xmldom.git",
     "xpath.js": "^1.0.6",
     "pkijs": "^1.3.17",
     "asn1js": "^1.2.12"
