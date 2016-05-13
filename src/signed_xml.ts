@@ -226,7 +226,8 @@ namespace xadesjs {
             }
             else if (node && (node as Node).nodeType === XmlNodeType.Element) {
                 // constructor(node: Element);
-                this.envdoc = new DOMParser().parseFromString(node.outerHTML, APPLICATION_XML);
+                let xmlText = new XMLSerializer().serializeToString(node);
+                this.envdoc = new DOMParser().parseFromString(xmlText, APPLICATION_XML);
             }
         }
 
@@ -357,7 +358,7 @@ namespace xadesjs {
                                     let n = found.childNodes[j];
                                     // Do not copy default namespace as it must be xmldsig namespace for "Object" element.
                                     if (n.nodeType === xadesjs.XmlNodeType.Element)
-                                        this.FixupNamespaceNodes(n, doc, true);
+                                        this.FixupNamespaceNodes(n as Element, doc as Element, true);
                                 }
                                 break;
                             }
@@ -426,8 +427,6 @@ namespace xadesjs {
         private SignedInfoTransformed(): string {
             let t = this.GetC14NMethod();
 
-            // if (!this.SignatureValue) {
-            // when creating signatures
             let xml = new XMLSerializer().serializeToString(this.m_signature.SignedInfo.GetXml())
             let doc = new DOMParser().parseFromString(xml, APPLICATION_XML);
             if (this.envdoc) {
@@ -441,40 +440,6 @@ namespace xadesjs {
                 }
             }
             t.LoadInnerXml(doc);
-            // }
-            // else {
-            //     // when verifying signatures
-            //     // TODO - check m_signature.SignedInfo.Id
-            //     let el = this.Signature.getXml().getElementsByTagNameNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.SignedInfo)[0] as Element;
-            //     let sw = new StringWriter();
-            //     let xtw = new XmlTextWriter(sw);
-            //     xtw.WriteStartElement(el.Prefix, el.LocalName, el.NamespaceURI);
-
-            //     // context namespace nodes (except for "xmlns:xml")
-            //     XmlNodeList nl = el.SelectNodes("namespace::*");
-            //     foreach(XmlAttribute attr in nl) {
-            //         if (attr.ParentNode == el)
-            //             continue;
-            //         if (attr.LocalName == "xml")
-            //             continue;
-            //         if (attr.Prefix == el.Prefix)
-            //             continue;
-            //         attr.WriteTo(xtw);
-            //     }
-            //     foreach(XmlNode attr in el.Attributes)
-            //     attr.WriteTo(xtw);
-            //     foreach(XmlNode n in el.ChildNodes)
-            //     n.WriteTo(xtw);
-
-            //     xtw.WriteEndElement();
-            //     byte[] si = Encoding.UTF8.GetBytes(sw.ToString());
-
-            //     MemoryStream ms = new MemoryStream();
-            //     ms.Write(si, 0, si.Length);
-            //     ms.Position = 0;
-
-            //     t.LoadInput(ms);
-            // }
             return t.GetOutput();
         }
 
