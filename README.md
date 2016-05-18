@@ -84,7 +84,7 @@ var xadesjs = require("xadesjs");
 var WebCrypto = require("node-webcrypto-p11").WebCrypto;
 
 xadesjs.Application.setEngine("PKCS11", new WebCrypto({
-    library: "/puth/to/pkcs11.so",
+    library: "/path/to/pkcs11.so",
 	name: "Name of PKCS11 lib",
 	slot: 0,
     sessionFlags: 2 | 4, // RW_SESSION | SERIAL_SESSION
