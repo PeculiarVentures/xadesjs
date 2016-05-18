@@ -105,13 +105,13 @@ This means that you will have to use [our fork of xmldom](https://github.com/pec
 
 ## EXAMPLES
 
-### Declaring Dependencies
+### Declaring Dependencies in HTML
 ```html
-<script type="text/javascript" src="../node_modules/asn1js/org/pkijs/common.js"></script>
-<script type="text/javascript" src="../node_modules/asn1js/org/pkijs/asn1.js"></script>
-<script type="text/javascript" src="../node_modules/pkijs/org/pkijs/x509_schema.js"></script>
-<script type="text/javascript" src="../node_modules/pkijs/org/pkijs/x509_simpl.js"></script>
-<script src="../built/xades.js"></script>
+<script type="text/javascript" src="external/asn1js/org/asn1js/asn1.js"></script>
+<script type="text/javascript" src="external/pkijs/org/pkijs/common.js"></script>
+<script type="text/javascript" src="external/pkijs/org/pkijs/x509_schema.js"></script>
+<script type="text/javascript" src="external/pkijs/org/pkijs/x509_simpl.js"></script>
+<script type="text/javascript" src="external/xadesjs/xades.js"></script>
 ```
 
 ### Create XMLDSIG Signature
