@@ -209,7 +209,7 @@ var WebCrypto = require("./node-webcrypto-ossl").default;
 xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
 
 var fs = require("fs");
-var xmlString = fs.readFileSync("./xadesjs/test/static/invalid_signature.xml","utf8");
+var xmlString = fs.readFileSync("./xadesjs/test/static/valid_signature.xml","utf8");
 
 var signedDocument = new DOMParser().parseFromString(xmlString, "application/xml");
 var xmlSignature = signedDocument.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
