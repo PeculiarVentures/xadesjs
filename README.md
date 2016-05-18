@@ -117,6 +117,13 @@ This means that you will have to use [our fork of xmldom](https://github.com/pec
 ### Create XMLDSIG Signature
 
 ```javascript
+var xadesjs = require("./xadesjs/built/xades.js");
+var DOMParser = require("xmldom").DOMParser;
+var XMLSerializer = require("xmldom").XMLSerializer;
+var WebCrypto = require("./node-webcrypto-ossl").default;
+
+xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
+
 // Generate RSA key pair
 var privateKey, publicKey;
 xadesjs.Application.crypto.subtle.generateKey(
@@ -184,6 +191,7 @@ function SignXml(xmlString, key, algorithm) {
 
                 // Serialize XML document
                 var signedDocument = new XMLSerializer().serializeToString(xmlDoc);
+
                 return Promise.resolve(signedDocument);
             })
             .then(resolve, reject);
