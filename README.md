@@ -202,23 +202,27 @@ function SignXml(xmlString, key, algorithm) {
 ### Check XMLDSIG Signature 
 
 ```javascript
-var xadesjs = require("../built/xades.js");
-
-var XMLSerializer = require("xmldom").XMLSerializer;
+var xadesjs = require("./xadesjs/built/xades.js");
 var DOMParser = require("xmldom").DOMParser;
-var DOMImplementation = require("xmldom").DOMImplementation;
-var document = new DOMImplementation().createDocument("http://www.w3.org/1999/xhtml", "html", null);
+var WebCrypto = require("./node-webcrypto-ossl").default;
+
+xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
 
 var fs = require("fs");
-var ref = fs.readFileSync("./test/files/document.signed.t.bes.xml","utf8");
+var xmlString = fs.readFileSync("./xadesjs/test/static/invalid_signature.xml","utf8");
 
-var parser = new DOMParser();
-var xmlDoc = parser.parseFromString(ref, "application/xml");
-var xmlSignature = xmlDoc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
+var signedDocument = new DOMParser().parseFromString(xmlString, "application/xml");
+var xmlSignature = signedDocument.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 
-var sxml = new xadesjs.SignedXml(xmlDoc);
-sxml.LoadXml(xmlSignature[0]);
-sxml.CheckSignature();
+var signedXml = new xadesjs.SignedXml(signedDocument);
+signedXml.LoadXml(xmlSignature[0]);
+signedXml.CheckSignature()
+.then(function (signedDocument) {
+        console.log("Successfully Verified");
+})
+.catch(function (e) {
+        console.error(e);
+});
 ```
 
 ## TESTING
