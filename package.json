@@ -27,7 +27,7 @@
   "dependencies": {
     "co": "^4.6.0",
     "node.extend": "^1.1.5",
-    "xmldom": "git+ssh://github.com/PeculiarVentures/xmldom",
+    "xmldom-alpha": "^0.1.23",
     "xpath.js": "^1.0.6",
     "pkijs": "^1.3.17",
     "asn1js": "^1.2.12"
