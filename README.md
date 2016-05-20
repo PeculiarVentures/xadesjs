@@ -49,24 +49,9 @@ They differ slightly based on what is included in the signature:
 
 ### PLATFORM SUPPORT
 
-XAdESjs works with any browser that suppports  Web Crypto. 
+XAdESjs works with any browser that suppports  Web Crypto. Since node does not have Web Crypto you will need a polyfill on this platform. The package includes [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl), browsers do not need this dependency but it will be ignored.
 
-For Node you will need to use a polyfill for Web Crypto such as [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11).
-
-Unless you are working with a PKCS #11 device you probably want [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl), to install it:
-
-```
-git clone https://github.com/PeculiarVentures/node-webcrypto-ossl
-cd node-webcrypto-ossl
-npm install node-gyp -g
-npm install typescript -g
-npm install tsd -g
-npm install mocha -g
-npm install
-tsd install
-tsc
-node-gyp configure build
-```
+We have also created a polyfill for Web Crypto that supports PKCS #11, it is [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11).
 
 With [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) installed you need to specify you want to use it, that looks like this:
 
