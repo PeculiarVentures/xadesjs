@@ -30,7 +30,8 @@
     "xmldom-alpha": "^0.1.23",
     "xpath.js": "^1.0.6",
     "pkijs": "^1.3.17",
-    "asn1js": "^1.2.12"
+    "asn1js": "^1.2.12",
+    "node-webcrypto-ossl":"^1.0.2"
   },
   "devDependencies": {
     "express": "^4.13.4"
