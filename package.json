@@ -5,7 +5,8 @@
   "main": "built/xades.js",
   "scripts": {
     "test": "mocha test/scripts",
-    "start": "node test/html/server.js"
+    "start": "node test/html/server.js",
+    "postinstall": "mv node_modules/xmldom-alpha node_modules/xmldom"
   },
   "repository": {
     "type": "git",
