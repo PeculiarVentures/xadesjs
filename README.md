@@ -49,11 +49,11 @@ They differ slightly based on what is included in the signature:
 
 ### PLATFORM SUPPORT
 
-XAdESjs works with any browser that suppports  Web Crypto. Since node does not have Web Crypto you will need a polyfill on this platform. The package includes [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl), browsers do not need this dependency but it will be ignored.
+XAdESjs works with any browser that suppports Web Crypto. Since node does not have Web Crypto you will need a polyfill on this platform, for this reason the npm package includes [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl); browsers do not need this dependency and in those cases though it will be installed it will be ignored.
 
-We have also created a polyfill for Web Crypto that supports PKCS #11, it is [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11).
+If you need to use a Hardware Security Module we have also created a polyfill for Web Crypto that supports PKCS #11. Thus polyfill is [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11).
 
-With [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) installed you need to specify you want to use it, that looks like this:
+To use [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) you need to specify you want to use it, that looks like this:
 
 ```javascript
 var xadesjs = require("xadesjs");
@@ -62,7 +62,7 @@ var WebCrypto = require("node-webcrypto-ossl").default;
 xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
 ```
 
-The [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11) will work the same way you just have to specify the details about your PKCS #11 device when you instansiate it:
+The [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11) polyfill will work the same way. The only difference is that you have to specify the details about your PKCS #11 device when you instansiate it:
 
 ```javascript
 var xadesjs = require("xadesjs");
