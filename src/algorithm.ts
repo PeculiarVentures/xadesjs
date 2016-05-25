@@ -25,6 +25,7 @@ namespace xadesjs {
 
     export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorithm {
         getHash(xml: string): Promise {
+            // console.log("HashedInfo:", xml);
             return Application.crypto.subtle.digest(this.algorithm, Convert.ToBufferUtf8String(xml));
         }
     }

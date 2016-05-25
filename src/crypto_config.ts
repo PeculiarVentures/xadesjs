@@ -33,9 +33,8 @@ namespace xadesjs {
             let t: Transform = null;
             switch (name) {
                 case XmlSignature.AlgorithmNamespaces.XmlDsigBase64Transform:
-                    throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, name);
-                // t = new XmlDsigBase64Transform();
-                // break;
+                    t = new XmlDsigBase64Transform();
+                    break;
                 case XmlSignature.AlgorithmNamespaces.XmlDsigC14NTransform:
                     t = new XmlDsigC14NTransform();
                     break;

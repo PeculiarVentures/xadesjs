@@ -26,6 +26,7 @@
         "src/key/ecdsa_key.ts",
         "src/canonicalizer.ts",
         "src/transforms/transform.ts",
+        "src/transforms/base64.ts",
         "src/transforms/enveloped_signature.ts",
         "src/transforms/c14n.ts",
         "src/transforms/exc_c14n.ts",

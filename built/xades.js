@@ -337,14 +337,19 @@ var xadesjs;
         });
     }
     xadesjs.encodeSpecialCharactersInText = encodeSpecialCharactersInText;
-    function SelectNamespaces(node) {
-        var attrs = [];
-        for (var i = 0; i < node.attributes.length; i++) {
-            var attr = node.attributes[i];
-            if (attr.localName === "xml" || attr.prefix === "xml" ||
-                attr.localName === "xmlns" || attr.prefix === "xmlns")
-                attrs.push(attr);
+    function _SelectNamespaces(node, selectedNodes) {
+        if (selectedNodes === void 0) { selectedNodes = {}; }
+        if (node.namespaceURI !== "http://www.w3.org/XML/1998/namespace")
+            selectedNodes[node.prefix ? node.prefix : ""] = node.namespaceURI;
+        for (var i = 0; i < node.childNodes.length; i++) {
+            var _node = node.childNodes.item(i);
+            if (_node.nodeType === xadesjs.XmlNodeType.Element)
+                _SelectNamespaces(_node, selectedNodes);
         }
+    }
+    function SelectNamespaces(node) {
+        var attrs = {};
+        _SelectNamespaces(node, attrs);
         return attrs;
     }
     xadesjs.SelectNamespaces = SelectNamespaces;
@@ -423,6 +428,13 @@ var xadesjs;
                 result_string = result_string + String.fromCharCode(buffer[i]);
             return result_string;
         };
+        Convert.ToDateTime = function (dateTime) {
+            return new Date(dateTime);
+        };
+        Convert.FromDateTime = function (dateTime) {
+            var str = dateTime.toISOString().replace(/\.\d{3}/, "");
+            return str;
+        };
         return Convert;
     }());
     xadesjs.Convert = Convert;
@@ -444,6 +456,7 @@ var xadesjs;
             _super.apply(this, arguments);
         }
         HashAlgorithm.prototype.getHash = function (xml) {
+            console.log("HashedInfo:", xml);
             return xadesjs.Application.crypto.subtle.digest(this.algorithm, xadesjs.Convert.ToBufferUtf8String(xml));
         };
         return HashAlgorithm;
@@ -465,9 +478,9 @@ var xadesjs;
         */
         SignatureAlgorithm.prototype.verifySignature = function (signedInfo, key, signatureValue, algorithm) {
             var _signatureValue = xadesjs.Convert.ToBufferString(signatureValue);
-            // console.log("SignatureValue:", Convert.ToBase64String(Convert.FromBufferString(_signatureValue)));
+            console.log("SignatureValue:", xadesjs.Convert.ToBase64String(xadesjs.Convert.FromBufferString(_signatureValue)));
             var _signedInfo = xadesjs.Convert.ToBufferUtf8String(signedInfo);
-            // console.log("SignedInfo:", Convert.FromBufferString(_signedInfo));
+            console.log("SignedInfo:", xadesjs.Convert.FromBufferString(_signedInfo));
             return xadesjs.Application.crypto.subtle.verify(algorithm || this.algorithm, key, _signatureValue, _signedInfo);
         };
         return SignatureAlgorithm;
@@ -2136,6 +2149,25 @@ var xadesjs;
 })(xadesjs || (xadesjs = {}));
 var xadesjs;
 (function (xadesjs) {
+    // http://www.w3.org/2000/09/xmldsig#base64
+    var XmlDsigBase64Transform = (function (_super) {
+        __extends(XmlDsigBase64Transform, _super);
+        function XmlDsigBase64Transform() {
+            _super.apply(this, arguments);
+            this.Algorithm = xadesjs.XmlSignature.AlgorithmNamespaces.XmlDsigBase64Transform;
+        }
+        /**
+         * Returns the output of the current XmlDsigBase64Transform object
+         */
+        XmlDsigBase64Transform.prototype.GetOutput = function () {
+            return xadesjs.Convert.FromBase64String(this.innerXml.textContent);
+        };
+        return XmlDsigBase64Transform;
+    }(xadesjs.Transform));
+    xadesjs.XmlDsigBase64Transform = XmlDsigBase64Transform;
+})(xadesjs || (xadesjs = {}));
+var xadesjs;
+(function (xadesjs) {
     /**
      * Represents the enveloped signature transform for an XML digital signature as defined by the W3C.
      */
@@ -2286,9 +2318,8 @@ var xadesjs;
             var t = null;
             switch (name) {
                 case xadesjs.XmlSignature.AlgorithmNamespaces.XmlDsigBase64Transform:
-                    throw new xadesjs.XmlError(xadesjs.XE.ALGORITHM_NOT_SUPPORTED, name);
-                // t = new XmlDsigBase64Transform();
-                // break;
+                    t = new xadesjs.XmlDsigBase64Transform();
+                    break;
                 case xadesjs.XmlSignature.AlgorithmNamespaces.XmlDsigC14NTransform:
                     t = new xadesjs.XmlDsigC14NTransform();
                     break;
@@ -3417,7 +3448,8 @@ var xadesjs;
             }
             else if (node && node.nodeType === xadesjs.XmlNodeType.Element) {
                 // constructor(node: Element);
-                this.envdoc = new DOMParser().parseFromString(node.outerHTML, xadesjs.APPLICATION_XML);
+                var xmlText = new XMLSerializer().serializeToString(node);
+                this.envdoc = new DOMParser().parseFromString(xmlText, xadesjs.APPLICATION_XML);
             }
         }
         Object.defineProperty(SignedXml.prototype, "KeyInfo", {
@@ -3593,13 +3625,13 @@ var xadesjs;
         SignedXml.prototype.FixupNamespaceNodes = function (src, dst, ignoreDefault) {
             // add namespace nodes
             var namespaces = xadesjs.SelectNamespaces(src);
-            for (var i = 0; i < namespaces.length; i++) {
-                var attr = namespaces[i];
-                if (attr.localName === "xml")
-                    continue;
-                if (ignoreDefault && attr.localName === "xmlns")
-                    continue;
-                dst.setAttributeNode(dst.ownerDocument.importNode(attr, true));
+            for (var i in namespaces) {
+                var uri = namespaces[i];
+                // if (attr.localName === "xml")
+                //     continue;
+                // if (ignoreDefault && attr.localName === "xmlns")
+                //     continue;
+                dst.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
             }
         };
         SignedXml.prototype.findById = function (element, id) {
@@ -3675,6 +3707,12 @@ var xadesjs;
                     }
                 }
                 if (r.TransformChain.length > 0) {
+                    // Sort transforms. Enveloped should be first transform
+                    r.TransformChain.sort(function (a, b) {
+                        if (b instanceof xadesjs.XmlDsigEnvelopedSignatureTransform)
+                            return 1;
+                        return 0;
+                    });
                     for (var i in r.TransformChain) {
                         var t = r.TransformChain[i];
                         if (t instanceof xadesjs.XmlDsigC14NWithCommentsTransform)
@@ -3723,8 +3761,6 @@ var xadesjs;
         };
         SignedXml.prototype.SignedInfoTransformed = function () {
             var t = this.GetC14NMethod();
-            // if (!this.SignatureValue) {
-            // when creating signatures
             var xml = new XMLSerializer().serializeToString(this.m_signature.SignedInfo.GetXml());
             var doc = new DOMParser().parseFromString(xml, xadesjs.APPLICATION_XML);
             if (this.envdoc) {
@@ -3739,36 +3775,6 @@ var xadesjs;
                 }
             }
             t.LoadInnerXml(doc);
-            // }
-            // else {
-            //     // when verifying signatures
-            //     // TODO - check m_signature.SignedInfo.Id
-            //     let el = this.Signature.getXml().getElementsByTagNameNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.SignedInfo)[0] as Element;
-            //     let sw = new StringWriter();
-            //     let xtw = new XmlTextWriter(sw);
-            //     xtw.WriteStartElement(el.Prefix, el.LocalName, el.NamespaceURI);
-            //     // context namespace nodes (except for "xmlns:xml")
-            //     XmlNodeList nl = el.SelectNodes("namespace::*");
-            //     foreach(XmlAttribute attr in nl) {
-            //         if (attr.ParentNode == el)
-            //             continue;
-            //         if (attr.LocalName == "xml")
-            //             continue;
-            //         if (attr.Prefix == el.Prefix)
-            //             continue;
-            //         attr.WriteTo(xtw);
-            //     }
-            //     foreach(XmlNode attr in el.Attributes)
-            //     attr.WriteTo(xtw);
-            //     foreach(XmlNode n in el.ChildNodes)
-            //     n.WriteTo(xtw);
-            //     xtw.WriteEndElement();
-            //     byte[] si = Encoding.UTF8.GetBytes(sw.ToString());
-            //     MemoryStream ms = new MemoryStream();
-            //     ms.Write(si, 0, si.Length);
-            //     ms.Position = 0;
-            //     t.LoadInput(ms);
-            // }
             return t.GetOutput();
         };
         /**
@@ -3897,8 +3903,10 @@ var xadesjs;
                         return _this.GetReferenceHash(ref, false);
                     })
                         .then(function (digest) {
-                        if (xadesjs.Convert.FromBufferString(digest) !== xadesjs.Convert.FromBufferString(ref.DigestValue)) {
-                            var err_text = "invalid signature: for uri " + ref.Uri + " calculated digest is " + digest + " but the xml to validate supplies digest " + ref.DigestValue;
+                        var b64Digest = xadesjs.Convert.ToBase64String(xadesjs.Convert.FromBufferString(digest));
+                        var b64DigestValue = xadesjs.Convert.ToBase64String(xadesjs.Convert.FromBufferString(ref.DigestValue));
+                        if (b64Digest !== b64DigestValue) {
+                            var err_text = "invalid signature: for uri '" + ref.Uri + "'' calculated digest is " + b64Digest + " but the xml to validate supplies digest " + b64DigestValue;
                             _this.validationErrors.push(err_text);
                             throw new xadesjs.XmlError(xadesjs.XE.CRYPTOGRAPHIC, err_text);
                         }

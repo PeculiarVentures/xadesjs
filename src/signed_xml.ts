@@ -291,13 +291,13 @@ namespace xadesjs {
         private FixupNamespaceNodes(src: Element, dst: Element, ignoreDefault: boolean): void {
             // add namespace nodes
             let namespaces = SelectNamespaces(src);
-            for (let i = 0; i < namespaces.length; i++) {
-                let attr = namespaces[i];
-                if (attr.localName === "xml")
-                    continue;
-                if (ignoreDefault && attr.localName === "xmlns")
-                    continue;
-                dst.setAttributeNode(dst.ownerDocument.importNode(attr, true) as Attr);
+            for (let i in namespaces) {
+                let uri = namespaces[i];
+                // if (attr.localName === "xml")
+                //     continue;
+                // if (ignoreDefault && attr.localName === "xmlns")
+                //     continue;
+                dst.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
             }
         }
 
@@ -376,6 +376,12 @@ namespace xadesjs {
                 }
 
                 if (r.TransformChain.length > 0) {
+                    // Sort transforms. Enveloped should be first transform
+                    r.TransformChain.sort((a, b) => {
+                        if (b instanceof XmlDsigEnvelopedSignatureTransform)
+                            return 1;
+                        return 0;
+                    })
                     for (let i in r.TransformChain) {
                         let t = r.TransformChain[i];
                         if (t instanceof XmlDsigC14NWithCommentsTransform)
@@ -578,8 +584,10 @@ namespace xadesjs {
                         return this.GetReferenceHash(ref, false);
                     })
                         .then((digest: Uint8Array) => {
-                            if (Convert.FromBufferString(digest) !== Convert.FromBufferString(ref.DigestValue)) {
-                                let err_text = `invalid signature: for uri ${ref.Uri} calculated digest is ${digest} but the xml to validate supplies digest ${ref.DigestValue}`;
+                            let b64Digest = Convert.ToBase64String(Convert.FromBufferString(digest));
+                            let b64DigestValue = Convert.ToBase64String(Convert.FromBufferString(ref.DigestValue));
+                            if (b64Digest !== b64DigestValue) {
+                                let err_text = `invalid signature: for uri '${ref.Uri}'' calculated digest is ${b64Digest} but the xml to validate supplies digest ${b64DigestValue}`;
                                 this.validationErrors.push(err_text);
                                 throw new XmlError(XE.CRYPTOGRAPHIC, err_text);
                             }
@@ -629,7 +637,7 @@ namespace xadesjs {
             // }
         }
 
-        protected GetIdElement(document: Document, idValue: string): Element {
+        public GetIdElement(document: Document, idValue: string): Element {
             if ((document == null) || (idValue == null))
                 return null;
 

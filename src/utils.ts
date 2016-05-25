@@ -126,14 +126,19 @@ namespace xadesjs {
             });
     }
 
-    export function SelectNamespaces(node: Element): Node[] {
-        let attrs: Node[] = [];
-        for (let i = 0; i < node.attributes.length; i++) {
-            let attr = node.attributes[i];
-            if (attr.localName === "xml" || attr.prefix === "xml" ||
-                attr.localName === "xmlns" || attr.prefix === "xmlns")
-                attrs.push(attr);
+    function _SelectNamespaces(node: Element, selectedNodes: IAssocArray = {}) {
+        if (node.namespaceURI !== "http://www.w3.org/XML/1998/namespace")
+            selectedNodes[node.prefix ? node.prefix : ""] = node.namespaceURI;
+        for (let i = 0; i < node.childNodes.length; i++) {
+            let _node = node.childNodes.item(i) as Element;
+            if (_node.nodeType === XmlNodeType.Element)
+                _SelectNamespaces(_node, selectedNodes);
         }
+    }
+
+    export function SelectNamespaces(node: Element): IAssocArray {
+        let attrs: IAssocArray = {};
+        _SelectNamespaces(node, attrs);
         return attrs;
     }
 
