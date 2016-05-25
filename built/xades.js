@@ -456,7 +456,7 @@ var xadesjs;
             _super.apply(this, arguments);
         }
         HashAlgorithm.prototype.getHash = function (xml) {
-            console.log("HashedInfo:", xml);
+            // console.log("HashedInfo:", xml);
             return xadesjs.Application.crypto.subtle.digest(this.algorithm, xadesjs.Convert.ToBufferUtf8String(xml));
         };
         return HashAlgorithm;
@@ -478,9 +478,9 @@ var xadesjs;
         */
         SignatureAlgorithm.prototype.verifySignature = function (signedInfo, key, signatureValue, algorithm) {
             var _signatureValue = xadesjs.Convert.ToBufferString(signatureValue);
-            console.log("SignatureValue:", xadesjs.Convert.ToBase64String(xadesjs.Convert.FromBufferString(_signatureValue)));
+            // console.log("SignatureValue:", Convert.ToBase64String(Convert.FromBufferString(_signatureValue)));
             var _signedInfo = xadesjs.Convert.ToBufferUtf8String(signedInfo);
-            console.log("SignedInfo:", xadesjs.Convert.FromBufferString(_signedInfo));
+            // console.log("SignedInfo:", Convert.FromBufferString(_signedInfo));
             return xadesjs.Application.crypto.subtle.verify(algorithm || this.algorithm, key, _signatureValue, _signedInfo);
         };
         return SignatureAlgorithm;
@@ -3627,10 +3627,6 @@ var xadesjs;
             var namespaces = xadesjs.SelectNamespaces(src);
             for (var i in namespaces) {
                 var uri = namespaces[i];
-                // if (attr.localName === "xml")
-                //     continue;
-                // if (ignoreDefault && attr.localName === "xmlns")
-                //     continue;
                 dst.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
             }
         };
@@ -3765,13 +3761,11 @@ var xadesjs;
             var doc = new DOMParser().parseFromString(xml, xadesjs.APPLICATION_XML);
             if (this.envdoc) {
                 var namespaces = xadesjs.SelectNamespaces(this.envdoc.documentElement);
-                for (var _i = 0, namespaces_1 = namespaces; _i < namespaces_1.length; _i++) {
-                    var attr = namespaces_1[_i];
-                    if (attr.localName === "xml")
+                for (var i in namespaces) {
+                    var uri = namespaces[i];
+                    if (i === doc.documentElement.prefix)
                         continue;
-                    if (attr.prefix == doc.documentElement.prefix)
-                        continue;
-                    doc.documentElement.setAttributeNode(doc.importNode(attr, true));
+                    doc.documentElement.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
                 }
             }
             t.LoadInnerXml(doc);
