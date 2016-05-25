@@ -293,10 +293,6 @@ namespace xadesjs {
             let namespaces = SelectNamespaces(src);
             for (let i in namespaces) {
                 let uri = namespaces[i];
-                // if (attr.localName === "xml")
-                //     continue;
-                // if (ignoreDefault && attr.localName === "xmlns")
-                //     continue;
                 dst.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
             }
         }
@@ -437,12 +433,11 @@ namespace xadesjs {
             let doc = new DOMParser().parseFromString(xml, APPLICATION_XML);
             if (this.envdoc) {
                 let namespaces = SelectNamespaces(this.envdoc.documentElement);
-                for (let attr of namespaces) {
-                    if (attr.localName === "xml")
+                for (let i in namespaces) {
+                    let uri = namespaces[i];
+                    if (i === doc.documentElement.prefix)
                         continue;
-                    if (attr.prefix == doc.documentElement.prefix)
-                        continue;
-                    doc.documentElement.setAttributeNode(doc.importNode(attr, true) as Attr);
+                    doc.documentElement.setAttribute("xmlns" + (i ? ":" + i : ""), uri);
                 }
             }
             t.LoadInnerXml(doc);
