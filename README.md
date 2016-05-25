@@ -26,6 +26,7 @@ They differ slightly based on what is included in the signature:
 | XAdES-A    | Yes                        | Yes                              | Yes                            | Yes                      | Yes                                      |
 
 - Variants in **BOLD** are currently supported by XAdESjs
+- Other variants are supported by XAdESjs-PRO which is availible under a commercial license,  [email](mailto:info@peculiarventures.com) for more information
  
 ## COMPATABILITY
 
