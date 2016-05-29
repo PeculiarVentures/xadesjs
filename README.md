@@ -89,11 +89,11 @@ xadesjs.Application.setEngine("PKCS11", new WebCrypto({
 
 ### Declaring Dependencies in HTML
 ```html
-<script type="text/javascript" src="external/asn1js/org/asn1js/asn1.js"></script>
-<script type="text/javascript" src="external/pkijs/org/pkijs/common.js"></script>
-<script type="text/javascript" src="external/pkijs/org/pkijs/x509_schema.js"></script>
-<script type="text/javascript" src="external/pkijs/org/pkijs/x509_simpl.js"></script>
-<script type="text/javascript" src="external/xadesjs/xades.js"></script>
+<script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/common.js"></script>
+<script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/asn1.js"></script>
+<script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_schema.js"></script>
+<script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_simpl.js"></script>
+<script type="text/javascript" src="https://cdn.rawgit.com/PeculiarVentures/xadesjs/master/built/xades.js"></script>
 ```
 
 ### Create XMLDSIG Signature
