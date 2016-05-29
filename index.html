@@ -130,9 +130,8 @@
                  block.scrollTop = block.scrollHeight;
              })
              .catch(function (e) {
-                     alert("Error signing document");
+                     alert("Error signing document: " & e);
                      console.log("Error signing document");
-                     console.error(e);
                      alert(e);
              });
         }
