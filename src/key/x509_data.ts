@@ -74,7 +74,7 @@ namespace xadesjs {
                 if (this.Certificates.length)
                     this.Certificates[0].exportKey(alg)
                         .then(resolve, reject);
-            })
+            });
         }
 
         // this gets complicated because we must:
