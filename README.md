@@ -92,10 +92,10 @@ xadesjs.Application.setEngine("PKCS11", new WebCrypto({
 #### In Node
 
 ```javascript
-var xadesjs = require("./xadesjs/built/xades.js");
+var xadesjs = require("xades");
 var DOMParser = require("xmldom").DOMParser;
 var XMLSerializer = require("xmldom").XMLSerializer;
-var WebCrypto = require("./node-webcrypto-ossl").default;
+var WebCrypto = require("node-webcrypto-ossl").default;
 
 xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
 
@@ -276,9 +276,9 @@ function SignXml(xmlString, key, algorithm) {
 #### In Node
 
 ```javascript
-var xadesjs = require("./xadesjs/built/xades.js");
+var xadesjs = require("xadesjs");
 var DOMParser = require("xmldom").DOMParser;
-var WebCrypto = require("./node-webcrypto-ossl").default;
+var WebCrypto = require("node-webcrypto-ossl").default;
 
 xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
 
