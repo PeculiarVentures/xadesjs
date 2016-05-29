@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.rawgit.com/PrismJS/prism/gh-pages/themes/prism.css">
+    <title>Signing and Verifying with X.509 Certificate</title>
+    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/common.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/asn1.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_schema.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_simpl.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/PrismJS/prism/gh-pages/prism.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/PeculiarVentures/xadesjs/master/built/xades.js"></script>
+</head>
+
+<body>
+    <h1>1. Create Key and Certificate</h1>
+
+    <!--KeyGen select-->
+    <div>
+        <h2>Key pair generation</h2>
+        <div>
+            <label for="key_gen_select">Key type:</label>
+            <select id="key_gen_select" onchange="selectKeyGen.call(this)">
+                <option value="RSA" selected>RSA</option>
+                <option value="EC">ECDSA</option>
+            </select>
+        </div>
+
+        <!--RSA key-->
+        <table id="rsa_params">
+            <thead>
+                <tr>
+                    <th colspan="2">RSA</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!--Modulus length-->
+                <tr>
+                    <td><label for="rsa_modulus_length">Modulus length:</label></td>
+                    <td><input type="text" id="rsa_modulus_length" value="1024" /></td>
+                </tr>
+                <!--Public exponent-->
+                <tr>
+                    <td><label for="rsa_public_exponent">Public exponent:</label></td>
+                    <td>
+                        <select type="text" id="rsa_public_exponent">
+                            <option value="1" selected>v1</option>
+                            <option value="2">v2</option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!--EC key-->
+        <table id="ec_params" hidden>
+            <thead>
+                <tr>
+                    <th colspan="2">ECDSA</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!--Named curve-->
+                <tr>
+                    <td><label for="ec_named_curve">Named curve:</label></td>
+                    <td>
+                        <select id="ec_named_curve">
+                            <option value="P-256" selected>P-256</option>
+                            <option value="P-384" >P-384</option>
+                            <option value="P-521" >P-521</option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!--Certificate-->
+    <div>
+        <h2>Certificate generation</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">Certificate name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!--Common name-->
+                <tr>
+                    <td><label for="x509_common">Common name (2.5.4.3):</label></td>
+                    <td><input type="text" id="x509_common" value="Test" /></td>
+                </tr>
+                <!--Country name-->
+                <tr>
+                    <td><label for="x509_country">Country name (2.5.4.6):</label></td>
+                    <td><input type="text" id="x509_country" /></td>
+                </tr>
+                <!--State name-->
+                <tr>
+                    <td><label for="x509_state">State name (2.5.4.8):</label></td>
+                    <td><input type="text" id="x509_state" /></td>
+                </tr>
+                <!--Locality name-->
+                <tr>
+                    <td><label for="x509_locality">Locality name (2.5.4.7):</label></td>
+                    <td><input type="text" id="x509_locality" /></td>
+                </tr>
+                <!--organization name-->
+                <tr>
+                    <td><label for="x509_organization">Organization name (2.5.4.10):</label></td>
+                    <td><input type="text" id="x509_organization" /></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!--Digest algorithm-->
+    <div>
+        <h2>Digest selection</h2>
+        <label for="digest">Digest algorithm:</label>
+        <select id="digest">
+            <option value="SHA-1">SHA-1</option>
+            <option value="SHA-256" selected>SHA-256</option>
+            <option value="SHA-384">SHA-384</option>
+            <option value="SHA-512">SHA-512</option>
+        </select>
+    </div>
+
+    <!--Xml document-->
+    <h1>2. Sign documen</h1>
+    <div>
+        <h2>Select document to sign</h2>
+        <div>
+            <input id="r1" name="xml-document" type="radio" /><label for="r1">Input URI for the XML document</label><br/>
+            <input id="xml_uri" type="text" placeholder="URI" />
+        </div>
+        <div>
+            <input id="r2" name="xml-document" type="radio" /><label for="r2">Select your own local XML file</label><br/>
+            <input id="xml_file" type="file" />
+        </div>
+        <div>
+            <input id="r3" name="xml-document" type="radio" checked/><label for="r3">Input your own XML document</label><br/>
+            <textarea id="xml_document" cols="50" rows="10">&lt;root&gt;&#10;&#09;&lt;child&gt;Simple text&lt;/child&gt;&#10;&lt;/root&gt;</textarea>
+        </div>
+    </div>
+
+    <button id="btn_sign" onclick="sign()">Sign</button>
+
+    <hr/>
+
+    <div id="output" hidden>
+        <h1>3. Output</h1>
+        <h2>Key PEM</h2>
+        <textarea id="output_key" cols="50" rows="10"></textarea>
+        <div>
+            <a id="asn1_key" target="_blank">View ASN1</a>
+        </div>
+        <h2>Certificate PEM</h2>
+        <textarea id="output_certificate" cols="50" rows="10"></textarea>
+        <div>
+            <a id="asn1_cert" target="_blank">View ASN1</a>
+        </div>
+        <h2>Signed XML</h2>
+        <!--<pre><code id="output_xml" class="language-xml"></code></pre>-->
+        <div>
+            <textarea id="output_xml" cols="50" rows="20"></textarea>
+        </div>
+        <button onclick="verify()">Verify</button>
+        <form action="https://www.aleksey.com/cgi-bin/xmldsigverify" method="POST" target="_blank">
+            <input id="xml_aleksey" type="hidden" name="_xmldoc" value="" />
+            <button type="submit">Verify with aleksey.com</button>
+        </form>
+    </div>
+
+    <script type="text/javascript" src="./src/api.js"></script>
+    <script type="text/javascript" src="./src/form.js"></script>
+</body>
+
+</html>
