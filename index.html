@@ -124,6 +124,7 @@
                  var block = document.getElementById("signedXML");
                  block.textContent = signedDocument;
                  Prism.highlightElement(block);
+                 block.scrollTop = block.scrollHeight;
              })
              .catch(function (e) {
                      alert("Error signing document");
