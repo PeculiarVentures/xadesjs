@@ -87,15 +87,6 @@ xadesjs.Application.setEngine("PKCS11", new WebCrypto({
 
 ## EXAMPLES
 
-### Declaring Dependencies in HTML
-```html
-<script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/common.js"></script>
-<script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/asn1.js"></script>
-<script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_schema.js"></script>
-<script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_simpl.js"></script>
-<script type="text/javascript" src="https://cdn.rawgit.com/PeculiarVentures/xadesjs/master/built/xades.js"></script>
-```
-
 ### Create XMLDSIG Signature
 
 #### In Node
@@ -204,7 +195,6 @@ function SignXml(xmlString, key, algorithm) {
     <script type="text/javascript">
         // Generate RSA key pair
         var privateKey, publicKey;
-        console.log("hi");
         window.crypto.subtle.generateKey(
         {
             name: "RSASSA-PKCS1-v1_5",
