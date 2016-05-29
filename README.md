@@ -343,12 +343,13 @@ signedXml.CheckSignature()
 
 ## TESTING
 
-To run test for NodeJS:
+### For NodeJS:
 
 ```
 npm test
 ```
 
+### For browser
 To run the browser test you need to run the server, from the test directory run: 
 ```
 npm start
