@@ -299,6 +299,48 @@ signedXml.CheckSignature()
 });
 ```
 
+#### In the browser
+```HTML
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <title>XADESJS Verify Sample</title>
+</head>
+
+<body>
+    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/common.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/asn1.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_schema.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_simpl.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/PeculiarVentures/xadesjs/master/built/xades.js"></script>
+    
+    <script type="text/javascript">
+        fetch("https://cdn.rawgit.com/PeculiarVentures/xadesjs/master/test/static/valid_signature.xml")
+        .then(function(response) {
+            return response.text()
+        }).then(function(body) {
+            var xmlString = body;
+            
+            var signedDocument = new DOMParser().parseFromString(xmlString, "application/xml");
+            var xmlSignature = signedDocument.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
+
+            var signedXml = new xadesjs.SignedXml(signedDocument);
+            signedXml.LoadXml(xmlSignature[0]);
+            signedXml.CheckSignature()
+            .then(function (signedDocument) {
+                    console.log("Successfully Verified");
+            })
+            .catch(function (e) {
+                    console.error(e);
+            });
+        })
+    </script>
+</body>
+</html>
+```
+
 ## TESTING
 
 To run test for NodeJS:
