@@ -18,6 +18,7 @@
     <script type="text/javascript" src="https://cdn.rawgit.com/PeculiarVentures/xadesjs/master/built/xades.js"></script>
     
     <script type="text/javascript" src="https://cdn.rawgit.com/PrismJS/prism/gh-pages/prism.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/vkiryukhin/vkBeautify/master/vkbeautify.js"></script>
     <script type="text/javascript"src="https://cdn.rawgit.com/Zolmeister/promiz/master/promiz.min.js"></script>
     <script type="text/javascript" src="https://cdn.rawgit.com/vibornoff/webcrypto-shim/master/webcrypto-shim.js"></script>
     
@@ -125,6 +126,7 @@
                  console.log("Successfully Signed");
                  
                  var block = document.getElementById("signedXML");
+                 block = vkbeautify.xml(block);
                  block.textContent = signedDocument;
                  Prism.highlightElement(block);
                  block.scrollTop = block.scrollHeight;
