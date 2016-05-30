@@ -126,7 +126,7 @@
                  console.log("Successfully Signed");
                  
                  var block = document.getElementById("signedXML");
-                 block = vkbeautify.xml(block);
+                 block.textContent = vkbeautify.xml(block.textContent);
                  block.textContent = signedDocument;
                  Prism.highlightElement(block);
                  block.scrollTop = block.scrollHeight;
