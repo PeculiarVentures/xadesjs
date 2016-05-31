@@ -1,10 +1,5 @@
 namespace xadesjs {
 
-    export declare type XmlNamespace = {
-        prefix: string;
-        namespace: string;
-    }
-
     export enum XmlCanonicalizerState {
         BeforeDocElement,
         InsideDocElement,
@@ -15,14 +10,14 @@ namespace xadesjs {
 
         protected withComments: boolean;
         protected exclusive: boolean;
-        protected propagatedNamespaces: XmlNamespace[];
+        protected propagatedNamespaces = new NamespaceManager();
         protected document: Document;
         protected result: string[];
-        protected visibleNamespaces: XmlNamespace[] = [];
+        protected visibleNamespaces = new NamespaceManager();
         protected inclusiveNamespacesPrefixList: string[] = [];
         protected state: XmlCanonicalizerState = XmlCanonicalizerState.BeforeDocElement;
 
-        constructor(withComments: boolean, excC14N: boolean, propagatedNamespaces: XmlNamespace[] = []) {
+        constructor(withComments: boolean, excC14N: boolean, propagatedNamespaces: NamespaceManager = new NamespaceManager) {
             this.withComments = withComments;
             this.exclusive = excC14N;
             this.propagatedNamespaces = propagatedNamespaces;
@@ -196,9 +191,8 @@ namespace xadesjs {
                 this.state = XmlCanonicalizerState.AfterDocElement;
 
             // remove added namespaces
-            this.visibleNamespaces = this.visibleNamespaces.filter((item, index) =>
-                index < this.visibleNamespaces.length - visibleNamespacesCount
-            );
+            while (visibleNamespacesCount--)
+                this.visibleNamespaces.Pop();
         }
 
         protected WriteNamespacesAxis(node: Node): number {
@@ -212,10 +206,17 @@ namespace xadesjs {
                     if (attribute.prefix && !this.IsNamespaceRendered(attribute.prefix, attribute.namespaceURI)) {
                         let ns = { prefix: attribute.prefix, namespace: attribute.namespaceURI };
                         list.push(ns);
-                        this.visibleNamespaces.push(ns);
+                        this.visibleNamespaces.Add(ns);
                         visibleNamespacesCount++;
                     }
                     continue;
+                }
+
+                if (attribute.localName === "xmlns" && !attribute.prefix && !attribute.nodeValue) {
+                    let ns = { prefix: attribute.prefix, namespace: attribute.nodeValue };
+                    list.push(ns);
+                    this.visibleNamespaces.Add(ns);
+                    visibleNamespacesCount++;
                 }
 
                 if (attribute.localName === "xmlns")
@@ -242,7 +243,7 @@ namespace xadesjs {
                 if (printable) {
                     let ns = { prefix: prefix, namespace: attribute.nodeValue };
                     list.push(ns);
-                    this.visibleNamespaces.push(ns);
+                    this.visibleNamespaces.Add(ns);
                     visibleNamespacesCount++;
                 }
             }
@@ -250,7 +251,7 @@ namespace xadesjs {
             if (!this.IsNamespaceRendered(node.prefix, node.namespaceURI) && node.namespaceURI !== "http://www.w3.org/2000/xmlns/") {
                 let ns = { prefix: node.prefix, namespace: node.namespaceURI };
                 list.push(ns);
-                this.visibleNamespaces.push(ns);
+                this.visibleNamespaces.Add(ns);
                 visibleNamespacesCount++;
             }
 
@@ -258,7 +259,7 @@ namespace xadesjs {
             // sort nss
             list.sort(XmlDsigC14NTransformNamespacesComparer);
 
-            let prevPrefix: string = "";
+            let prevPrefix: string = null;
             for (let n of list) {
                 if (n.prefix === prevPrefix) {
                     continue;
@@ -343,20 +344,15 @@ namespace xadesjs {
         }
 
         private IsNamespaceRendered(prefix: string, uri: string): boolean {
-            // // if the default namespace xmlns="" is not re-defined yet
-            // // then we do not want to print it out
+            prefix = prefix || "";
+            uri = uri || "";
             if (!prefix && !uri)
                 return true;
-            uri = uri || "";
             if (prefix === "xml" && uri === "http://www.w3.org/XML/1998/namespace")
                 return true;
-            for (let i = this.visibleNamespaces.length - 1; i >= 0; i--) {
-                let node = this.visibleNamespaces[i];
-                // get namespace prefix
-                if (node.prefix == prefix)
-                    return node.namespace == uri;
-            }
-
+            let ns = this.visibleNamespaces.GetPrefix(prefix);
+            if (ns)
+                return ns.namespace === uri;
             return false;
         }
 

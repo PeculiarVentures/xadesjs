@@ -24,6 +24,7 @@
         "src/key/x509_data.ts",
         "src/key/rsa_key.ts",
         "src/key/ecdsa_key.ts",
+        "src/namespace_manager.ts",
         "src/canonicalizer.ts",
         "src/transforms/transform.ts",
         "src/transforms/base64.ts",

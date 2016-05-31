@@ -1725,6 +1725,71 @@ var xadesjs;
 })(xadesjs || (xadesjs = {}));
 var xadesjs;
 (function (xadesjs) {
+    var NamespaceManager = (function () {
+        function NamespaceManager() {
+            this.items = [];
+        }
+        Object.defineProperty(NamespaceManager.prototype, "Count", {
+            get: function () {
+                return this.items.length;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        NamespaceManager.prototype.Item = function (index) {
+            return this.items[index];
+        };
+        NamespaceManager.prototype.RemoveAt = function (index) {
+            this.items = this.items.filter(function (item, _index) {
+                return index !== _index;
+            });
+        };
+        NamespaceManager.prototype.IsEmpry = function () {
+            return this.Count === 0;
+        };
+        NamespaceManager.prototype.Add = function (item) {
+            item.prefix = item.prefix || "";
+            item.namespace = item.namespace || "";
+            this.items.push(item);
+        };
+        NamespaceManager.prototype.Pop = function () {
+            return this.items.pop();
+        };
+        NamespaceManager.prototype.GetPrefix = function (prefix, start) {
+            if (start === void 0) { start = this.Count - 1; }
+            var lim = this.Count - 1;
+            prefix = prefix || "";
+            if (start > lim)
+                start = lim;
+            for (var i = start; i >= 0; i--) {
+                var item = this.items[i];
+                if (item.prefix === prefix)
+                    return item;
+            }
+            return null;
+        };
+        NamespaceManager.prototype.GetNamespace = function (namespaceUrl, start) {
+            if (start === void 0) { start = this.Count - 1; }
+            var lim = this.Count - 1;
+            namespaceUrl = namespaceUrl || "";
+            if (start > lim)
+                start = lim;
+            for (var i = start; i >= 0; i--) {
+                var item = this.items[i];
+                if (item.namespace === namespaceUrl)
+                    return item;
+            }
+            return null;
+        };
+        NamespaceManager.prototype.GetIterator = function () {
+            return this.items;
+        };
+        return NamespaceManager;
+    }());
+    xadesjs.NamespaceManager = NamespaceManager;
+})(xadesjs || (xadesjs = {}));
+var xadesjs;
+(function (xadesjs) {
     (function (XmlCanonicalizerState) {
         XmlCanonicalizerState[XmlCanonicalizerState["BeforeDocElement"] = 0] = "BeforeDocElement";
         XmlCanonicalizerState[XmlCanonicalizerState["InsideDocElement"] = 1] = "InsideDocElement";
@@ -1733,8 +1798,9 @@ var xadesjs;
     var XmlCanonicalizerState = xadesjs.XmlCanonicalizerState;
     var XmlCanonicalizer = (function () {
         function XmlCanonicalizer(withComments, excC14N, propagatedNamespaces) {
-            if (propagatedNamespaces === void 0) { propagatedNamespaces = []; }
-            this.visibleNamespaces = [];
+            if (propagatedNamespaces === void 0) { propagatedNamespaces = new xadesjs.NamespaceManager; }
+            this.propagatedNamespaces = new xadesjs.NamespaceManager();
+            this.visibleNamespaces = new xadesjs.NamespaceManager();
             this.inclusiveNamespacesPrefixList = [];
             this.state = XmlCanonicalizerState.BeforeDocElement;
             this.withComments = withComments;
@@ -1872,7 +1938,6 @@ var xadesjs;
         };
         XmlCanonicalizer.prototype.WriteElementNode = function (node) {
             // console.log(`WriteElementNode: ${node.nodeName}`);
-            var _this = this;
             if (this.state === XmlCanonicalizerState.BeforeDocElement)
                 this.state = XmlCanonicalizerState.InsideDocElement;
             // open tag
@@ -1894,9 +1959,8 @@ var xadesjs;
             if (this.state === XmlCanonicalizerState.BeforeDocElement)
                 this.state = XmlCanonicalizerState.AfterDocElement;
             // remove added namespaces
-            this.visibleNamespaces = this.visibleNamespaces.filter(function (item, index) {
-                return index < _this.visibleNamespaces.length - visibleNamespacesCount;
-            });
+            while (visibleNamespacesCount--)
+                this.visibleNamespaces.Pop();
         };
         XmlCanonicalizer.prototype.WriteNamespacesAxis = function (node) {
             var list = [];
@@ -1908,10 +1972,16 @@ var xadesjs;
                     if (attribute.prefix && !this.IsNamespaceRendered(attribute.prefix, attribute.namespaceURI)) {
                         var ns = { prefix: attribute.prefix, namespace: attribute.namespaceURI };
                         list.push(ns);
-                        this.visibleNamespaces.push(ns);
+                        this.visibleNamespaces.Add(ns);
                         visibleNamespacesCount++;
                     }
                     continue;
+                }
+                if (attribute.localName === "xmlns" && !attribute.prefix && !attribute.nodeValue) {
+                    var ns = { prefix: attribute.prefix, namespace: attribute.nodeValue };
+                    list.push(ns);
+                    this.visibleNamespaces.Add(ns);
+                    visibleNamespacesCount++;
                 }
                 if (attribute.localName === "xmlns")
                     continue;
@@ -1933,19 +2003,19 @@ var xadesjs;
                 if (printable) {
                     var ns = { prefix: prefix, namespace: attribute.nodeValue };
                     list.push(ns);
-                    this.visibleNamespaces.push(ns);
+                    this.visibleNamespaces.Add(ns);
                     visibleNamespacesCount++;
                 }
             }
             if (!this.IsNamespaceRendered(node.prefix, node.namespaceURI) && node.namespaceURI !== "http://www.w3.org/2000/xmlns/") {
                 var ns = { prefix: node.prefix, namespace: node.namespaceURI };
                 list.push(ns);
-                this.visibleNamespaces.push(ns);
+                this.visibleNamespaces.Add(ns);
                 visibleNamespacesCount++;
             }
             // sort nss
             list.sort(XmlDsigC14NTransformNamespacesComparer);
-            var prevPrefix = "";
+            var prevPrefix = null;
             for (var _i = 0, list_1 = list; _i < list_1.length; _i++) {
                 var n = list_1[_i];
                 if (n.prefix === prevPrefix) {
@@ -2022,19 +2092,15 @@ var xadesjs;
             return this.inclusiveNamespacesPrefixList.indexOf(prefix) !== -1; // && node.prefix === prefix;
         };
         XmlCanonicalizer.prototype.IsNamespaceRendered = function (prefix, uri) {
-            // // if the default namespace xmlns="" is not re-defined yet
-            // // then we do not want to print it out
+            prefix = prefix || "";
+            uri = uri || "";
             if (!prefix && !uri)
                 return true;
-            uri = uri || "";
             if (prefix === "xml" && uri === "http://www.w3.org/XML/1998/namespace")
                 return true;
-            for (var i = this.visibleNamespaces.length - 1; i >= 0; i--) {
-                var node = this.visibleNamespaces[i];
-                // get namespace prefix
-                if (node.prefix == prefix)
-                    return node.namespace == uri;
-            }
+            var ns = this.visibleNamespaces.GetPrefix(prefix);
+            if (ns)
+                return ns.namespace === uri;
             return false;
         };
         return XmlCanonicalizer;
