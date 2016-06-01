@@ -104,7 +104,7 @@ var privateKey, publicKey;
 xadesjs.Application.crypto.subtle.generateKey(
     {
         name: "RSASSA-PKCS1-v1_5",
-        modulusLength: 1024 //can be 1024, 2048, or 4096,
+        modulusLength: 1024, //can be 1024, 2048, or 4096,
         publicExponent: new Uint8Array([1, 0, 1]),
         hash: { name: "SHA-1" }, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
     },
