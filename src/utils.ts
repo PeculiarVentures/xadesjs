@@ -20,13 +20,13 @@ namespace xadesjs {
         let name_prefix = "",
             ns_prefix = "",
             namespace_uri = "";
-        // if (prefix) {
-        //     name_prefix = prefix + ":";
-        //     ns_prefix = ":" + prefix;
-        // }
-        // if (namespaceUri) {
-        //     namespace_uri = ` xmlns${ns_prefix}="${namespaceUri}"`;
-        // }
+        if (prefix) {
+            name_prefix = prefix + ":";
+            ns_prefix = ":" + prefix;
+        }
+        if (namespaceUri) {
+            namespace_uri = ` xmlns${ns_prefix}="${namespaceUri}"`;
+        }
         let name = `${name_prefix}${root}`;
         let doc = new DOMParser().parseFromString(`<${name}${namespace_uri}></${name}>`, APPLICATION_XML);
         return doc;

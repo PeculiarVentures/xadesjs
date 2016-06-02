@@ -207,6 +207,8 @@ namespace xadesjs {
 
     export const XmlSignature = {
 
+        DefaultPrefix: "ds",
+
         ElementNames: {
 
             CanonicalizationMethod: "CanonicalizationMethod",

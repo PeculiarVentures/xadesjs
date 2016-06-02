@@ -241,13 +241,13 @@ var xadesjs;
         if (namespaceUri === void 0) { namespaceUri = xadesjs.XmlSignature.NamespaceURI; }
         if (prefix === void 0) { prefix = xadesjs.XmlSignature.Prefix; }
         var name_prefix = "", ns_prefix = "", namespace_uri = "";
-        // if (prefix) {
-        //     name_prefix = prefix + ":";
-        //     ns_prefix = ":" + prefix;
-        // }
-        // if (namespaceUri) {
-        //     namespace_uri = ` xmlns${ns_prefix}="${namespaceUri}"`;
-        // }
+        if (prefix) {
+            name_prefix = prefix + ":";
+            ns_prefix = ":" + prefix;
+        }
+        if (namespaceUri) {
+            namespace_uri = " xmlns" + ns_prefix + "=\"" + namespaceUri + "\"";
+        }
         var name = "" + name_prefix + root;
         var doc = new DOMParser().parseFromString("<" + name + namespace_uri + "></" + name + ">", xadesjs.APPLICATION_XML);
         return doc;
@@ -3133,6 +3133,7 @@ var xadesjs;
     }(xadesjs.XmlObject));
     xadesjs.Signature = Signature;
     xadesjs.XmlSignature = {
+        DefaultPrefix: "ds",
         ElementNames: {
             CanonicalizationMethod: "CanonicalizationMethod",
             DigestMethod: "DigestMethod",
