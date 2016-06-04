@@ -377,7 +377,7 @@ namespace xadesjs {
                         if (b instanceof XmlDsigEnvelopedSignatureTransform)
                             return 1;
                         return 0;
-                    })
+                    });
                     for (let i in r.TransformChain) {
                         let t = r.TransformChain[i];
                         if (t instanceof XmlDsigC14NWithCommentsTransform)
@@ -429,7 +429,7 @@ namespace xadesjs {
         private SignedInfoTransformed(): string {
             let t = this.GetC14NMethod();
 
-            let xml = new XMLSerializer().serializeToString(this.m_signature.SignedInfo.GetXml())
+            let xml = new XMLSerializer().serializeToString(this.m_signature.SignedInfo.GetXml());
             let doc = new DOMParser().parseFromString(xml, APPLICATION_XML);
             if (this.envdoc) {
                 let namespaces = SelectNamespaces(this.envdoc.documentElement);
