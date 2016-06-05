@@ -432,7 +432,7 @@ var xadesjs;
             return new Date(dateTime);
         };
         Convert.FromDateTime = function (dateTime) {
-            var str = dateTime.toISOString().replace(/\.\d{3}/, "");
+            var str = dateTime.toISOString();
             return str;
         };
         return Convert;
@@ -3746,7 +3746,6 @@ var xadesjs;
                             var obj = _this.m_signature.ObjectList[i];
                             found = _this.findById(obj.element, objectName);
                             if (found) {
-                                // found.setAttribute("xmlns", SignedXml.XmlDsigNamespaceUrl);
                                 doc = doc.importNode(found, true);
                                 // FIXME: there should be theoretical justification of copying namespace declaration nodes this way.
                                 for (var j = 0; j < found.childNodes.length; j++) {

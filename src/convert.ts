@@ -87,7 +87,7 @@ namespace xadesjs {
             return new Date(dateTime);
         }
         static FromDateTime(dateTime: Date): string {
-            let str = dateTime.toISOString().replace(/\.\d{3}/, "");
+            let str = dateTime.toISOString();
             return str;
         }
     }
