@@ -347,7 +347,6 @@ namespace xadesjs {
                             let obj = this.m_signature.ObjectList[i];
                             found = this.findById((obj as any).element, objectName);
                             if (found) {
-                                found.setAttribute("xmlns", SignedXml.XmlDsigNamespaceUrl);
                                 doc = (doc as Document).importNode(found, true);
                                 // FIXME: there should be theoretical justification of copying namespace declaration nodes this way.
                                 for (let j = 0; j < found.childNodes.length; j++) {
