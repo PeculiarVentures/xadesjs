@@ -229,9 +229,9 @@ namespace xadesjs {
             let sm = XmlSignature.GetChildElement(value, XmlSignature.ElementNames.SignatureMethod, XmlSignature.NamespaceURI);
             if (sm !== null) {
                 this.signatureMethod = sm.getAttribute(XmlSignature.AttributeNames.Algorithm);
-                if (sm.hasChildNodes){
+                if (sm.hasChildNodes) {
                     let pss = XmlSignature.GetChildElement(sm, XmlSignature.ElementNames.RSAPSSParams, XmlSignature.NamespaceURIPss);
-                    if (pss){
+                    if (pss) {
                         this.signatureParams = new PssAlgorithmParams();
                         this.signatureParams.LoadXml(pss);
                     }

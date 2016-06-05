@@ -108,7 +108,7 @@ var xadesjs;
     xes[XE.PARAM_REQUIRED] = "Required parameter is missing '%1'";
     xes[XE.CONVERTER_UNSUPPORTED] = "Converter is not supported";
     xes[XE.ELEMENT_MALFORMED] = "Malformed element '%1'";
-    xes[XE.CRYPTOGRAPHIC] = "Cryptogrphic error: %1";
+    xes[XE.CRYPTOGRAPHIC] = "Cryptographic error: %1";
     xes[XE.CRYPTOGRAPHIC_NO_MODULE] = "WebCrypto module is not found";
     xes[XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM] = "Unknown transform %1";
     xes[XE.ALGORITHM_NOT_SUPPORTED] = "Algorithm is not supported '%1'";
@@ -184,7 +184,7 @@ var xadesjs;
     var XmlNodeType = xadesjs.XmlNodeType;
     var XmlObject = (function () {
         function XmlObject() {
-            this.m_prefix = "";
+            this.m_prefix = xadesjs.XmlSignature.DefaultPrefix;
         }
         Object.defineProperty(XmlObject.prototype, "Prefix", {
             get: function () {
@@ -3746,7 +3746,7 @@ var xadesjs;
                             var obj = _this.m_signature.ObjectList[i];
                             found = _this.findById(obj.element, objectName);
                             if (found) {
-                                found.setAttribute("xmlns", SignedXml.XmlDsigNamespaceUrl);
+                                // found.setAttribute("xmlns", SignedXml.XmlDsigNamespaceUrl);
                                 doc = doc.importNode(found, true);
                                 // FIXME: there should be theoretical justification of copying namespace declaration nodes this way.
                                 for (var j = 0; j < found.childNodes.length; j++) {

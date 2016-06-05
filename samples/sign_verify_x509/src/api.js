@@ -184,9 +184,6 @@ function SignXml(xmlString, keyPair, algorithm, certRaw) {
             signedXml.KeyInfo.AddClause(certInfo)
         }
 
-        // Set prefix for Signature namespace
-        signedXml.Prefix = "ds";
-
         // Compute the signature.
         signedXml.ComputeSignature(algorithm)
             .then(function () {
