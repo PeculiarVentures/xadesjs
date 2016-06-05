@@ -41,7 +41,7 @@ namespace xadesjs {
 
     export abstract class XmlObject implements IXmlSerializable {
 
-        protected m_prefix = "";
+        protected m_prefix = XmlSignature.DefaultPrefix;
 
         get Prefix(): string {
             return this.m_prefix;
