@@ -428,6 +428,16 @@ var xadesjs;
                 result_string = result_string + String.fromCharCode(buffer[i]);
             return result_string;
         };
+        Convert.ToHex = function (buffer) {
+            var splitter = "";
+            var u8buf = new Uint8Array(buffer);
+            var res = [];
+            for (var i = 0; i < u8buf.length; i++) {
+                var char = u8buf[i].toString(16);
+                res.push(char.length === 1 ? "0" + char : char);
+            }
+            return res.join(splitter);
+        };
         Convert.ToDateTime = function (dateTime) {
             return new Date(dateTime);
         };
@@ -941,6 +951,76 @@ var xadesjs;
 var xadesjs;
 (function (xadesjs) {
     /**
+     * List of OIDs
+     * Source: https://msdn.microsoft.com/ru-ru/library/windows/desktop/aa386991(v=vs.85).aspx
+     */
+    var OID = {
+        "2.5.4.3": {
+            short: "CN",
+            long: "CommonName"
+        },
+        "2.5.4.6": {
+            short: "C",
+            long: "Country"
+        },
+        "2.5.4.5": {
+            short: null,
+            long: "DeviceSerialNumber"
+        },
+        "0.9.2342.19200300.100.1.25": {
+            short: "DC",
+            long: "DomainComponent"
+        },
+        "1.2.840.113549.1.9.1": {
+            short: "E",
+            long: "EMail"
+        },
+        "2.5.4.42": {
+            short: "G",
+            long: "GivenName"
+        },
+        "2.5.4.43": {
+            short: "I",
+            long: "Initials"
+        },
+        "2.5.4.7": {
+            short: "L",
+            long: "Locality"
+        },
+        "2.5.4.10": {
+            short: "O",
+            long: "Organization"
+        },
+        "2.5.4.11": {
+            short: "OU",
+            long: "OrganizationUnit"
+        },
+        "2.5.4.8": {
+            short: "ST",
+            long: "State"
+        },
+        "2.5.4.9": {
+            short: "Street",
+            long: "StreetAddress"
+        },
+        "2.5.4.4": {
+            short: "SN",
+            long: "SurName"
+        },
+        "2.5.4.12": {
+            short: "T",
+            long: "Title"
+        },
+        "1.2.840.113549.1.9.8": {
+            short: null,
+            long: "UnstructuredAddress"
+        },
+        "1.2.840.113549.1.9.2": {
+            short: null,
+            long: "UnstructuredName"
+        }
+    };
+    /**
      * Represents an <X509Certificate> element.
      */
     var X509Certificate = (function () {
@@ -951,6 +1031,64 @@ var xadesjs;
                 this.raw = rawData;
             }
         }
+        Object.defineProperty(X509Certificate.prototype, "SerialNumber", {
+            /**
+             * Gets a serial number of the certificate in HEX format
+             */
+            get: function () {
+                return xadesjs.Convert.ToHex(this.cert_simpl.serialNumber.value_block.value_hex);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * Converts X500Name to string
+         * @param  {RDN} name X500Name
+         * @param  {string} spliter Splitter char. Default ','
+         * @returns string Formated string
+         * Example:
+         * > C=Some name, O=Some organization name, C=RU
+         */
+        X509Certificate.prototype.NameToString = function (name, spliter) {
+            if (spliter === void 0) { spliter = ","; }
+            var res = [];
+            for (var _i = 0, _a = name.types_and_values; _i < _a.length; _i++) {
+                var type_and_value = _a[_i];
+                var type = type_and_value.type;
+                var name_1 = OID[type].short;
+                res.push((name_1 ? name_1 : type) + "=" + type_and_value.value.value_block.value);
+            }
+            return res.join(spliter + " ");
+        };
+        Object.defineProperty(X509Certificate.prototype, "Issuer", {
+            /**
+             * Gets a issuer name of the certificate
+             */
+            get: function () {
+                return this.NameToString(this.cert_simpl.issuer);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(X509Certificate.prototype, "Subject", {
+            /**
+             * Gets a subject name of the certificate
+             */
+            get: function () {
+                return this.NameToString(this.cert_simpl.subject);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * Returns a thumbrint of the certififcate
+         * @param  {DigestAlgorithm="SHA-1"} algName Digest algorithm name
+         * @returns PromiseLike
+         */
+        X509Certificate.prototype.Thumbprint = function (algName) {
+            if (algName === void 0) { algName = "SHA-1"; }
+            return xadesjs.Application.crypto.subtle.digest(algName, this.raw);
+        };
         /**
          * Loads X509Certificate from DER data
          * @param  {Uint8Array} rawData

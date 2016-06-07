@@ -82,6 +82,23 @@ namespace xadesjs {
                 result_string = result_string + String.fromCharCode(buffer[i]);
             return result_string;
         }
+        /**
+         * Converts buffer to HEX string
+         * @param  {ArrayBuffer} buffer Incoming buffer
+         * @returns string
+         */
+        static ToHex(buffer: ArrayBuffer): string;
+        static ToHex(buffer: ArrayBufferView): string;
+        static ToHex(buffer: any): string {
+            const splitter = "";
+            let u8buf = new Uint8Array(buffer);
+            let res: string[] = [];
+            for (let i = 0; i < u8buf.length; i++) {
+                let char = u8buf[i].toString(16);
+                res.push(char.length === 1 ? "0" + char : char);
+            }
+            return res.join(splitter);
+        }
 
         static ToDateTime(dateTime: string): Date {
             return new Date(dateTime);
