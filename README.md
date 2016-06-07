@@ -25,7 +25,7 @@ They differ slightly based on what is included in the signature:
 | XAdES-X-L  | Yes                        | Yes                              | Yes                            | Yes                      | No                                       |
 | XAdES-A    | Yes                        | Yes                              | Yes                            | Yes                      | Yes                                      |
 
-- Only XADES-BES is directly (shown in **BOLD**) is currently supported by XAdESjs
+- Only XAdES-BES is fully (as shown in **BOLD**) supported by XAdESjs
 - Other variants are supported by XAdESjs-PRO which is availible under a commercial license,  [email](mailto:info@peculiarventures.com) for more information
  
 ## COMPATABILITY
