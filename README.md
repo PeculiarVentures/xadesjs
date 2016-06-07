@@ -2,7 +2,7 @@
 
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/PeculiarVentures/xadesjs/master/LICENSE.md)
 
-[XAdES](https://en.wikipedia.org/wiki/XAdES) is short for "XML Advanced Electronic Signatures", it is a superset of XMLDSIG. This library aims to provide an implementation of both XMLDSIG and XAdES (in progress) in pure Javascript that uses Web Crypto for cryptographic operations so it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)).
+[XAdES](https://en.wikipedia.org/wiki/XAdES) is short for "XML Advanced Electronic Signatures", it is a superset of XMLDSIG. This library aims to provide an implementation of both XMLDSIG and XAdES-BES in pure Javascript that uses Web Crypto for cryptographic operations so it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)).
 
 There are seven different profiles of XAdES, they are:
 - Basic Electronic Signature (XAdES-BES)
@@ -25,7 +25,7 @@ They differ slightly based on what is included in the signature:
 | XAdES-X-L  | Yes                        | Yes                              | Yes                            | Yes                      | No                                       |
 | XAdES-A    | Yes                        | Yes                              | Yes                            | Yes                      | Yes                                      |
 
-- Variants in **BOLD** are currently supported by XAdESjs
+- Only XADES-BES is directly (shown in **BOLD**) is currently supported by XAdESjs
 - Other variants are supported by XAdESjs-PRO which is availible under a commercial license,  [email](mailto:info@peculiarventures.com) for more information
  
 ## COMPATABILITY
