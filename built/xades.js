@@ -215,6 +215,23 @@ var xadesjs;
                 return xel.getAttribute(attribute);
             return null;
         };
+        XmlObject.prototype.GetElementById = function (document, idValue) {
+            if ((document == null) || (idValue == null))
+                return null;
+            // this works only if there's a DTD or XSD available to define the ID
+            var xel = document.getElementById(idValue);
+            if (xel == null) {
+                // search an "undefined" ID
+                xel = xadesjs.SelectSingleNode(document, "//*[@Id='" + idValue + "']");
+                if (xel == null) {
+                    xel = xadesjs.SelectSingleNode(document, "//*[@ID='" + idValue + "']");
+                    if (xel == null) {
+                        xel = xadesjs.SelectSingleNode(document, "//*[@id='" + idValue + "']");
+                    }
+                }
+            }
+            return xel;
+        };
         return XmlObject;
     }());
     xadesjs.XmlObject = XmlObject;
@@ -3896,7 +3913,7 @@ var xadesjs;
                             }
                         }
                         if (found == null && _this.envdoc != null) {
-                            found = _this.GetIdElement(_this.envdoc, objectName);
+                            found = _this.GetElementById(_this.envdoc, objectName);
                             if (found != null) {
                                 doc = doc.importNode(found, true);
                                 _this.FixupNamespaceNodes(found, doc, false);
@@ -4151,23 +4168,6 @@ var xadesjs;
             //             (<XmlDecryptionTransform>t).EncryptedXml = this.EncryptedXml;
             //     }
             // }
-        };
-        SignedXml.prototype.GetIdElement = function (document, idValue) {
-            if ((document == null) || (idValue == null))
-                return null;
-            // this works only if there's a DTD or XSD available to define the ID
-            var xel = document.getElementById(idValue);
-            if (xel == null) {
-                // search an "undefined" ID
-                xel = xadesjs.SelectSingleNode(document, "//*[@Id='" + idValue + "']");
-                if (xel == null) {
-                    xel = xadesjs.SelectSingleNode(document, "//*[@ID='" + idValue + "']");
-                    if (xel == null) {
-                        xel = xadesjs.SelectSingleNode(document, "//*[@id='" + idValue + "']");
-                    }
-                }
-            }
-            return xel;
         };
         /**
          * Returns the XML representation of a SignedXml object.

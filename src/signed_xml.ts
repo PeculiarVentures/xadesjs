@@ -359,7 +359,7 @@ namespace xadesjs {
                             }
                         }
                         if (found == null && this.envdoc != null) {
-                            found = this.GetIdElement(this.envdoc, objectName);
+                            found = this.GetElementById(this.envdoc, objectName);
                             if (found != null) {
                                 doc = (doc as Document).importNode(found, true);
                                 this.FixupNamespaceNodes(found, doc as Element, false);
@@ -629,25 +629,6 @@ namespace xadesjs {
             //             (<XmlDecryptionTransform>t).EncryptedXml = this.EncryptedXml;
             //     }
             // }
-        }
-
-        public GetIdElement(document: Document, idValue: string): Element {
-            if ((document == null) || (idValue == null))
-                return null;
-
-            // this works only if there's a DTD or XSD available to define the ID
-            let xel: Node = document.getElementById(idValue);
-            if (xel == null) {
-                // search an "undefined" ID
-                xel = SelectSingleNode(document, `//*[@Id='${idValue}']`);
-                if (xel == null) {
-                    xel = SelectSingleNode(document, `//*[@ID='${idValue}']`);
-                    if (xel == null) {
-                        xel = SelectSingleNode(document, `//*[@id='${idValue}']`);
-                    }
-                }
-            }
-            return xel as Element;
         }
 
         /**
