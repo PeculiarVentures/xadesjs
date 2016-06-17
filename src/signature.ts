@@ -72,8 +72,6 @@ namespace xadesjs {
             this.signature_id = value;
         }
 
-
-
         /**
          * Gets or sets the SignedInfo of the current Signature.
          */
