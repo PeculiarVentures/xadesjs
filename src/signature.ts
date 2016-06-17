@@ -10,6 +10,7 @@ namespace xadesjs {
         private key: KeyInfo;
         private id: string;
         private signature: Uint8Array;
+        private signature_id: string;
         private element: Element;
 
         public constructor() {
@@ -59,6 +60,19 @@ namespace xadesjs {
             this.element = null;
             this.signature = value;
         }
+
+        /**
+         * Gets or sets the Id of the SignatureValue.
+         */
+        get SignatureValueId(): string {
+            return this.signature_id;
+        }
+        set SignatureValueId(value: string) {
+            this.element = null;
+            this.signature_id = value;
+        }
+
+
 
         /**
          * Gets or sets the SignedInfo of the current Signature.
@@ -113,6 +127,8 @@ namespace xadesjs {
             if (this.signature != null) {
                 let sv = document.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.SignatureValue);
                 sv.textContent = Convert.ToBase64String(Convert.FromBufferString(this.signature));
+                if (this.signature_id)
+                    sv.setAttribute(XmlSignature.AttributeNames.Id, this.signature_id);
                 xel.appendChild(sv);
             }
 
@@ -157,6 +173,7 @@ namespace xadesjs {
                 i = this.NextElementPos(value.childNodes, ++i, XmlSignature.ElementNames.SignatureValue, XmlSignature.NamespaceURI, true);
                 let sigValue = <Element>value.childNodes[i];
                 this.signature = Convert.ToBufferString(Convert.FromBase64String(sigValue.textContent));
+                this.signature_id = this.getAttribute(sigValue, XmlSignature.AttributeNames.Id);
 
                 // signature isn't required: <element ref="ds:KeyInfo" minOccurs="0"/> 
                 i = this.NextElementPos(value.childNodes, ++i, XmlSignature.ElementNames.KeyInfo, XmlSignature.NamespaceURI, false);

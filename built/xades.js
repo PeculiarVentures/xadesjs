@@ -3156,6 +3156,20 @@ var xadesjs;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Signature.prototype, "SignatureValueId", {
+            /**
+             * Gets or sets the Id of the SignatureValue.
+             */
+            get: function () {
+                return this.signature_id;
+            },
+            set: function (value) {
+                this.element = null;
+                this.signature_id = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Signature.prototype, "SignedInfo", {
             /**
              * Gets or sets the SignedInfo of the current Signature.
@@ -3205,6 +3219,8 @@ var xadesjs;
             if (this.signature != null) {
                 var sv = document.createElementNS(xadesjs.XmlSignature.NamespaceURI, prefix + xadesjs.XmlSignature.ElementNames.SignatureValue);
                 sv.textContent = xadesjs.Convert.ToBase64String(xadesjs.Convert.FromBufferString(this.signature));
+                if (this.signature_id)
+                    sv.setAttribute(xadesjs.XmlSignature.AttributeNames.Id, this.signature_id);
                 xel.appendChild(sv);
             }
             if (this.key != null) {
@@ -3242,6 +3258,7 @@ var xadesjs;
                 i = this.NextElementPos(value.childNodes, ++i, xadesjs.XmlSignature.ElementNames.SignatureValue, xadesjs.XmlSignature.NamespaceURI, true);
                 var sigValue = value.childNodes[i];
                 this.signature = xadesjs.Convert.ToBufferString(xadesjs.Convert.FromBase64String(sigValue.textContent));
+                this.signature_id = this.getAttribute(sigValue, xadesjs.XmlSignature.AttributeNames.Id);
                 // signature isn't required: <element ref="ds:KeyInfo" minOccurs="0"/> 
                 i = this.NextElementPos(value.childNodes, ++i, xadesjs.XmlSignature.ElementNames.KeyInfo, xadesjs.XmlSignature.NamespaceURI, false);
                 if (i > 0) {
