@@ -215,18 +215,20 @@ var xadesjs;
                 return xel.getAttribute(attribute);
             return null;
         };
-        XmlObject.prototype.GetElementById = function (document, idValue) {
-            if ((document == null) || (idValue == null))
+        XmlObject.prototype.GetElementById = function (node, idValue) {
+            if ((node == null) || (idValue == null))
                 return null;
             // this works only if there's a DTD or XSD available to define the ID
-            var xel = document.getElementById(idValue);
+            var xel = null;
+            if (node.nodeType === XmlNodeType.Document)
+                xel = node.getElementById(idValue);
             if (xel == null) {
                 // search an "undefined" ID
-                xel = xadesjs.SelectSingleNode(document, "//*[@Id='" + idValue + "']");
+                xel = xadesjs.SelectSingleNode(node, "//*[@Id='" + idValue + "']");
                 if (xel == null) {
-                    xel = xadesjs.SelectSingleNode(document, "//*[@ID='" + idValue + "']");
+                    xel = xadesjs.SelectSingleNode(node, "//*[@ID='" + idValue + "']");
                     if (xel == null) {
-                        xel = xadesjs.SelectSingleNode(document, "//*[@id='" + idValue + "']");
+                        xel = xadesjs.SelectSingleNode(node, "//*[@id='" + idValue + "']");
                     }
                 }
             }

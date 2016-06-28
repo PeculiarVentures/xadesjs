@@ -75,19 +75,23 @@ namespace xadesjs {
             return null;
         }
 
-        protected GetElementById(document: Document, idValue: string): Element {
-            if ((document == null) || (idValue == null))
+        protected GetElementById(document: Document, idValue: string): Element;
+        protected GetElementById(element: Element, idValue: string): Element;
+        protected GetElementById(node: Node, idValue: string): Element {
+            if ((node == null) || (idValue == null))
                 return null;
 
             // this works only if there's a DTD or XSD available to define the ID
-            let xel: Node = document.getElementById(idValue);
+            let xel: Node = null;
+            if (node.nodeType === XmlNodeType.Document)
+                xel = (node as Document).getElementById(idValue);
             if (xel == null) {
                 // search an "undefined" ID
-                xel = SelectSingleNode(document, `//*[@Id='${idValue}']`);
+                xel = SelectSingleNode(node, `//*[@Id='${idValue}']`);
                 if (xel == null) {
-                    xel = SelectSingleNode(document, `//*[@ID='${idValue}']`);
+                    xel = SelectSingleNode(node, `//*[@ID='${idValue}']`);
                     if (xel == null) {
-                        xel = SelectSingleNode(document, `//*[@id='${idValue}']`);
+                        xel = SelectSingleNode(node, `//*[@id='${idValue}']`);
                     }
                 }
             }
