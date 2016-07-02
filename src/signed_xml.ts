@@ -637,7 +637,10 @@ namespace xadesjs {
          */
         public GetXml(): Element {
             this.m_signature.Prefix = this.Prefix;
-            return this.m_signature.GetXml();
+            if (this.m_element)
+                return this.m_element as Element;
+            else
+                return this.m_signature.GetXml();
         }
 
     }

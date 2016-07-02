@@ -3307,6 +3307,7 @@ var xadesjs;
     }(xadesjs.XmlObject));
     xadesjs.Signature = Signature;
     xadesjs.XmlSignature = {
+        DEFAULT_CANON_METHOD: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
         DefaultPrefix: "ds",
         ElementNames: {
             CanonicalizationMethod: "CanonicalizationMethod",
@@ -4194,7 +4195,10 @@ var xadesjs;
          */
         SignedXml.prototype.GetXml = function () {
             this.m_signature.Prefix = this.Prefix;
-            return this.m_signature.GetXml();
+            if (this.m_element)
+                return this.m_element;
+            else
+                return this.m_signature.GetXml();
         };
         /**
          * Represents the Uniform Resource Identifier (URI) for the standard canonicalization

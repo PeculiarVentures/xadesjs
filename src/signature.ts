@@ -222,6 +222,8 @@ namespace xadesjs {
 
     export const XmlSignature = {
 
+        DEFAULT_CANON_METHOD: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
+
         DefaultPrefix: "ds",
 
         ElementNames: {
