@@ -314,7 +314,7 @@ namespace xadesjs {
         private GetReferenceHash(r: Reference, check_hmac: boolean): Promise {
             return new Promise((resolve, reject) => {
                 let doc: Node = null;
-                let s: string = null;
+                let s: any = null;
                 if (!r.Uri) { // Empty
                     doc = this.envdoc;
                 }
@@ -410,8 +410,6 @@ namespace xadesjs {
                 if (digest == null)
                     resolve(null);
                 else {
-                    if (typeof s === "object")
-                        s = new XMLSerializer().serializeToString(s as any);
                     digest.getHash(s)
                         .then(resolve, reject);
                 }

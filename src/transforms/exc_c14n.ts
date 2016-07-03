@@ -6,7 +6,7 @@ namespace xadesjs {
      */
     export class XmlDsigExcC14NTransform extends Transform {
 
-        protected xmlCanonicalizer = new XmlCanonicalizer(false, true, []);
+        protected xmlCanonicalizer = new XmlCanonicalizer(false, true);
 
         Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#";
 
@@ -36,6 +36,6 @@ namespace xadesjs {
      */
     export class XmlDsigExcC14NWithCommentsTransform extends XmlDsigExcC14NTransform {
         Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#WithComments";
-        protected xmlCanonicalizer = new XmlCanonicalizer(true, true, []);
+        protected xmlCanonicalizer = new XmlCanonicalizer(true, true);
     }
 }

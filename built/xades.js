@@ -486,7 +486,21 @@ var xadesjs;
         }
         HashAlgorithm.prototype.getHash = function (xml) {
             // console.log("HashedInfo:", xml);
-            return xadesjs.Application.crypto.subtle.digest(this.algorithm, xadesjs.Convert.ToBufferUtf8String(xml));
+            var buf;
+            if (typeof xml === "string") {
+                // C14N transforms
+                buf = xadesjs.Convert.ToBufferUtf8String(xml);
+            }
+            else if (xml instanceof Uint8Array) {
+                // base64 transform
+                buf = xml;
+            }
+            else {
+                // enveloped signature transform
+                var txt = new XMLSerializer().serializeToString(xml);
+                buf = xadesjs.Convert.ToBufferUtf8String(txt);
+            }
+            return xadesjs.Application.crypto.subtle.digest(this.algorithm, buf);
         };
         return HashAlgorithm;
     }(XmlAlgorithm));
@@ -2383,7 +2397,7 @@ var xadesjs;
          * Returns the output of the current XmlDsigBase64Transform object
          */
         XmlDsigBase64Transform.prototype.GetOutput = function () {
-            return xadesjs.Convert.FromBase64String(this.innerXml.textContent);
+            return xadesjs.Convert.ToBufferString(xadesjs.Convert.FromBase64String(this.innerXml.textContent));
         };
         return XmlDsigBase64Transform;
     }(xadesjs.Transform));
@@ -2408,8 +2422,7 @@ var xadesjs;
             var signature = select(this.innerXml, ".//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
             if (signature)
                 signature.parentNode.removeChild(signature);
-            var res = new XMLSerializer().serializeToString(this.innerXml); // .replace(/\r/g, "");
-            return res;
+            return this.innerXml;
         };
         return XmlDsigEnvelopedSignatureTransform;
     }(xadesjs.Transform));
@@ -2425,7 +2438,7 @@ var xadesjs;
         __extends(XmlDsigC14NTransform, _super);
         function XmlDsigC14NTransform() {
             _super.apply(this, arguments);
-            this.xmlCanonicalizer = new xadesjs.XmlCanonicalizer(false, false, []);
+            this.xmlCanonicalizer = new xadesjs.XmlCanonicalizer(false, false);
             this.Algorithm = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
         }
         /**
@@ -2448,7 +2461,7 @@ var xadesjs;
         function XmlDsigC14NWithCommentsTransform() {
             _super.apply(this, arguments);
             this.Algorithm = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments";
-            this.xmlCanonicalizer = new xadesjs.XmlCanonicalizer(true, true, []);
+            this.xmlCanonicalizer = new xadesjs.XmlCanonicalizer(true, true);
         }
         return XmlDsigC14NWithCommentsTransform;
     }(XmlDsigC14NTransform));
@@ -2464,7 +2477,7 @@ var xadesjs;
         __extends(XmlDsigExcC14NTransform, _super);
         function XmlDsigExcC14NTransform() {
             _super.apply(this, arguments);
-            this.xmlCanonicalizer = new xadesjs.XmlCanonicalizer(false, true, []);
+            this.xmlCanonicalizer = new xadesjs.XmlCanonicalizer(false, true);
             this.Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#";
         }
         Object.defineProperty(XmlDsigExcC14NTransform.prototype, "InclusiveNamespacesPrefixList", {
@@ -2500,7 +2513,7 @@ var xadesjs;
         function XmlDsigExcC14NWithCommentsTransform() {
             _super.apply(this, arguments);
             this.Algorithm = "http://www.w3.org/2001/10/xml-exc-c14n#WithComments";
-            this.xmlCanonicalizer = new xadesjs.XmlCanonicalizer(true, true, []);
+            this.xmlCanonicalizer = new xadesjs.XmlCanonicalizer(true, true);
         }
         return XmlDsigExcC14NWithCommentsTransform;
     }(XmlDsigExcC14NTransform));
@@ -3983,8 +3996,6 @@ var xadesjs;
                 if (digest == null)
                     resolve(null);
                 else {
-                    if (typeof s === "object")
-                        s = new XMLSerializer().serializeToString(s);
                     digest.getHash(s)
                         .then(resolve, reject);
                 }

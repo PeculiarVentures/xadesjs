@@ -11,11 +11,10 @@ namespace xadesjs {
          * Returns the output of the current XmlDsigEnvelopedSignatureTransform object.
          * @returns string
          */
-        GetOutput(): string {
+        GetOutput(): Node {
             let signature = select(this.innerXml, ".//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
             if (signature) signature.parentNode.removeChild(signature);
-            let res = new XMLSerializer().serializeToString(this.innerXml); // .replace(/\r/g, "");
-            return res;
+            return this.innerXml;
         }
 
     }

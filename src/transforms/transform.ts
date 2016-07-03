@@ -6,7 +6,7 @@ namespace xadesjs {
         Algorithm: string;
         LoadInnerXml(node: Node): void;
         GetInnerXml(): Node;
-        GetOutput(): string;
+        GetOutput(): any;
     }
 
     export interface ICanonicalizationAlgorithmConstructable {

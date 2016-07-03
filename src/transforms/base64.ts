@@ -8,8 +8,8 @@ namespace xadesjs {
         /**
          * Returns the output of the current XmlDsigBase64Transform object
          */
-        GetOutput(): string {
-            return Convert.FromBase64String(this.innerXml.textContent);
+        GetOutput(): any {
+            return Convert.ToBufferString(Convert.FromBase64String(this.innerXml.textContent));
         }
 
     }
