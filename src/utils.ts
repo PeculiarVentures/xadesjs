@@ -126,13 +126,12 @@ namespace xadesjs {
             });
     }
 
-    function _SelectNamespaces(node: Element, selectedNodes: IAssocArray = {}) {
-        if (node.namespaceURI !== "http://www.w3.org/XML/1998/namespace")
-            selectedNodes[node.prefix ? node.prefix : ""] = node.namespaceURI;
-        for (let i = 0; i < node.childNodes.length; i++) {
-            let _node = node.childNodes.item(i) as Element;
-            if (_node.nodeType === XmlNodeType.Element)
-                _SelectNamespaces(_node, selectedNodes);
+    function _SelectNamespaces(node: Node, selectedNodes: IAssocArray = {}) {
+        if (node && node.nodeType === XmlNodeType.Element) {
+            if (node.namespaceURI !== "http://www.w3.org/XML/1998/namespace" && !selectedNodes[node.prefix || ""])
+                selectedNodes[node.prefix ? node.prefix : ""] = node.namespaceURI;
+            if (node.nodeType === XmlNodeType.Element)
+                _SelectNamespaces(node.parentElement, selectedNodes);
         }
     }
 

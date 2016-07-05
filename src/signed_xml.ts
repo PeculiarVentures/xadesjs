@@ -234,22 +234,39 @@ namespace xadesjs {
         /**
          * Returns the public key of a signature.
          */
-        protected GetPublicKey(): Promise {
+        protected GetPublicKeys(): Promise {
             return new Promise((resolve, reject) => {
                 if (this.key !== null)
                     return resolve(this.key);
 
                 let pkEnumerator = this.KeyInfo.GetEnumerator();
 
+                let keys: CryptoKey[] = [];
+                let chain = Promise.resolve();
                 for (let kic of pkEnumerator) {
                     let alg = CryptoConfig.CreateSignatureAlgorithm(this.SignatureMethod);
-                    kic.exportKey(alg.algorithm)
-                        .then((key: CryptoKey) => {
-                            this.key = key;
-                            return Promise.resolve(key);
+                    if (kic instanceof KeyInfoX509Data) {
+                        for (let cert of (kic as KeyInfoX509Data).Certificates) {
+                            chain = chain.then(() => {
+                                return cert.exportKey(alg.algorithm);
+                            })
+                                .then((key: CryptoKey) => {
+                                    keys.push(key);
+                                    return Promise.resolve(keys);
+                                });
+                        }
+                    }
+                    else {
+                        chain = chain.then(() => {
+                            return kic.exportKey(alg.algorithm);
                         })
-                        .then(resolve, reject);
+                            .then((key: CryptoKey) => {
+                                keys.push(key);
+                                return Promise.resolve(keys);
+                            });
+                    }
                 }
+                chain.then(resolve, reject);
             });
         }
 
@@ -369,6 +386,9 @@ namespace xadesjs {
                             throw new XmlError(XE.CRYPTOGRAPHIC, `Malformed reference object: ${objectName}`);
                     }
                 }
+
+                // Create clone to save sorce element from transformations
+                doc = doc.cloneNode(true);
 
                 if (r.TransformChain.length > 0) {
                     // Sort transforms. Enveloped should be first transform
@@ -550,9 +570,22 @@ namespace xadesjs {
             return new Promise((resolve, reject) => {
                 signedInfoCanon = this.SignedInfoTransformed();
                 signer = CryptoConfig.CreateSignatureAlgorithm(this.SignatureMethod);
-                this.GetPublicKey()
-                    .then((key: CryptoKey) => {
-                        return signer.verifySignature(signedInfoCanon, key, Convert.FromBufferString(this.SignatureValue));
+                this.GetPublicKeys()
+                    // Verify signature for all exported keys
+                    .then((keys: CryptoKey[]) => {
+                        return new Promise((resolve, reject) => {
+                            let chain = Promise.resolve(false);
+                            let signatureValue = Convert.FromBufferString(this.SignatureValue);
+                            for (let key of keys) {
+                                chain = chain.then((v: boolean) => {
+                                    if (!v) {
+                                        return signer.verifySignature(signedInfoCanon, key, signatureValue);
+                                    }
+                                    return Promise.resolve(v);
+                                });
+                            }
+                            chain.then(resolve, reject);
+                        });
                     })
                     .then(resolve, reject);
             });
@@ -579,7 +612,7 @@ namespace xadesjs {
                             let b64Digest = Convert.ToBase64String(Convert.FromBufferString(digest));
                             let b64DigestValue = Convert.ToBase64String(Convert.FromBufferString(ref.DigestValue));
                             if (b64Digest !== b64DigestValue) {
-                                let err_text = `invalid signature: for uri '${ref.Uri}'' calculated digest is ${b64Digest} but the xml to validate supplies digest ${b64DigestValue}`;
+                                let err_text = `Invalid digest for uri '${ref.Uri}'. Calculated digest is ${b64Digest} but the xml to validate supplies digest ${b64DigestValue}`;
                                 this.validationErrors.push(err_text);
                                 throw new XmlError(XE.CRYPTOGRAPHIC, err_text);
                             }

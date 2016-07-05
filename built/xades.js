@@ -358,12 +358,11 @@ var xadesjs;
     xadesjs.encodeSpecialCharactersInText = encodeSpecialCharactersInText;
     function _SelectNamespaces(node, selectedNodes) {
         if (selectedNodes === void 0) { selectedNodes = {}; }
-        if (node.namespaceURI !== "http://www.w3.org/XML/1998/namespace")
-            selectedNodes[node.prefix ? node.prefix : ""] = node.namespaceURI;
-        for (var i = 0; i < node.childNodes.length; i++) {
-            var _node = node.childNodes.item(i);
-            if (_node.nodeType === xadesjs.XmlNodeType.Element)
-                _SelectNamespaces(_node, selectedNodes);
+        if (node && node.nodeType === xadesjs.XmlNodeType.Element) {
+            if (node.namespaceURI !== "http://www.w3.org/XML/1998/namespace" && !selectedNodes[node.prefix || ""])
+                selectedNodes[node.prefix ? node.prefix : ""] = node.namespaceURI;
+            if (node.nodeType === xadesjs.XmlNodeType.Element)
+                _SelectNamespaces(node.parentElement, selectedNodes);
         }
     }
     function SelectNamespaces(node) {
@@ -2154,8 +2153,8 @@ var xadesjs;
                     this.visibleNamespaces.Add(ns);
                     visibleNamespacesCount++;
                 }
-                if (attribute.localName === "xmlns")
-                    continue;
+                // if (attribute.localName === "xmlns")
+                //     continue;
                 // get namespace prefix
                 var prefix = void 0;
                 var matches = null;
@@ -3822,22 +3821,46 @@ var xadesjs;
         /**
          * Returns the public key of a signature.
          */
-        SignedXml.prototype.GetPublicKey = function () {
+        SignedXml.prototype.GetPublicKeys = function () {
             var _this = this;
             return new Promise(function (resolve, reject) {
                 if (_this.key !== null)
                     return resolve(_this.key);
                 var pkEnumerator = _this.KeyInfo.GetEnumerator();
-                for (var _i = 0, pkEnumerator_1 = pkEnumerator; _i < pkEnumerator_1.length; _i++) {
-                    var kic = pkEnumerator_1[_i];
+                var keys = [];
+                var chain = Promise.resolve();
+                var _loop_1 = function(kic) {
                     var alg = xadesjs.CryptoConfig.CreateSignatureAlgorithm(_this.SignatureMethod);
-                    kic.exportKey(alg.algorithm)
-                        .then(function (key) {
-                        _this.key = key;
-                        return Promise.resolve(key);
-                    })
-                        .then(resolve, reject);
+                    if (kic instanceof xadesjs.KeyInfoX509Data) {
+                        var _loop_2 = function(cert) {
+                            chain = chain.then(function () {
+                                return cert.exportKey(alg.algorithm);
+                            })
+                                .then(function (key) {
+                                keys.push(key);
+                                return Promise.resolve(keys);
+                            });
+                        };
+                        for (var _i = 0, _a = kic.Certificates; _i < _a.length; _i++) {
+                            var cert = _a[_i];
+                            _loop_2(cert);
+                        }
+                    }
+                    else {
+                        chain = chain.then(function () {
+                            return kic.exportKey(alg.algorithm);
+                        })
+                            .then(function (key) {
+                            keys.push(key);
+                            return Promise.resolve(keys);
+                        });
+                    }
+                };
+                for (var _b = 0, pkEnumerator_1 = pkEnumerator; _b < pkEnumerator_1.length; _b++) {
+                    var kic = pkEnumerator_1[_b];
+                    _loop_1(kic);
                 }
+                chain.then(resolve, reject);
             });
         };
         /**
@@ -3858,7 +3881,7 @@ var xadesjs;
                 var promise = Promise.resolve();
                 // we must tell each reference which hash algorithm to use 
                 // before asking for the SignedInfo XML !
-                var _loop_1 = function(r) {
+                var _loop_3 = function(r) {
                     // assume SHA-1 if nothing is specified
                     if (r.DigestMethod == null)
                         r.DigestMethod = new xadesjs.Sha1().xmlNamespace;
@@ -3872,7 +3895,7 @@ var xadesjs;
                 };
                 for (var _i = 0, _a = _this.m_signature.SignedInfo.References; _i < _a.length; _i++) {
                     var r = _a[_i];
-                    _loop_1(r);
+                    _loop_3(r);
                 }
                 promise.then(resolve, reject);
             });
@@ -3956,6 +3979,7 @@ var xadesjs;
                             throw new xadesjs.XmlError(xadesjs.XE.CRYPTOGRAPHIC, "Malformed reference object: " + objectName);
                     }
                 }
+                doc = doc.cloneNode(true);
                 if (r.TransformChain.length > 0) {
                     // Sort transforms. Enveloped should be first transform
                     r.TransformChain.sort(function (a, b) {
@@ -4124,9 +4148,25 @@ var xadesjs;
             return new Promise(function (resolve, reject) {
                 signedInfoCanon = _this.SignedInfoTransformed();
                 signer = xadesjs.CryptoConfig.CreateSignatureAlgorithm(_this.SignatureMethod);
-                _this.GetPublicKey()
-                    .then(function (key) {
-                    return signer.verifySignature(signedInfoCanon, key, xadesjs.Convert.FromBufferString(_this.SignatureValue));
+                _this.GetPublicKeys()
+                    .then(function (keys) {
+                    return new Promise(function (resolve, reject) {
+                        var chain = Promise.resolve(false);
+                        var signatureValue = xadesjs.Convert.FromBufferString(_this.SignatureValue);
+                        var _loop_4 = function(key) {
+                            chain = chain.then(function (v) {
+                                if (!v) {
+                                    return signer.verifySignature(signedInfoCanon, key, signatureValue);
+                                }
+                                return Promise.resolve(v);
+                            });
+                        };
+                        for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+                            var key = keys_1[_i];
+                            _loop_4(key);
+                        }
+                        chain.then(resolve, reject);
+                    });
                 })
                     .then(resolve, reject);
             });
@@ -4144,7 +4184,7 @@ var xadesjs;
             return new Promise(function (resolve, reject) {
                 var refs = that.SignedInfo.References;
                 var promise = Promise.resolve();
-                var _loop_2 = function(ref) {
+                var _loop_5 = function(ref) {
                     promise = promise.then(function () {
                         return _this.GetReferenceHash(ref, false);
                     })
@@ -4152,7 +4192,7 @@ var xadesjs;
                         var b64Digest = xadesjs.Convert.ToBase64String(xadesjs.Convert.FromBufferString(digest));
                         var b64DigestValue = xadesjs.Convert.ToBase64String(xadesjs.Convert.FromBufferString(ref.DigestValue));
                         if (b64Digest !== b64DigestValue) {
-                            var err_text = "invalid signature: for uri '" + ref.Uri + "'' calculated digest is " + b64Digest + " but the xml to validate supplies digest " + b64DigestValue;
+                            var err_text = "Invalid digest for uri '" + ref.Uri + "'. Calculated digest is " + b64Digest + " but the xml to validate supplies digest " + b64DigestValue;
                             _this.validationErrors.push(err_text);
                             throw new xadesjs.XmlError(xadesjs.XE.CRYPTOGRAPHIC, err_text);
                         }
@@ -4161,7 +4201,7 @@ var xadesjs;
                 };
                 for (var _i = 0, refs_1 = refs; _i < refs_1.length; _i++) {
                     var ref = refs_1[_i];
-                    _loop_2(ref);
+                    _loop_5(ref);
                 }
                 promise.then(resolve, reject);
             });

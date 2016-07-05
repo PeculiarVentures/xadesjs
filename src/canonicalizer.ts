@@ -219,8 +219,8 @@ namespace xadesjs {
                     visibleNamespacesCount++;
                 }
 
-                if (attribute.localName === "xmlns")
-                    continue;
+                // if (attribute.localName === "xmlns")
+                //     continue;
 
                 // get namespace prefix
                 let prefix: string;
