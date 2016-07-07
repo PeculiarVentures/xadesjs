@@ -92,7 +92,7 @@ xadesjs.Application.setEngine("PKCS11", new WebCrypto({
 #### In Node
 
 ```javascript
-var xadesjs = require("xades");
+var xadesjs = require("xadesjs");
 var DOMParser = require("xmldom").DOMParser;
 var XMLSerializer = require("xmldom").XMLSerializer;
 var WebCrypto = require("node-webcrypto-ossl").default;
