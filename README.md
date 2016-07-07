@@ -57,7 +57,7 @@ If you need to use a Hardware Security Module we have also created a polyfill fo
 To use [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) you need to specify you want to use it, that looks like this:
 
 ```javascript
-var xadesjs = require("xadesjs");
+var xadesjs = require("./built/xades.js");
 var WebCrypto = require("node-webcrypto-ossl").default;
 
 xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
@@ -66,7 +66,7 @@ xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
 The [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11) polyfill will work the same way. The only difference is that you have to specify the details about your PKCS #11 device when you instansiate it:
 
 ```javascript
-var xadesjs = require("xadesjs");
+var xadesjs = require("./built/xades.js");
 var WebCrypto = require("node-webcrypto-p11").WebCrypto;
 
 xadesjs.Application.setEngine("PKCS11", new WebCrypto({
@@ -276,7 +276,7 @@ function SignXml(xmlString, key, algorithm) {
 #### In Node
 
 ```javascript
-var xadesjs = require("xadesjs");
+var xadesjs = require("./built/xades.js");
 var DOMParser = require("xmldom").DOMParser;
 var WebCrypto = require("node-webcrypto-ossl").default;
 
