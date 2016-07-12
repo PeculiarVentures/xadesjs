@@ -128,7 +128,7 @@ namespace xadesjs {
 
     function _SelectNamespaces(node: Node, selectedNodes: IAssocArray = {}) {
         if (node && node.nodeType === XmlNodeType.Element) {
-            if (node.namespaceURI !== "http://www.w3.org/XML/1998/namespace" && !selectedNodes[node.prefix || ""])
+            if (node.namespaceURI && node.namespaceURI !== "http://www.w3.org/XML/1998/namespace" && !selectedNodes[node.prefix || ""])
                 selectedNodes[node.prefix ? node.prefix : ""] = node.namespaceURI;
             if (node.nodeType === XmlNodeType.Element)
                 _SelectNamespaces(node.parentElement, selectedNodes);

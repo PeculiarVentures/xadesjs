@@ -359,7 +359,7 @@ var xadesjs;
     function _SelectNamespaces(node, selectedNodes) {
         if (selectedNodes === void 0) { selectedNodes = {}; }
         if (node && node.nodeType === xadesjs.XmlNodeType.Element) {
-            if (node.namespaceURI !== "http://www.w3.org/XML/1998/namespace" && !selectedNodes[node.prefix || ""])
+            if (node.namespaceURI && node.namespaceURI !== "http://www.w3.org/XML/1998/namespace" && !selectedNodes[node.prefix || ""])
                 selectedNodes[node.prefix ? node.prefix : ""] = node.namespaceURI;
             if (node.nodeType === xadesjs.XmlNodeType.Element)
                 _SelectNamespaces(node.parentElement, selectedNodes);
@@ -3979,6 +3979,7 @@ var xadesjs;
                             throw new xadesjs.XmlError(xadesjs.XE.CRYPTOGRAPHIC, "Malformed reference object: " + objectName);
                     }
                 }
+                // Create clone to save sorce element from transformations
                 doc = doc.cloneNode(true);
                 if (r.TransformChain.length > 0) {
                     // Sort transforms. Enveloped should be first transform
@@ -4020,6 +4021,7 @@ var xadesjs;
                 if (digest == null)
                     resolve(null);
                 else {
+                    console.log("Digest source:\n", s);
                     digest.getHash(s)
                         .then(resolve, reject);
                 }
