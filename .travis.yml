@@ -21,7 +21,7 @@ addons:
 
 compiler: g++
 
-sudo: required
+sudo: false
 
 os:
   - linux
