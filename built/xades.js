@@ -6,9 +6,9 @@ var __extends = (this && this.__extends) || function (d, b) {
 /// <reference path="../typings/xmldom/xmldom.d.ts" />
 /// <reference path="./typings/promise.d.ts" />
 /// <reference path="./typings/xpath.d.ts" /> 
-var XMLSerializer = XMLSerializer || require("xmldom").XMLSerializer;
-var DOMParser = DOMParser || require("xmldom").DOMParser;
-var DOMImplementation = DOMImplementation || require("xmldom").DOMImplementation;
+var XMLSerializer = XMLSerializer || require("xmldom-alpha").XMLSerializer;
+var DOMParser = DOMParser || require("xmldom-alpha").DOMParser;
+var DOMImplementation = DOMImplementation || require("xmldom-alpha").DOMImplementation;
 var document = document || new DOMImplementation().createDocument("http://www.w3.org/1999/xhtml", "html", null);
 // PKIjs
 var org = org || null;
@@ -4021,7 +4021,6 @@ var xadesjs;
                 if (digest == null)
                     resolve(null);
                 else {
-                    console.log("Digest source:\n", s);
                     digest.getHash(s)
                         .then(resolve, reject);
                 }

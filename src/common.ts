@@ -2,9 +2,9 @@
 /// <reference path="./typings/promise.d.ts" />
 /// <reference path="./typings/xpath.d.ts" /> 
 
-let XMLSerializer = XMLSerializer || require("xmldom").XMLSerializer;
-let DOMParser = DOMParser || require("xmldom").DOMParser;
-let DOMImplementation = DOMImplementation || require("xmldom").DOMImplementation;
+let XMLSerializer = XMLSerializer || require("xmldom-alpha").XMLSerializer;
+let DOMParser = DOMParser || require("xmldom-alpha").DOMParser;
+let DOMImplementation = DOMImplementation || require("xmldom-alpha").DOMImplementation;
 let document = document || new DOMImplementation().createDocument("http://www.w3.org/1999/xhtml", "html", null);
 
 // PKIjs
