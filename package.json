@@ -7,8 +7,7 @@
     "test": "mocha test/scripts",
     "start": "node test/html/server.js",
     "pub": "npm version patch && npm publish && git push",
-    "sync": "git ac && git pull --rebase && git push",
-    "postinstall": "if test -d ./node_modules/xmldom-alpha; then mv ./node_modules/xmldom-alpha ./node_modules/xmldom; fi"
+    "sync": "git ac && git pull --rebase && git push"
   },
   "repository": {
     "type": "git",
