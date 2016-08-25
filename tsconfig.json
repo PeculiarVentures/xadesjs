@@ -7,7 +7,9 @@
         "outFile": "built/xades.js"
     },
     "files": [
-        "typings/node/node.d.ts",
+        "typings/index.d.ts",
+        "src/typings/promise.d.ts",
+        "src/typings/xpath.d.ts",
         "src/common.ts",
         "src/error.ts",
         "src/application.ts",

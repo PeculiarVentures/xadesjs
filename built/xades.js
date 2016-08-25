@@ -3,9 +3,6 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-/// <reference path="../typings/xmldom/xmldom.d.ts" />
-/// <reference path="./typings/promise.d.ts" />
-/// <reference path="./typings/xpath.d.ts" /> 
 var XMLSerializer = XMLSerializer || require("xmldom-alpha").XMLSerializer;
 var DOMParser = DOMParser || require("xmldom-alpha").DOMParser;
 var DOMImplementation = DOMImplementation || require("xmldom-alpha").DOMImplementation;

@@ -3,11 +3,11 @@ console.warn("Runing: NodeJS");
 var fs = require("fs");
 var assert = require("assert");
 var select = require("xpath.js");
-var DOMParser = require("xmldom").DOMParser;
-var XMLSerializer = require("xmldom").XMLSerializer;
+var DOMParser = require("xmldom-alpha").DOMParser;
+var XMLSerializer = require("xmldom-alpha").XMLSerializer;
 xadesjs = require("../../built/xades.js");
 
-var WebCrypto = require("node-webcrypto-ossl").default;
+var WebCrypto = require("node-webcrypto-ossl");
 xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
 console.log("WebCrypto:", xadesjs.Application.crypto.name);
 

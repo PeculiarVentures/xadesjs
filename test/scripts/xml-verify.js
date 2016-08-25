@@ -54,7 +54,6 @@ describe("Verify XML signatures", function () {
     })
 
     it("test validating SAML response WithComments", function (done) {
-        console.warn("This doesn't matter, just want to make sure that we don't fail due to unknown algorithm");
         verifyXML("valid_saml_with_comments.xml", done, false);
     })
 

@@ -12,6 +12,20 @@ if (typeof module !== "undefined") {
 
 describe("HMAC", function () {
 
+    function isNode() {
+        if (typeof window === "undefined") {
+            warn("NodeJS");
+            return true;
+        }
+        return false;
+    }
+
+    function warn(name) {
+        console.warn("    \x1b[33mWARN:\x1b[0m Test is not supported for %s. Ossl doesn't support HMAC algs", name);
+    }
+
+    if (isNode()) return;
+
     function CheckSignature(xmlString, key) {
         return new Promise(function (resolve, reject) {
             var xml = new DOMParser().parseFromString(xmlString, "application/xml");
