@@ -34,7 +34,11 @@ before_install:
   - node --version
   - npm --version
   - gcc --version
+  - npm install typescript -g
+  - npm install typings -g
   - npm install mocha -g
+  - typings install
+  - tsc
 
 script:
   - npm install
