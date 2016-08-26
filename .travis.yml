@@ -5,7 +5,7 @@ node_js:
   - "4"
 
 env:
-  - CXX=g++
+  - CXX=clang
 
 addons:
   apt:
@@ -19,7 +19,7 @@ addons:
       - llvm-3.6-dev
       - clang-3.6
 
-compiler: g++
+compiler: clang
 
 sudo: false
 
