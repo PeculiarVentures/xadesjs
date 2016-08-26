@@ -41,7 +41,6 @@ before_install:
   - tsc
 
 script:
-  - npm install
   - npm test
 
 cache:
