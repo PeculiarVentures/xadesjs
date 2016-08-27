@@ -36,6 +36,7 @@ before_install:
   - gcc --version
   - npm install typescript -g
   - npm install mocha -g
+  - NODE_PATH = /usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript
   - echo $NODE_PATH
   - find . -name xmldom-alpha
 
