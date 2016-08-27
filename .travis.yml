@@ -42,7 +42,7 @@ before_install:
 
 script:
   - if [ -f "./node_modules/xmldom" ]; then mv "./node_modules/xmldom" "./node_modules/xmldom-alpha"; fi
-  - ls -R
+  - ls "./node_modules"
   - npm test
 
 cache:
