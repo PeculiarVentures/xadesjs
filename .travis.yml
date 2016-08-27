@@ -34,6 +34,7 @@ before_install:
   - node --version
   - npm --version
   - gcc --version
+  - npm cache clean
   - npm install typescript -g
   - npm install mocha -g
   - find . -name xmldom-alpha
