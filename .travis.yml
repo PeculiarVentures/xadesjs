@@ -36,6 +36,7 @@ before_install:
   - gcc --version
   - npm install typescript -g
   - npm install mocha -g
+  - echo $NODE_PATH
   - npm install
 
 
