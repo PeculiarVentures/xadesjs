@@ -35,10 +35,8 @@ before_install:
   - npm --version
   - gcc --version
   - npm install typescript -g
-  - npm install typings -g
   - npm install mocha -g
-  - typings install
-  - tsc
+
 
 script:
   - npm test
