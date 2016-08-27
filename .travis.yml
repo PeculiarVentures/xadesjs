@@ -39,6 +39,7 @@ before_install:
   - NODE_PATH = /usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript
   - echo $NODE_PATH
   - find . -name xmldom-alpha
+  - ls -R
 
 
 script:
