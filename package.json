@@ -36,7 +36,6 @@
     "node-webcrypto-ossl":"^1.0.7"
   },
   "devDependencies": {
-    "xmldom-alpha": "^0.1.23",
     "express": "^4.13.4",
     "mocha": "latest"
   }
