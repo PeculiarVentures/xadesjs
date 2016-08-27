@@ -36,14 +36,8 @@ before_install:
   - gcc --version
   - npm install typescript -g
   - npm install mocha -g
-  - find . -name xmldom-alpha
-  - ls -R
-  - npm cache clean
-
 
 script:
-  - if [ -f "./node_modules/xmldom" ]; then mv "./node_modules/xmldom" "./node_modules/xmldom-alpha"; fi
-  - ls "./node_modules"
   - npm test
 
 cache:
