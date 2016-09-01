@@ -7,7 +7,7 @@
 		"start": "node test/html/server.js",
 		"pretest": "npm run build",
 		"test": "mocha test/scripts",
-		"build": "tsc --sourceMap",
+		"build": "typings install && tsc --sourceMap",
 		"pub": "npm version patch && npm publish && git push",
 		"sync": "git ac && git pull --rebase && git push",
 		"coverage": "nyc npm test",
