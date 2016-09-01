@@ -36,9 +36,11 @@ before_install:
   - gcc --version
   - npm install typescript -g
   - npm install mocha -g
+  - npm install coveralls
 
 script:
   - npm test
+  - npm run coverage
 
 cache:
   directories:
