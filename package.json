@@ -1,58 +1,58 @@
 {
-  "name": "xadesjs",
-  "version": "1.0.1",
-  "description": "A pure Javascript implementation of XMLDSIG and XAdES based on Web Crypto ",
-  "main": "built/xades.js",
-  "scripts": {
-    "start": "node test/html/server.js",
-    "pretest": "npm run build",
-    "test": "mocha test/scripts",
-    "build": "typings install && tsc --sourceMap",
-    "pub": "npm version patch && npm publish && git push",
-    "sync": "git ac && git pull --rebase && git push",
-    "coverage": "nyc npm test",
-    "precoveragehtml": "npm run coverage",
-    "coveragehtml": "nyc report -r html",
-    "watch": "watch 'npm run coveragehtml' lib/ src/ test/",
-    "live": "live-server -q --port=4005 --ignorePattern='(js|css|png)$' coverage",
-    "predev": "if [ ! -f coverage/index.html ]; then mkdir coverage; cp .waiting.html coverage/index.html; fi",
-    "dev": "npm-run-all -p --silent watch live",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/PeculiarVentures/xadesjs.git"
-  },
-  "keywords": [
-    "xml",
-    "webcrypto",
-    "signature",
-    "rsa",
-    "ec"
-  ],
-  "author": "Peculiar Ventures, Inc.",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/PeculiarVentures/xadesjs/issues"
-  },
-  "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
-  "dependencies": {
-    "co": "^4.6.0",
-    "node.extend": "^1.1.5",
-    "xmldom-alpha": "^0.1.23",
-    "xpath.js": "^1.0.6",
-    "pkijs": "^1.3.27",
-    "asn1js": "^1.2.12",
-    "node-webcrypto-ossl":"^1.0.7"
-  },
-  "devDependencies": {
-    "express": "^4.13.4",
-    "live-server": "^1",
-    "mocha": "^3",
-    "npm-run-all": "^3",
-    "nyc": "^8",
-    "typescript": "^1.8.10",
-    "typings": "^1.3.3",
-    "watch": "^0",
-    "mocha": "latest"
+	"name": "xadesjs",
+	"version": "1.0.1",
+	"description": "A pure Javascript implementation of XMLDSIG and XAdES based on Web Crypto ",
+	"main": "built/xades.js",
+	"scripts": {
+		"start": "node test/html/server.js",
+		"pretest": "npm run build",
+		"test": "mocha test/scripts",
+		"build": "typings install && tsc --sourceMap",
+		"pub": "npm version patch && npm publish && git push",
+		"sync": "git ac && git pull --rebase && git push",
+		"coverage": "nyc npm test",
+		"precoveragehtml": "npm run coverage",
+		"coveragehtml": "nyc report -r html",
+		"watch": "watch 'npm run coveragehtml' lib/ src/ test/",
+		"live": "live-server -q --port=4005 --ignorePattern='(js|css|png)$' coverage",
+		"predev": "if [ ! -f coverage/index.html ]; then mkdir coverage; cp .waiting.html coverage/index.html; fi",
+		"dev": "npm-run-all -p --silent watch live",
+		"coveralls": "nyc report --reporter=text-lcov | coveralls"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/PeculiarVentures/xadesjs.git"
+	},
+	"keywords": [
+		"xml",
+		"webcrypto",
+		"signature",
+		"rsa",
+		"ec"
+	],
+	"author": "Peculiar Ventures, Inc.",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/PeculiarVentures/xadesjs/issues"
+	},
+	"homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
+	"dependencies": {
+		"co": "^4.6.0",
+		"node.extend": "^1.1.5",
+		"xmldom-alpha": "^0.1.23",
+		"xpath.js": "^1.0.6",
+		"pkijs": "^1.3.27",
+		"asn1js": "^1.2.12",
+		"node-webcrypto-ossl": "^1.0.7"
+	},
+	"devDependencies": {
+		"express": "^4.13.4",
+		"live-server": "^1",
+		"mocha": "^3",
+		"npm-run-all": "^3",
+		"nyc": "^8",
+		"typescript": "^1.8.10",
+		"typings": "^1.3.3",
+		"watch": "^0"
+	}
 }
