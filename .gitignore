@@ -1,5 +1,7 @@
 /node_modules
 /typings
+/.nyc_output/
+/coverage/
 /.vscode
 /test/test.js
 npm-debug.log
