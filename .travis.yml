@@ -34,8 +34,6 @@ before_install:
   - node --version
   - npm --version
   - gcc --version
-  - npm install typescript -g
-  - npm install mocha -g
   - npm install coveralls
 
 script:
