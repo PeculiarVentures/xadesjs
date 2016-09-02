@@ -37,7 +37,6 @@ before_install:
   - npm install coveralls
 
 script:
-  - npm test
   - npm run coverage
 
 cache:
