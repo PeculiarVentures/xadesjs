@@ -10,7 +10,7 @@ if (typeof module !== "undefined") {
 }
 
 describe("Verify XML signatures", function () {
-    this.timeout(3000);
+    this.timeout(3500);
     function verifyXML(name, done, res) {
         if (res === void 0) res = true;
         var folder = (typeof module === "undefined") ? "./static/" : "./test/static/";
