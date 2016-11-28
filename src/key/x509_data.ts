@@ -17,37 +17,33 @@ namespace xadesjs {
      */
     export class KeyInfoX509Data extends XmlObject implements KeyInfoClause {
 
-        private x509crl: Uint8Array;
+        private x509crl: Uint8Array | null = null;
         private IssuerSerialList: X509IssuerSerial[];
-        private SubjectKeyIdList: Uint8Array[];
+        private SubjectKeyIdList: Uint8Array[] = [];
         private SubjectNameList: string[];
         private X509CertificateList: X509Certificate[];
-        private key: CryptoKey = null;
+        private key: CryptoKey | null = null;
 
         public constructor();
         public constructor(rgbCert: Uint8Array);
         public constructor(cert: X509Certificate);
-        public constructor(cert?: any, includeOptions?: X509IncludeOption) {
+        public constructor(cert?: any, includeOptions = X509IncludeOption.None) {
             super();
             if (cert) {
                 if (cert instanceof Uint8Array)
                     this.AddCertificate(new X509Certificate(cert));
                 else if (cert instanceof X509Certificate) {
-                    if (!includeOptions)
-                        this.AddCertificate(cert);
-                    else {
-                        switch (includeOptions) {
-                            case X509IncludeOption.None:
-                            case X509IncludeOption.EndCertOnly:
-                                this.AddCertificate(cert);
-                                break;
-                            case X509IncludeOption.ExcludeRoot:
-                                this.AddCertificatesChainFrom(cert, false);
-                                break;
-                            case X509IncludeOption.WholeChain:
-                                this.AddCertificatesChainFrom(cert, true);
-                                break;
-                        }
+                    switch (includeOptions) {
+                        case X509IncludeOption.None:
+                        case X509IncludeOption.EndCertOnly:
+                            this.AddCertificate(cert);
+                            break;
+                        case X509IncludeOption.ExcludeRoot:
+                            this.AddCertificatesChainFrom(cert, false);
+                            break;
+                        case X509IncludeOption.WholeChain:
+                            this.AddCertificatesChainFrom(cert, true);
+                            break;
                     }
                 }
             }
@@ -56,11 +52,11 @@ namespace xadesjs {
         /**
          * Gets public key of the X509Data
          */
-        get Key(): CryptoKey {
+        get Key() {
             return this.key;
         }
 
-        importKey(key: CryptoKey): Promise {
+        importKey(key: CryptoKey) {
             return Promise.reject(new XmlError(XE.METHOD_NOT_SUPPORTED));
         }
 
@@ -69,7 +65,7 @@ namespace xadesjs {
          * @param  {Algorithm} alg
          * @returns Promise
          */
-        exportKey(alg: Algorithm): Promise {
+        exportKey(alg: Algorithm) {
             return new Promise((resolve, reject) => {
                 if (this.Certificates.length)
                     this.Certificates[0].exportKey(alg)
@@ -95,10 +91,10 @@ namespace xadesjs {
         /**
          * Gets or sets the Certificate Revocation List (CRL) contained within the KeyInfoX509Data object.
          */
-        public get CRL(): Uint8Array {
+        public get CRL() {
             return this.x509crl;
         }
-        public set CRL(value: Uint8Array) {
+        public set CRL(value: Uint8Array | null) {
             this.x509crl = value;
         }
 
@@ -160,14 +156,15 @@ namespace xadesjs {
         public AddSubjectKeyId(subjectKeyId: string): void;
         public AddSubjectKeyId(subjectKeyId: Uint8Array): void;
         public AddSubjectKeyId(subjectKeyId: any): void {
-            if (this.SubjectKeyIdList == null)
+            if (this.SubjectKeyIdList)
                 this.SubjectKeyIdList = [];
 
             if (typeof subjectKeyId === "string") {
-                let id: Uint8Array = null;
-                if (subjectKeyId != null)
+                if (subjectKeyId != null) {
+                    let id: Uint8Array;
                     id = Convert.ToBufferString(Convert.FromBase64String(subjectKeyId));
-                this.SubjectKeyIdList.push(id);
+                    this.SubjectKeyIdList.push(id);
+                }
             }
             else {
                 this.SubjectKeyIdList.push(subjectKeyId);
@@ -273,35 +270,41 @@ namespace xadesjs {
                 for (let xel of xnl) {
                     let issuer = XmlSignature.GetChildElement(xel, XmlSignature.ElementNames.X509IssuerName, XmlSignature.NamespaceURI);
                     let serial = XmlSignature.GetChildElement(xel, XmlSignature.ElementNames.X509SerialNumber, XmlSignature.NamespaceURI);
-                    this.AddIssuerSerial(issuer.textContent, serial.textContent);
+                    if (issuer && issuer.textContent && serial && serial.textContent)
+                        this.AddIssuerSerial(issuer.textContent, serial.textContent);
                 }
             }
             // <X509SKI>
             xnl = XmlSignature.GetChildElements(element, XmlSignature.ElementNames.X509SKI);
             if (xnl != null) {
                 for (let xel of xnl) {
-                    let skid = Convert.ToBufferString(Convert.FromBase64String(xel.textContent));
-                    this.AddSubjectKeyId(skid);
+                    if (xel.textContent) {
+                        let skid = Convert.ToBufferString(Convert.FromBase64String(xel.textContent));
+                        this.AddSubjectKeyId(skid);
+                    }
                 }
             }
             // <X509SubjectName>
             xnl = XmlSignature.GetChildElements(element, XmlSignature.ElementNames.X509SubjectName);
             if (xnl != null) {
                 for (let xel of xnl) {
-                    this.AddSubjectName(xel.textContent);
+                    if (xel.textContent)
+                        this.AddSubjectName(xel.textContent);
                 }
             }
             // <X509Certificate>
             xnl = XmlSignature.GetChildElements(element, XmlSignature.ElementNames.X509Certificate);
-            if (xnl != null) {
+            if (xnl) {
                 for (let xel of xnl) {
-                    let cert = Convert.ToBufferString(Convert.FromBase64String(xel.textContent));
-                    this.AddCertificate(new X509Certificate(cert));
+                    if (xel.textContent) {
+                        let cert = Convert.ToBufferString(Convert.FromBase64String(xel.textContent));
+                        this.AddCertificate(new X509Certificate(cert));
+                    }
                 }
             }
             // only one <X509CRL> 
             let x509el = XmlSignature.GetChildElement(element, XmlSignature.ElementNames.X509CRL, XmlSignature.NamespaceURI);
-            if (x509el != null) {
+            if (x509el && x509el.textContent) {
                 this.x509crl = Convert.ToBufferString(Convert.FromBase64String(x509el.textContent));
             }
         }

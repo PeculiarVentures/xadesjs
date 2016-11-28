@@ -34,11 +34,13 @@ namespace xadesjs {
 
     /**
      * Returns signle Node from given Node
-     * @param  {Node} node 
-     * @param  {string} path
-     * @returns Node
+     * 
+     * @export
+     * @param {Node} node
+     * @param {string} path
+     * @returns
      */
-    export function SelectSingleNode(node: Node, path: string): Node {
+    export function SelectSingleNode(node: Node, path: string) {
         let ns = select(node, path);
         if (ns && ns.length > 0)
             return ns[0];
@@ -47,7 +49,7 @@ namespace xadesjs {
 
     export type ISelectResult = Array<Node> | Node | boolean | number | string;
 
-    export function findAttr(node: Node, localName: string, nameSpace?: string): Attr {
+    export function findAttr(node: Node, localName: string, nameSpace?: string) {
         for (let i = 0; i < node.attributes.length; i++) {
             let attr = node.attributes[i];
 
@@ -80,7 +82,7 @@ namespace xadesjs {
         return attr.localName === localName && (attr.namespaceURI === nameSpace || !nameSpace);
     }
 
-    function attrEqualsImplicitly(attr: Attr, localName: string, nameSpace: string, node: Node) {
+    function attrEqualsImplicitly(attr: Attr, localName: string, nameSpace: string | undefined, node: Node) {
         return attr.localName === localName && ((!attr.namespaceURI && node.namespaceURI === nameSpace) || !nameSpace);
     }
 
@@ -107,29 +109,30 @@ namespace xadesjs {
     export function encodeSpecialCharactersInAttribute(attributeValue: string): string {
         return attributeValue
             .replace(/[\r\n\t ]+/g, " ") // White space normalization (Note: this should normally be done by the xml parser) See: https://www.w3.org/TR/xml/#AVNormalize
-            .replace(/([&<"\r\n\t])/g, function (str, item) {
+            .replace(/([&<"\r\n\t])/g, (str, item) =>
                 // Special character normalization. See:
                 // - https://www.w3.org/TR/xml-c14n#ProcessingModel (Attribute Nodes)
                 // - https://www.w3.org/TR/xml-c14n#Example-Chars
-                return xml_special_to_encoded_attribute[item];
-            });
+                xml_special_to_encoded_attribute[item]
+            );
     }
 
     export function encodeSpecialCharactersInText(text: string): string {
         return text
             .replace(/\r\n?/g, "\n")  // Line ending normalization (Note: this should normally be done by the xml parser). See: https://www.w3.org/TR/xml/#sec-line-ends
-            .replace(/([&<>\r])/g, function (str, item) {
+            .replace(/([&<>\r])/g, (str, item) =>
                 // Special character normalization. See:
                 // - https://www.w3.org/TR/xml-c14n#ProcessingModel (Text Nodes)
                 // - https://www.w3.org/TR/xml-c14n#Example-Chars
-                return xml_special_to_encoded_text[item];
-            });
+                xml_special_to_encoded_text[item]
+            );
     }
 
     function _SelectNamespaces(node: Node, selectedNodes: IAssocArray = {}) {
         if (node && node.nodeType === XmlNodeType.Element) {
-            if (node.namespaceURI && node.namespaceURI !== "http://www.w3.org/XML/1998/namespace" && !selectedNodes[node.prefix || ""])
-                selectedNodes[node.prefix ? node.prefix : ""] = node.namespaceURI;
+            const el = node as Element;
+            if (el.namespaceURI && el.namespaceURI !== "http://www.w3.org/XML/1998/namespace" && !selectedNodes[el.prefix || ""])
+                selectedNodes[el.prefix ? el.prefix : ""] = node.namespaceURI!;
             if (node.nodeType === XmlNodeType.Element)
                 _SelectNamespaces(node.parentElement, selectedNodes);
         }

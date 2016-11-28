@@ -29,20 +29,30 @@ namespace xadesjs {
     HashAlgorithms[SHA512_NAMESPACE] = Sha512;
 
     export class CryptoConfig {
-        static CreateFromName(name: string): Transform {
-            let t: Transform = null;
+        /**
+         * Creates Transform from given name
+         * if name is not exist then throws error
+         * 
+         * @static
+         * @param {(string |)} [name=null]
+         * @returns
+         * 
+         * @memberOf CryptoConfig
+         */
+        static CreateFromName(name: string | null) {
+            let transform: Transform;
             switch (name) {
                 case XmlSignature.AlgorithmNamespaces.XmlDsigBase64Transform:
-                    t = new XmlDsigBase64Transform();
+                    transform = new XmlDsigBase64Transform();
                     break;
                 case XmlSignature.AlgorithmNamespaces.XmlDsigC14NTransform:
-                    t = new XmlDsigC14NTransform();
+                    transform = new XmlDsigC14NTransform();
                     break;
                 case XmlSignature.AlgorithmNamespaces.XmlDsigC14NWithCommentsTransform:
-                    t = new XmlDsigC14NWithCommentsTransform();
+                    transform = new XmlDsigC14NWithCommentsTransform();
                     break;
                 case XmlSignature.AlgorithmNamespaces.XmlDsigEnvelopedSignatureTransform:
-                    t = new XmlDsigEnvelopedSignatureTransform();
+                    transform = new XmlDsigEnvelopedSignatureTransform();
                     break;
                 case XmlSignature.AlgorithmNamespaces.XmlDsigXPathTransform:
                     throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, name);
@@ -53,10 +63,10 @@ namespace xadesjs {
                 // t = new XmlDsigXsltTransform();
                 // break;
                 case XmlSignature.AlgorithmNamespaces.XmlDsigExcC14NTransform:
-                    t = new XmlDsigExcC14NTransform();
+                    transform = new XmlDsigExcC14NTransform();
                     break;
                 case XmlSignature.AlgorithmNamespaces.XmlDsigExcC14NWithCommentsTransform:
-                    t = new XmlDsigExcC14NWithCommentsTransform();
+                    transform = new XmlDsigExcC14NWithCommentsTransform();
                     break;
                 case XmlSignature.AlgorithmNamespaces.XmlDecryptionTransform:
                     throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, name);
@@ -65,7 +75,7 @@ namespace xadesjs {
                 default:
                     throw new XmlError(XE.ALGORITHM_NOT_SUPPORTED, name);
             }
-            return t;
+            return transform;
         }
 
         static CreateSignatureAlgorithm(namespace: string): SignatureAlgorithm {

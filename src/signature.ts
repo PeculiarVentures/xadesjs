@@ -6,12 +6,12 @@ namespace xadesjs {
     export class Signature extends XmlObject {
 
         private list: Array<DataObject>;
-        private info: SignedInfo;
-        private key: KeyInfo;
-        private id: string;
+        private info = new SignedInfo();
+        private key = new KeyInfo();
+        private id: string | null;
         private signature: Uint8Array;
-        private signature_id: string;
-        private element: Element;
+        private signature_id: string | null;
+        private element: Element | null;
 
         public constructor() {
             super();
@@ -21,11 +21,11 @@ namespace xadesjs {
         /**
          * Gets or sets the ID of the current Signature.
          */
-        set Id(value: string) {
+        set Id(value: string| null) {
             this.element = null;
             this.id = value;
         }
-        get Id(): string {
+        get Id(): string | null {
             return this.id;
         }
 
@@ -64,10 +64,10 @@ namespace xadesjs {
         /**
          * Gets or sets the Id of the SignatureValue.
          */
-        get SignatureValueId(): string {
+        get SignatureValueId(): string | null{
             return this.signature_id;
         }
-        set SignatureValueId(value: string) {
+        set SignatureValueId(value: string | null) {
             this.element = null;
             this.signature_id = value;
         }
@@ -170,7 +170,7 @@ namespace xadesjs {
 
                 i = this.NextElementPos(value.childNodes, ++i, XmlSignature.ElementNames.SignatureValue, XmlSignature.NamespaceURI, true);
                 let sigValue = <Element>value.childNodes[i];
-                this.signature = Convert.ToBufferString(Convert.FromBase64String(sigValue.textContent));
+                this.signature = Convert.ToBufferString(Convert.FromBase64String(sigValue.textContent || ""));
                 this.signature_id = this.getAttribute(sigValue, XmlSignature.AttributeNames.Id);
 
                 // signature isn't required: <element ref="ds:KeyInfo" minOccurs="0"/> 
@@ -219,109 +219,5 @@ namespace xadesjs {
             return -1;
         }
     }
-
-    export const XmlSignature = {
-
-        DEFAULT_CANON_METHOD: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
-
-        DefaultPrefix: "ds",
-
-        ElementNames: {
-
-            CanonicalizationMethod: "CanonicalizationMethod",
-            DigestMethod: "DigestMethod",
-            DigestValue: "DigestValue",
-            DSAKeyValue: "DSAKeyValue",
-            EncryptedKey: "EncryptedKey",
-            HMACOutputLength: "HMACOutputLength",
-            RSAPSSParams: "RSAPSSParams",
-            MaskGenerationFunction: "MaskGenerationFunction",
-            SaltLength: "SaltLength",
-            KeyInfo: "KeyInfo",
-            KeyName: "KeyName",
-            KeyValue: "KeyValue",
-            Modulus: "Modulus",
-            Exponent: "Exponent",
-            Manifest: "Manifest",
-            Object: "Object",
-            Reference: "Reference",
-            RetrievalMethod: "RetrievalMethod",
-            RSAKeyValue: "RSAKeyValue",
-            ECKeyValue: "ECKeyValue",
-            NamedCurve: "NamedCurve",
-            PublicKey: "PublicKey",
-            Signature: "Signature",
-            SignatureMethod: "SignatureMethod",
-            SignatureValue: "SignatureValue",
-            SignedInfo: "SignedInfo",
-            Transform: "Transform",
-            Transforms: "Transforms",
-            X509Data: "X509Data",
-            X509IssuerSerial: "X509IssuerSerial",
-            X509IssuerName: "X509IssuerName",
-            X509SerialNumber: "X509SerialNumber",
-            X509SKI: "X509SKI",
-            X509SubjectName: "X509SubjectName",
-            X509Certificate: "X509Certificate",
-            X509CRL: "X509CRL"
-        },
-
-
-        AttributeNames: {
-
-            Algorithm: "Algorithm",
-            Encoding: "Encoding",
-            Id: "Id",
-            MimeType: "MimeType",
-            Type: "Type",
-            URI: "URI",
-        },
-
-        AlgorithmNamespaces: {
-            XmlDsigBase64Transform: "http://www.w3.org/2000/09/xmldsig#base64",
-            XmlDsigC14NTransform: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
-            XmlDsigC14NWithCommentsTransform: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments",
-            XmlDsigEnvelopedSignatureTransform: "http://www.w3.org/2000/09/xmldsig#enveloped-signature",
-            XmlDsigXPathTransform: "http://www.w3.org/TR/1999/REC-xpath-19991116",
-            XmlDsigXsltTransform: "http://www.w3.org/TR/1999/REC-xslt-19991116",
-            XmlDsigExcC14NTransform: "http://www.w3.org/2001/10/xml-exc-c14n#",
-            XmlDsigExcC14NWithCommentsTransform: "http://www.w3.org/2001/10/xml-exc-c14n#WithComments",
-            XmlDecryptionTransform: "http://www.w3.org/2002/07/decrypt#XML",
-            XmlLicenseTransform: "urn:mpeg:mpeg21:2003:01-REL-R-NS:licenseTransform"
-        },
-
-        Uri: {
-            Manifest: "http://www.w3.org/2000/09/xmldsig#Manifest"
-        },
-
-        NamespaceURI: "http://www.w3.org/2000/09/xmldsig#",
-        NamespaceURIMore: "http://www.w3.org/2007/05/xmldsig-more#",
-        NamespaceURIPss: "http://www.example.org/xmldsig-pss/#",
-        Prefix: "ds",
-
-        GetChildElement: function GetChildElement(xel: Node, element: string, ns: string): Element {
-            for (let i = 0; i < xel.childNodes.length; i++) {
-                let n = xel.childNodes[i];
-                if (n.nodeType === XmlNodeType.Element && n.localName === element && n.namespaceURI === ns)
-                    return n as Element;
-            }
-            return null;
-        },
-
-        GetAttributeFromElement: function GetAttributeFromElement(xel: Element, attribute: string, element: string): string {
-            let el: Element = this.GetChildElement(xel, element, XmlSignature.NamespaceURI);
-            return el != null ? el.getAttribute(attribute) : null;
-        },
-
-        GetChildElements: function GetChildElements(xel: Element, element: string): Element[] {
-            let al: Element[] = [];
-            for (let i = 0; i < xel.childNodes.length; i++) {
-                let n = xel.childNodes[i];
-                if (n.nodeType === XmlNodeType.Element && n.localName === element && n.namespaceURI === XmlSignature.NamespaceURI)
-                    al.push(n as Element);
-            }
-            return al;
-        }
-    };
 
 }

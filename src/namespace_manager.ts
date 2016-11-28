@@ -1,8 +1,8 @@
 namespace xadesjs {
 
     export interface XmlNamespace {
-        prefix: string;
-        namespace: string;
+        prefix: string | null;
+        namespace: string | null;
     }
 
     export class NamespaceManager {
@@ -37,7 +37,7 @@ namespace xadesjs {
             this.items.push(item);
         }
 
-        Pop(): XmlNamespace {
+        Pop() {
             return this.items.pop();
         }
 

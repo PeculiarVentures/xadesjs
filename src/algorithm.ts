@@ -8,7 +8,7 @@ namespace xadesjs {
     }
 
     export interface IHashAlgorithm extends IAlgorithm {
-        getHash(xml: string): Promise;
+        getHash(xml: string): PromiseLike<ArrayBuffer>;
     }
 
     export interface IHashAlgorithmConstructable {
@@ -24,7 +24,7 @@ namespace xadesjs {
     }
 
     export abstract class HashAlgorithm extends XmlAlgorithm implements IHashAlgorithm {
-        getHash(xml: Uint8Array | string | Node): Promise {
+        getHash(xml: Uint8Array | string | Node) {
             // console.log("HashedInfo:", xml);
             let buf: ArrayBufferView;
             if (typeof xml === "string") {
@@ -45,8 +45,8 @@ namespace xadesjs {
     }
 
     export interface ISignatureAlgorithm extends IAlgorithm {
-        getSignature(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm): Promise;
-        verifySignature(signedInfo: string, key: CryptoKey, signatureValue: string, algorithm?: Algorithm): Promise;
+        getSignature(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm): PromiseLike<ArrayBuffer>;
+        verifySignature(signedInfo: string, key: CryptoKey, signatureValue: string, algorithm?: Algorithm): PromiseLike<boolean>;
     }
 
     export interface ISignatureAlgorithmConstructable {
@@ -57,19 +57,19 @@ namespace xadesjs {
         /**
          * Sign the given string using the given key
          */
-        getSignature(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm): Promise {
-            return Application.crypto.subtle.sign(algorithm, signingKey, Convert.ToBufferString(signedInfo));
+        getSignature(signedInfo: string, signingKey: CryptoKey, algorithm: Algorithm) {
+            return Application.crypto.subtle.sign(algorithm as any, signingKey, Convert.ToBufferString(signedInfo));
         }
 
         /**
         * Verify the given signature of the given string using key
         */
-        verifySignature(signedInfo: string, key: CryptoKey, signatureValue: string, algorithm?: Algorithm): Promise {
+        verifySignature(signedInfo: string, key: CryptoKey, signatureValue: string, algorithm?: Algorithm) {
             let _signatureValue = Convert.ToBufferString(signatureValue);
             // console.log("SignatureValue:", Convert.ToBase64String(Convert.FromBufferString(_signatureValue)));
             let _signedInfo = Convert.ToBufferUtf8String(signedInfo);
             // console.log("SignedInfo:", Convert.FromBufferString(_signedInfo));
-            return Application.crypto.subtle.verify(algorithm || this.algorithm, key, _signatureValue, _signedInfo);
+            return Application.crypto.subtle.verify((algorithm || this.algorithm) as any, key, _signatureValue, _signedInfo);
         }
     }
 

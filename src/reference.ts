@@ -8,13 +8,12 @@ namespace xadesjs {
     export class Reference extends XmlObject {
 
         private chain: Transform[];
-        private digestMethod: string;
+        private digestMethod: string | null;
         private digestValue: ArrayBuffer;
-        private id: string;
-        private uri: string;
-        private type: string;
-        private element: Element;
-        private inclusiveNamespacesPrefixList: string;
+        private id: string | null;
+        private uri: string | null;
+        private type: string | null;
+        private element: Element | null = null;
 
         public constructor(p?: string) {
             super();
@@ -29,10 +28,10 @@ namespace xadesjs {
         /**
          * Gets or sets the digest method Uniform Resource Identifier (URI) of the current
          */
-        get DigestMethod(): string {
+        get DigestMethod(): string | null {
             return this.digestMethod;
         }
-        set DigestMethod(value: string) {
+        set DigestMethod(value: string | null) {
             this.element = null;
             this.digestMethod = value;
         }
@@ -51,10 +50,10 @@ namespace xadesjs {
         /**
          * Gets or sets the ID of the current Reference.
          */
-        get Id(): string {
+        get Id(): string | null {
             return this.id;
         }
-        set Id(value: string) {
+        set Id(value: string | null) {
             this.element = null;
             this.id = value;
         }
@@ -72,10 +71,10 @@ namespace xadesjs {
         /**
          * Gets or sets the type of the object being signed.
          */
-        get Type(): string {
+        get Type(): string | null {
             return this.type;
         }
-        set Type(value: string) {
+        set Type(value: string | null) {
             this.element = null;
             this.type = value;
         }
@@ -83,10 +82,10 @@ namespace xadesjs {
         /**
          * Gets or sets the Uri of the current Reference.
          */
-        get Uri(): string {
+        get Uri(): string | null {
             return this.uri;
         }
-        set Uri(value: string) {
+        set Uri(value: string | null) {
             this.element = null;
             this.uri = value;
         }
@@ -148,8 +147,7 @@ namespace xadesjs {
             return xel;
         }
 
-        // note: we do NOT return null -on purpose- if attribute isn't found
-        private GetAttribute(xel: Element, attribute: string): string {
+        private GetAttribute(xel: Element, attribute: string) {
             return xel.hasAttribute(attribute) ? xel.getAttribute(attribute) : null;
         }
 
@@ -170,11 +168,11 @@ namespace xadesjs {
             // Note: order is important for validations
             let xnl = value.getElementsByTagNameNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.Transform);
             if ((xnl != null) && (xnl.length > 0)) {
-                let t: Transform = null;
+                let t: Transform | null = null;
                 for (let i = 0; i < xnl.length; i++) {
                     let xn = xnl[i];
-                    let a = this.GetAttribute(<Element>xn, XmlSignature.AttributeNames.Algorithm);
-                    t = <Transform>CryptoConfig.CreateFromName(a);
+                    let a = this.GetAttribute(xn, XmlSignature.AttributeNames.Algorithm);
+                    t = CryptoConfig.CreateFromName(a) as Transform;
                     if (t == null)
                         throw new XmlError(XE.CRYPTOGRAPHIC_UNKNOWN_TRANSFORM, a);
 
@@ -193,7 +191,7 @@ namespace xadesjs {
             // get DigestValue
             let dig = XmlSignature.GetChildElement(value, XmlSignature.ElementNames.DigestValue, XmlSignature.NamespaceURI);
             if (dig != null)
-                this.DigestValue = Convert.ToBufferString(Convert.FromBase64String(dig.textContent));
+                this.DigestValue = Convert.ToBufferString(Convert.FromBase64String(dig.textContent || ""));
             this.element = value;
         }
     }

@@ -3,7 +3,7 @@ namespace xadesjs {
     export enum XmlCanonicalizerState {
         BeforeDocElement,
         InsideDocElement,
-        AfterDocElement
+        AfterDocElement,
     }
 
     export class XmlCanonicalizer {
@@ -12,17 +12,15 @@ namespace xadesjs {
         protected exclusive: boolean;
         protected propagatedNamespaces = new NamespaceManager();
         protected document: Document;
-        protected result: string[];
+        protected result: string[] = [];
         protected visibleNamespaces = new NamespaceManager();
         protected inclusiveNamespacesPrefixList: string[] = [];
-        protected state: XmlCanonicalizerState = XmlCanonicalizerState.BeforeDocElement;
+        protected state = XmlCanonicalizerState.BeforeDocElement;
 
-        constructor(withComments: boolean, excC14N: boolean, propagatedNamespaces: NamespaceManager = new NamespaceManager) {
+        constructor(withComments: boolean, excC14N: boolean, propagatedNamespaces: NamespaceManager = new NamespaceManager()) {
             this.withComments = withComments;
             this.exclusive = excC14N;
             this.propagatedNamespaces = propagatedNamespaces;
-            this.result = [];
-            this.state = XmlCanonicalizerState.BeforeDocElement;
         }
 
         // See xml-enc-c14n specification
@@ -61,7 +59,7 @@ namespace xadesjs {
                     this.WriteDocumentNode(node);
                     break;
                 case XmlNodeType.Element:
-                    this.WriteElementNode(node);
+                    this.WriteElementNode(node as Element);
                     break;
                 case XmlNodeType.CDATA:
                 case XmlNodeType.SignificantWhitespace:
@@ -162,7 +160,7 @@ namespace xadesjs {
                 this.result.push("?>");
         }
 
-        protected WriteElementNode(node: Node) {
+        protected WriteElementNode(node: Element) {
             // console.log(`WriteElementNode: ${node.nodeName}`);
 
             if (this.state === XmlCanonicalizerState.BeforeDocElement)
@@ -187,7 +185,7 @@ namespace xadesjs {
             this.result.push(node.nodeName);
             this.result.push(">");
 
-            if (this.state === XmlCanonicalizerState.BeforeDocElement)
+            if ((this.state as any) === XmlCanonicalizerState.BeforeDocElement)
                 this.state = XmlCanonicalizerState.AfterDocElement;
 
             // remove added namespaces
@@ -195,7 +193,7 @@ namespace xadesjs {
                 this.visibleNamespaces.Pop();
         }
 
-        protected WriteNamespacesAxis(node: Node): number {
+        protected WriteNamespacesAxis(node: Element | Attr): number {
             let list: XmlNamespace[] = [];
             let visibleNamespacesCount = 0;
             for (let i = 0; i < node.attributes.length; i++) {
@@ -223,8 +221,8 @@ namespace xadesjs {
                 //     continue;
 
                 // get namespace prefix
-                let prefix: string;
-                let matches: string[] = null;
+                let prefix: string | null = null;
+                let matches: RegExpExecArray | null;
                 if (matches = /xmlns:(\w+)/.exec(attribute.nodeName))
                     prefix = matches[1];
 
@@ -259,7 +257,7 @@ namespace xadesjs {
             // sort nss
             list.sort(XmlDsigC14NTransformNamespacesComparer);
 
-            let prevPrefix: string = null;
+            let prevPrefix: string | null = null;
             for (let n of list) {
                 if (n.prefix === prevPrefix) {
                     continue;
@@ -269,7 +267,7 @@ namespace xadesjs {
                 if (n.prefix)
                     this.result.push(":" + n.prefix);
                 this.result.push("=\"");
-                this.result.push(n.namespace);
+                this.result.push(n.namespace!); // TODO namespace can be null
                 this.result.push("\"");
             }
 
@@ -300,7 +298,10 @@ namespace xadesjs {
 
         }
 
-        protected NormalizeString(input: string, type: XmlNodeType): string {
+        protected NormalizeString(input: string | null, type: XmlNodeType): string {
+            if (!input) {
+                throw new XmlError(XE.NULL_REFERENCE, "Parameter 'input' is null");
+            }
             let sb: string[] = [];
             for (let i = 0; i < input.length; i++) {
                 let ch = input[i];
@@ -336,14 +337,14 @@ namespace xadesjs {
             return false;
         }
 
-        private IsNamespaceInclusive(node: Node, prefix: string): boolean {
-            prefix = prefix || null;
-            if (node.prefix === prefix)
+        private IsNamespaceInclusive(node: Element | Attr, prefix: string | null): boolean {
+            let _prefix = prefix || null;
+            if (node.prefix === _prefix)
                 return false;
-            return this.inclusiveNamespacesPrefixList.indexOf(prefix) !== -1; // && node.prefix === prefix;
+            return this.inclusiveNamespacesPrefixList.indexOf(_prefix || "") !== -1; // && node.prefix === prefix;
         }
 
-        private IsNamespaceRendered(prefix: string, uri: string): boolean {
+        private IsNamespaceRendered(prefix: string | null, uri: string | null): boolean {
             prefix = prefix || "";
             uri = uri || "";
             if (!prefix && !uri)
@@ -386,9 +387,9 @@ namespace xadesjs {
         else return 1;
     }
 
-    function IsNamespaceUsed(node: Node, prefix: string, result: number = 0): number {
-        prefix = prefix || null;
-        if (node.prefix === prefix)
+    function IsNamespaceUsed(node: Element | Attr, prefix: string | null, result: number = 0): number {
+        let _prefix = prefix || null;
+        if (node.prefix === _prefix)
             return ++result;
         // prefix of attributes
         if (node.attributes)
@@ -399,9 +400,12 @@ namespace xadesjs {
             }
         // check prefix of Element
         for (let n = node.firstChild; !!n; n = n.nextSibling) {
-            let res = IsNamespaceUsed(n, prefix, result);
-            if (n.nodeType === XmlNodeType.Element && res)
-                return ++result + res;
+            if (n.nodeType === XmlNodeType.Element) {
+                const el = n as Element;
+                let res = IsNamespaceUsed(el, prefix, result);
+                if (n.nodeType === XmlNodeType.Element && res)
+                    return ++result + res;
+            }
         }
         return result;
     }

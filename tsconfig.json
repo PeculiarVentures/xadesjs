@@ -2,14 +2,26 @@
     "compilerOptions": {
         "module": "amd",
         "target": "es5",
+        "lib": [
+            "es5",
+            "dom",
+            "es2015.promise"
+        ],
+        "typeRoots": [
+          "node_modules/@types"  
+        ],
         "noImplicitAny": true,
         "sourceMap": false,
-        "outFile": "built/xades.js"
+        "noUnusedLocals": true,
+        "noUnusedParameters": false,
+        "strictNullChecks": true,
+        "pretty": true,
+        "noImplicitReturns": true,
+        "outFile": "build/xades.js"
     },
     "files": [
-        "typings/index.d.ts",
-        "src/typings/promise.d.ts",
         "src/typings/xpath.d.ts",
+        "src/typings/index.d.ts",
         "src/common.ts",
         "src/error.ts",
         "src/application.ts",

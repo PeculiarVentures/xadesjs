@@ -56,34 +56,32 @@ namespace xadesjs {
     }
 
     export class PssAlgorithmParams extends XmlObject {
-        private m_digest_method: string;
-        private m_salt_length: number;
-        private m_mgf: string;
+        private m_digest_method: string | null = null;
+        private m_salt_length: number | null = null;
+        private m_mgf: string | null = null;
         private element: Element;
 
         dsPrefix: string;
 
-        get DigestMethod(): string {
+        public get DigestMethod(): string | null {
             return this.m_digest_method;
         }
-        set DigestMethod(value: string) {
+        public set DigestMethod(value: string | null) {
             this.m_digest_method = value;
         }
 
-        public get SaltLength(): number {
+        public get SaltLength(): number | null {
             return this.m_salt_length;
         }
-
-        public set SaltLength(v: number) {
+        public set SaltLength(v: number | null) {
             this.m_salt_length = v;
         }
 
 
-        public get MGF(): string {
+        public get MGF(): string | null {
             return this.m_mgf;
         }
-
-        public set MGF(v: string) {
+        public set MGF(v: string | null) {
             this.m_mgf = v;
         }
 
@@ -100,13 +98,23 @@ namespace xadesjs {
             let doc = CreateDocument();
             let xel = doc.createElementNS(XmlSignature.NamespaceURIPss, prefix + XmlSignature.ElementNames.RSAPSSParams);
 
-            let dsDigestMethod = doc.createElementNS(XmlSignature.NamespaceURI, ds_prefix + XmlSignature.ElementNames.DigestMethod);
-            dsDigestMethod.setAttribute(XmlSignature.AttributeNames.Algorithm, this.DigestMethod);
-            xel.appendChild(dsDigestMethod);
+            if (this.DigestMethod !== null) {
+                let dsDigestMethod = doc.createElementNS(XmlSignature.NamespaceURI, ds_prefix + XmlSignature.ElementNames.DigestMethod);
+                dsDigestMethod.setAttribute(XmlSignature.AttributeNames.Algorithm, this.DigestMethod);
+                xel.appendChild(dsDigestMethod);
+            }
 
-            let SaltLength = doc.createElementNS(XmlSignature.NamespaceURIPss, prefix + XmlSignature.ElementNames.SaltLength);
-            SaltLength.textContent = this.SaltLength.toString();
-            xel.appendChild(SaltLength);
+            if (this.SaltLength !== null) {
+                let SaltLength = doc.createElementNS(XmlSignature.NamespaceURIPss, prefix + XmlSignature.ElementNames.SaltLength);
+                SaltLength.textContent = this.SaltLength.toString();
+                xel.appendChild(SaltLength);
+            }
+
+            if (this.MGF !== null) {
+                let MGF = doc.createElementNS(XmlSignature.NamespaceURIPss, prefix + XmlSignature.ElementNames.MaskGenerationFunction);
+                MGF.setAttribute(XmlSignature.AttributeNames.Algorithm, this.MGF);
+                xel.appendChild(MGF);
+            }
 
             return xel;
         }

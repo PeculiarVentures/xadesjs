@@ -4,4 +4,5 @@
 /coverage/
 /.vscode
 /test/test.js
+/build
 npm-debug.log

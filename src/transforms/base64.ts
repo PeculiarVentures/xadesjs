@@ -9,7 +9,7 @@ namespace xadesjs {
          * Returns the output of the current XmlDsigBase64Transform object
          */
         GetOutput(): any {
-            return Convert.ToBufferString(Convert.FromBase64String(this.innerXml.textContent));
+            return Convert.ToBufferString(Convert.FromBase64String(this.innerXml.textContent || ""));
         }
 
     }

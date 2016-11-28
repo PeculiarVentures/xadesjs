@@ -13,14 +13,14 @@ namespace xadesjs {
         private propertyModified: boolean;
 
         public constructor();
-        public constructor(id?: string, mimeType?: string, encoding?: string, data?: Element);
-        public constructor(id: string = null, mimeType: string = null, encoding: string = null, data: Element = null) {
+        public constructor(id: string | null, mimeType: string | null, encoding: string | null, data: Element | null);
+        public constructor(id?: string | null, mimeType?: string | null, encoding?: string | null, data?: Element | null) {
             super();
             this.Build(id, mimeType, encoding, data);
         }
 
         // this one accept a null "data" parameter
-        private Build(id: string, mimeType: string, encoding: string, data: Element): void {
+        private Build(id?: string | null, mimeType?: string | null, encoding?: string | null, data?: Element | null) {
             let document = CreateDocument();
 
             let prefix = this.GetPrefix();
@@ -66,20 +66,20 @@ namespace xadesjs {
         /**
          * Gets or sets the encoding of the current DataObject object.
          */
-        public get Encoding(): string {
+        public get Encoding(): string | null {
             return this.GetField(XmlSignature.AttributeNames.Encoding);
         }
-        public set Encoding(value: string) {
+        public set Encoding(value: string | null) {
             this.SetField(XmlSignature.AttributeNames.Encoding, value);
         }
 
         /**
          * Gets or sets the identification of the current DataObject object.
          */
-        public get Id(): string {
+        public get Id(): string | null {
             return this.GetField(XmlSignature.AttributeNames.Id);
         }
-        public set Id(value: string) {
+        public set Id(value: string | null) {
             this.SetField(XmlSignature.AttributeNames.Id, value);
         }
 
@@ -87,18 +87,18 @@ namespace xadesjs {
         /**
          * Gets or sets the MIME type of the current DataObject object.
          */
-        public get MimeType(): string {
+        public get MimeType() {
             return this.GetField(XmlSignature.AttributeNames.MimeType);
         }
-        public set MimeType(value: string) {
+        public set MimeType(value: string | null) {
             this.SetField(XmlSignature.AttributeNames.MimeType, value);
         }
 
-        private GetField(attribute: string): string {
+        private GetField(attribute: string) {
             return this.element.hasAttribute(attribute) ? this.element.getAttribute(attribute) : null;
         }
 
-        private SetField(attribute: string, value: string): void {
+        private SetField(attribute: string, value: string | null): void {
             // MS-BUGS: it never cleans attribute value up.
             if (value == null)
                 return;
@@ -131,7 +131,7 @@ namespace xadesjs {
                         case XmlSignature.AttributeNames.Id:
                         case XmlSignature.AttributeNames.Encoding:
                         case XmlSignature.AttributeNames.MimeType:
-                            this.element.setAttribute(attribute.nodeName, attribute.nodeValue);
+                            this.element.setAttribute(attribute.nodeName, attribute.nodeValue!); // TODO Can be attr value null?
                             break;
                     }
                 }

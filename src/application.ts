@@ -4,7 +4,7 @@ namespace xadesjs {
         name: string;
     }
 
-    let _crypto: CryptoEx = null;
+    let _crypto: CryptoEx | null = null;
 
     export class Application {
 
@@ -15,7 +15,7 @@ namespace xadesjs {
          * @returns void
          */
         static setEngine(name: string, crypto: Crypto): void {
-            _crypto = <any>crypto;
+            _crypto = crypto as CryptoEx;
             _crypto.name = name;
         }
 

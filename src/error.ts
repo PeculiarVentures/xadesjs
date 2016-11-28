@@ -3,7 +3,7 @@ namespace xadesjs {
     function printf(text: string, ...args: any[]) {
         let msg: string = text;
         let regFind = /[^%](%\d+)/g;
-        let match: RegExpExecArray = null;
+        let match: RegExpExecArray | null = null;
         let matches: { arg: string, index: number }[] = [];
         while (match = regFind.exec(msg)) {
             matches.push({ arg: match[1], index: match.index });
@@ -44,6 +44,7 @@ namespace xadesjs {
     export enum XE {
         NONE,
         NULL_REFERENCE,
+        NULL_PARAM,
         METHOD_NOT_IMPLEMENTED,
         METHOD_NOT_SUPPORTED,
         PARAM_REQUIRED,
@@ -64,6 +65,7 @@ namespace xadesjs {
     const xes: IXmlError = {};
     xes[XE.NONE] = "No decription";
     xes[XE.NULL_REFERENCE] = "Null reference";
+    xes[XE.NULL_PARAM] = "%1 has empty %2 object";
     xes[XE.METHOD_NOT_IMPLEMENTED] = "Method is not implemented";
     xes[XE.METHOD_NOT_SUPPORTED] = "Method is not supported";
     xes[XE.PARAM_REQUIRED] = "Required parameter is missing '%1'";

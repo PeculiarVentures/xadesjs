@@ -1,7 +1,5 @@
 namespace xadesjs {
 
-    export const APPLICATION_XML = "application/xml";
-
     /**
     * Provides a wrapper on a core XML signature object to facilitate creating XML signatures.
     */
@@ -111,18 +109,17 @@ namespace xadesjs {
 
         // Internal properties
 
-        protected m_element: Node = null;
+        protected m_element: Node | null = null;
 
         /**
          * Represents the Signature object of the current SignedXml object
          */
-        protected m_signature: Signature = null;
-        protected m_signature_algorithm: ISignatureAlgorithm = null;
-        protected envdoc: Document = null;
+        protected m_signature: Signature;
+        protected m_signature_algorithm: ISignatureAlgorithm | null = null;
+        protected envdoc: Document | null = null;
 
         protected validationErrors: string[] = [];
-        protected key: CryptoKey = null;
-        protected idAttributes = ["Id", "ID"];
+        protected key: CryptoKey | null = null;
 
         private static whitespaceChars = [` `, `\r`, `\n`, `\t`];
 
@@ -130,8 +127,6 @@ namespace xadesjs {
          * Gets or sets the KeyInfo object of the current SignedXml object.
          */
         get KeyInfo(): KeyInfo {
-            if (this.m_signature.KeyInfo == null)
-                this.m_signature.KeyInfo = new KeyInfo();
             return this.m_signature.KeyInfo;
         }
         set KeyInfo(value: KeyInfo) {
@@ -141,7 +136,7 @@ namespace xadesjs {
         /**
          * Gets the Signature object of the current SignedXml object.
          */
-        get Signature(): Signature {
+        get Signature() {
             return this.m_signature;
         }
 
@@ -164,7 +159,9 @@ namespace xadesjs {
         }
 
         get SignatureMethod(): string {
-            return this.m_signature.SignedInfo.SignatureMethod;
+            if (!this.SignedInfo.SignatureMethod)
+                throw new XmlError(XE.NULL_PARAM, "SignedXml.Signature.SignedInfo", "SignatureMethod");
+            return this.SignedInfo.SignatureMethod;
         }
 
         /**
@@ -178,23 +175,25 @@ namespace xadesjs {
          * Gets the CanonicalizationMethod of the current SignedXml object.
          */
         get CanonicalizationMethod(): string {
-            return this.m_signature.SignedInfo.CanonicalizationMethod;
+            if (!this.SignedInfo.CanonicalizationMethod)
+                throw new XmlError(XE.NULL_PARAM, "SignedXml", "CanonicalizationMethod");
+            return this.SignedInfo.CanonicalizationMethod;
         }
 
         /**
          * Gets the SignedInfo object of the current SignedXml object.
          */
         get SignedInfo(): SignedInfo {
-            return this.m_signature.SignedInfo;
+            return this.SignedInfo;
         }
 
         /**
          * Gets or sets the asymmetric algorithm key used for signing a SignedXml object.
          */
-        get SigningKey(): CryptoKey {
+        get SigningKey() {
             return this.key;
         }
-        set SigningKey(value: CryptoKey) {
+        set SigningKey(value: CryptoKey | null) {
             this.key = value;
         }
 
@@ -218,7 +217,6 @@ namespace xadesjs {
             super();
             // constructor();
             this.m_signature = new Signature();
-            this.m_signature.SignedInfo = new SignedInfo(this);
             // this.hashes = new Hashtable(2); // 98% SHA1 for now
             if (node && (node as Node).nodeType === XmlNodeType.Document) {
                 // constructor(node: Document);
@@ -234,10 +232,10 @@ namespace xadesjs {
         /**
          * Returns the public key of a signature.
          */
-        protected GetPublicKeys(): Promise {
+        protected GetPublicKeys(): PromiseLike<CryptoKey[]> {
             return new Promise((resolve, reject) => {
                 if (this.key !== null)
-                    return resolve(this.key);
+                    return resolve([this.key]);
 
                 let pkEnumerator = this.KeyInfo.GetEnumerator();
 
@@ -266,7 +264,7 @@ namespace xadesjs {
                             });
                     }
                 }
-                chain.then(resolve, reject);
+                chain.then(resolve as any, reject);
             });
         }
 
@@ -281,15 +279,15 @@ namespace xadesjs {
         AddReference(reference: Reference): void {
             if (reference == null)
                 throw new XmlError(XE.PARAM_REQUIRED, "reference");
-            this.m_signature.SignedInfo.AddReference(reference);
+            this.SignedInfo.AddReference(reference);
         }
 
-        private DigestReferences(): Promise {
+        private DigestReferences() {
             return new Promise((resolve, reject) => {
                 let promise = Promise.resolve();
                 // we must tell each reference which hash algorithm to use 
                 // before asking for the SignedInfo XML !
-                for (let r of this.m_signature.SignedInfo.References) {
+                for (let r of this.SignedInfo.References) {
                     // assume SHA-1 if nothing is specified
                     if (r.DigestMethod == null)
                         r.DigestMethod = new Sha1().xmlNamespace;
@@ -301,7 +299,7 @@ namespace xadesjs {
                             return Promise.resolve();
                         });
                 }
-                promise.then(resolve, reject);
+                promise.then(resolve as any, reject);
             });
         }
 
@@ -314,7 +312,7 @@ namespace xadesjs {
             }
         }
 
-        protected findById(element: Element, id: string): Element {
+        protected findById(element: Element, id: string): Element | null {
             if (element.nodeType !== xadesjs.XmlNodeType.Element)
                 return null;
             if (element.hasAttribute("Id") && element.getAttribute("Id") === id)
@@ -328,19 +326,19 @@ namespace xadesjs {
             return null;
         }
 
-        private GetReferenceHash(r: Reference, check_hmac: boolean): Promise {
+        private GetReferenceHash(reference: Reference, check_hmac: boolean) {
             return new Promise((resolve, reject) => {
-                let doc: Node = null;
-                let s: any = null;
-                if (!r.Uri) { // Empty
+                let doc: Node | null = null;
+                let canonOutput: any = null;
+                if (!reference.Uri) { // Empty
                     doc = this.envdoc;
                 }
                 else {
                     doc = CreateDocument();
-                    let objectName: string = null;
+                    let objectName: string | null = null;
 
-                    if (r.Uri.indexOf("#xpointer") === 0) {
-                        let uri: string = r.Uri;
+                    if (reference.Uri.indexOf("#xpointer") === 0) {
+                        let uri: string = reference.Uri;
                         SignedXml.whitespaceChars.forEach((c) => {
                             uri = uri.substring(9).split(c).join("");
                         });
@@ -355,27 +353,29 @@ namespace xadesjs {
                             // id('foo'), id("foo")
                             objectName = uri.substring(4, uri.length - 6);
                     }
-                    else if (r.Uri[0] === `#`) {
-                        objectName = r.Uri.substring(1);
+                    else if (reference.Uri[0] === `#`) {
+                        objectName = reference.Uri.substring(1);
                     }
-                    if (objectName != null) {
-                        let found: Element = null;
-                        for (let i in this.m_signature.ObjectList) {
-                            let obj = this.m_signature.ObjectList[i];
-                            found = this.findById((obj as any).element, objectName);
-                            if (found) {
-                                doc = (doc as Document).importNode(found, true);
-                                // FIXME: there should be theoretical justification of copying namespace declaration nodes this way.
-                                for (let j = 0; j < found.childNodes.length; j++) {
-                                    let n = found.childNodes[j];
-                                    // Do not copy default namespace as it must be xmldsig namespace for "Object" element.
-                                    if (n.nodeType === xadesjs.XmlNodeType.Element)
-                                        this.FixupNamespaceNodes(n as Element, doc as Element, true);
+                    if (objectName) {
+                        let found: Element | null = null;
+                        if (this.m_signature) {
+                            for (let i in this.m_signature.ObjectList) {
+                                let obj = this.m_signature.ObjectList[i];
+                                found = this.findById((obj as any).element, objectName);
+                                if (found) {
+                                    doc = (doc as Document).importNode(found, true);
+                                    // FIXME: there should be theoretical justification of copying namespace declaration nodes this way.
+                                    for (let j = 0; j < found.childNodes.length; j++) {
+                                        let n = found.childNodes[j];
+                                        // Do not copy default namespace as it must be xmldsig namespace for "Object" element.
+                                        if (n.nodeType === xadesjs.XmlNodeType.Element)
+                                            this.FixupNamespaceNodes(n as Element, doc as Element, true);
+                                    }
+                                    break;
                                 }
-                                break;
                             }
                         }
-                        if (found == null && this.envdoc != null) {
+                        if (!found && this.envdoc) {
                             found = this.GetElementById(this.envdoc, objectName);
                             if (found != null) {
                                 doc = (doc as Document).importNode(found, true);
@@ -388,65 +388,61 @@ namespace xadesjs {
                 }
 
                 // Create clone to save sorce element from transformations
-                doc = doc.cloneNode(true);
+                doc = (doc as Document).cloneNode(true);
 
-                if (r.TransformChain.length > 0) {
+                if (reference.TransformChain.length > 0) {
                     // Sort transforms. Enveloped should be first transform
-                    r.TransformChain.sort((a, b) => {
+                    reference.TransformChain.sort((a, b) => {
                         if (b instanceof XmlDsigEnvelopedSignatureTransform)
                             return 1;
                         return 0;
                     });
-                    for (let i in r.TransformChain) {
-                        let t = r.TransformChain[i];
-                        if (t instanceof XmlDsigC14NWithCommentsTransform)
-                            t = new XmlDsigC14NTransform(); // TODO: Check RFC for it
-                        if (t instanceof XmlDsigExcC14NWithCommentsTransform)
-                            t = new XmlDsigExcC14NTransform(); // TODO: Check RFC for it
-                        t.LoadInnerXml(doc);
-                        s = t.GetOutput();
+                    for (let i in reference.TransformChain) {
+                        let transform = reference.TransformChain[i];
+                        if (transform instanceof XmlDsigC14NWithCommentsTransform)
+                            transform = new XmlDsigC14NTransform(); // TODO: Check RFC for it
+                        if (transform instanceof XmlDsigExcC14NWithCommentsTransform)
+                            transform = new XmlDsigExcC14NTransform(); // TODO: Check RFC for it
+                        transform.LoadInnerXml(doc);
+                        canonOutput = transform.GetOutput();
                     }
                     // Apply C14N transform if Reference has only one transform EnvelopdeSignature
-                    if (r.TransformChain.length === 1 && r.TransformChain[0] instanceof XmlDsigEnvelopedSignatureTransform) {
+                    if (reference.TransformChain.length === 1 && reference.TransformChain[0] instanceof XmlDsigEnvelopedSignatureTransform) {
                         let c14n = new XmlDsigC14NTransform();
                         c14n.LoadInnerXml(doc);
-                        s = c14n.GetOutput();
+                        canonOutput = c14n.GetOutput();
                     }
                 }
-                else if (s == null) {
+                else if (canonOutput == null) {
                     // we must not C14N references from outside the document
                     // e.g. non-xml documents
-                    if (r.Uri && r.Uri[0] !== `#`) {
-                        s = new XMLSerializer().serializeToString(doc);
+                    if (reference.Uri && reference.Uri[0] !== `#`) {
+                        canonOutput = new XMLSerializer().serializeToString(doc);
                     }
                     else {
                         // apply default C14N transformation
                         let excC14N = new XmlDsigC14NTransform();
                         excC14N.LoadInnerXml(doc);
-                        s = excC14N.GetOutput();
+                        canonOutput = excC14N.GetOutput();
                     }
                 }
-                let digest = CryptoConfig.CreateHashAlgorithm(r.DigestMethod);
-                if (digest == null)
-                    resolve(null);
-                else {
-                    digest.getHash(s)
-                        .then(resolve, reject);
+                if (!reference.DigestMethod) {
+                    throw new XmlError(XE.NULL_PARAM, "Reference", "DigestMethod");
                 }
+                let digest = CryptoConfig.CreateHashAlgorithm(reference.DigestMethod);
+                digest.getHash(canonOutput)
+                    .then(resolve, reject);
             });
         }
 
         private GetC14NMethod(): Transform {
-            let t = <Transform>CryptoConfig.CreateFromName(this.m_signature.SignedInfo.CanonicalizationMethod);
-            if (t == null)
-                throw new XmlError(XE.CRYPTOGRAPHIC, `Unknown Canonicalization Method ${this.m_signature.SignedInfo.CanonicalizationMethod}`);
-            return t;
+            return CryptoConfig.CreateFromName(this.CanonicalizationMethod);
         }
 
         private SignedInfoTransformed(): string {
             let t = this.GetC14NMethod();
 
-            let xml = new XMLSerializer().serializeToString(this.m_signature.SignedInfo.GetXml());
+            let xml = new XMLSerializer().serializeToString(this.SignedInfo.GetXml());
             let doc = new DOMParser().parseFromString(xml, APPLICATION_XML);
             if (this.envdoc) {
                 let namespaces = SelectNamespaces(this.envdoc.documentElement);
@@ -466,16 +462,16 @@ namespace xadesjs {
          * @param  {Algorithm} algorithm Specified WebCrypto Algoriithm
          * @returns Promise
          */
-        public ComputeSignature(algorithm: Algorithm): Promise {
+        public ComputeSignature(algorithm: Algorithm) {
             return new Promise((resolve, reject) => {
-                if (this.key != null) {
-                    let alg = GetSignatureAlgorithm((this.key.algorithm as any).hash ? this.key.algorithm : algorithm);
-                    if (this.m_signature.SignedInfo.SignatureMethod == null)
+                if (this.key) {
+                    let alg = GetSignatureAlgorithm(this.key.algorithm ? this.key.algorithm as Algorithm : algorithm);
+                    if (this.SignedInfo.SignatureMethod == null)
                         // required before hashing
-                        this.m_signature.SignedInfo.SignatureMethod = alg.xmlNamespace;
-                    else if (this.m_signature.SignedInfo.SignatureMethod !== alg.xmlNamespace)
+                        this.SignedInfo.SignatureMethod = alg.xmlNamespace;
+                    else if (this.SignedInfo.SignatureMethod !== alg.xmlNamespace)
                         throw new XmlError(XE.CRYPTOGRAPHIC, "Specified SignatureAlgorithm is not supported by the signing key.");
-                    if (this.key.algorithm.name.toUpperCase() === RSA_PSS) {
+                    if (this.key.algorithm.name!.toUpperCase() === RSA_PSS) {
                         let pss = this.SignedInfo.SignatureParams = new PssAlgorithmParams();
                         pss.SaltLength = (algorithm as any).saltLength;
                         switch ((this.key.algorithm as any).hash.name.toUpperCase()) {
@@ -497,12 +493,14 @@ namespace xadesjs {
                         .then(() => {
                             // let si = this.getCanonXml([this.SignedInfo.CanonicalizationMethodObject], this.SignedInfo.getXml());
                             let si = this.SignedInfoTransformed();
-                            alg.getSignature(si, this.key, algorithm)
+                            if (!this.SigningKey)
+                                throw new XmlError(XE.NULL_PARAM, "SignedXml", "SigningKey");
+                            alg.getSignature(si, this.SigningKey, algorithm)
                                 .then((signature: Uint8Array) => {
                                     this.m_signature.SignatureValue = signature;
-                                    resolve(signature);
+                                    return Promise.resolve(signature);
                                 })
-                                .catch(reject);
+                                .then(resolve, reject);
                         })
                         .catch(reject);
                 }
@@ -515,21 +513,25 @@ namespace xadesjs {
          * Determines whether the SignedXml.Signature property verifies using the public key in the signature. 
          * @returns Promise
          */
-        CheckSignature(): Promise;
-        CheckSignature(key: CryptoKey): Promise;
-        CheckSignature(cert: X509Certificate): Promise;
-        CheckSignature(param?: any): Promise {
+        CheckSignature(): PromiseLike<boolean>;
+        CheckSignature(key: CryptoKey): PromiseLike<boolean>;
+        CheckSignature(cert: X509Certificate): PromiseLike<boolean>;
+        CheckSignature(param?: any): PromiseLike<boolean> {
             return new Promise((resolve, reject) => {
                 this.validationErrors = [];
 
                 let xml = this.envdoc;
+                if (!xml)
+                    throw new XmlError(XE.NULL_PARAM, "SignedXml", "envdoc");
 
                 this.ValidateReferences(xml)
                     .then(() => {
                         if (param) {
                             let signer = CryptoConfig.CreateSignatureAlgorithm(this.SignatureMethod);
-                            if (!signer)
-                                return reject(new XmlError(XE.ALGORITHM_NOT_SUPPORTED, this.SignedInfo.SignatureMethod));
+                            if (!signer) {
+                                reject(new XmlError(XE.ALGORITHM_NOT_SUPPORTED, this.SignedInfo.SignatureMethod));
+                                return false;
+                            }
                             let promise = Promise.resolve();
                             let key: CryptoKey = param;
                             if (param instanceof X509Certificate) {
@@ -564,7 +566,7 @@ namespace xadesjs {
             });
         }
 
-        protected validateSignatureValue(): Promise {
+        protected validateSignatureValue(): PromiseLike<boolean> {
             let signer: ISignatureAlgorithm;
             let signedInfoCanon: string;
             return new Promise((resolve, reject) => {
@@ -598,11 +600,11 @@ namespace xadesjs {
             else throw new Error(`canonicalization algorithm '${name}' is not supported`);
         }
 
-        protected ValidateReferences(doc: Node): Promise {
+        protected ValidateReferences(doc: Node): PromiseLike<boolean> {
             let that = this;
             return new Promise((resolve, reject) => {
                 let refs = that.SignedInfo.References;
-                let promise = Promise.resolve();
+                let promise = Promise.resolve(true);
                 for (let ref of refs) {
 
                     promise = promise.then(() => {
@@ -616,7 +618,7 @@ namespace xadesjs {
                                 this.validationErrors.push(err_text);
                                 throw new XmlError(XE.CRYPTOGRAPHIC, err_text);
                             }
-                            return Promise.resolve();
+                            return Promise.resolve(true);
                         });
 
                 }
@@ -654,7 +656,7 @@ namespace xadesjs {
             // Need to give the EncryptedXml object to the 
             // XmlDecryptionTransform to give it a fighting 
             // chance at decrypting the document.
-            // for (let r of this.m_signature.SignedInfo.References) {
+            // for (let r of this.SignedInfo.References) {
             //     for (let t of r.TransformChain) {
             //         if (t instanceof XmlDecryptionTransform)
             //             (<XmlDecryptionTransform>t).EncryptedXml = this.EncryptedXml;

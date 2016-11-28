@@ -18,7 +18,7 @@ namespace xadesjs {
      * that can be used in an XML digital signature derive.
      */
     export abstract class Transform extends XmlObject implements Transform {
-        protected innerXml: Node = null;
+        protected innerXml: Node | null = null;
 
         /**
          * When overridden in a derived class, returns the output of the current Transform object.
@@ -33,7 +33,7 @@ namespace xadesjs {
             this.innerXml = node;
         }
 
-        GetInnerXml(): Node {
+        GetInnerXml(): Node | null {
             return this.innerXml;
         }
 

@@ -6,7 +6,7 @@ namespace xadesjs {
     export class KeyInfo extends XmlObject {
 
         private Info: Array<KeyInfoClause>;
-        private id: string;
+        private id: string | null;
 
         constructor() {
             super();
@@ -23,10 +23,10 @@ namespace xadesjs {
         /**
          * Gets or sets the key information identity.
          */
-        get Id(): string {
+        get Id(): string | null {
             return this.id;
         }
-        set Id(value: string) {
+        set Id(value: string | null) {
             this.id = value;
         }
 
@@ -95,7 +95,7 @@ namespace xadesjs {
                     if (n.nodeType !== XmlNodeType.Element)
                         continue;
 
-                    let kic: KeyInfoClause = null;
+                    let kic: KeyInfoClause | null = null;
 
                     switch (n.localName) {
                         case XmlSignature.ElementNames.KeyValue:
@@ -142,7 +142,7 @@ namespace xadesjs {
                     }
 
                     if (kic != null) {
-                        kic.LoadXml(<Element>n);
+                        kic.LoadXml(n);
                         this.AddClause(kic);
                     }
                 }
@@ -152,9 +152,9 @@ namespace xadesjs {
     }
 
     export interface KeyInfoClause extends IXmlSerializable {
-        Key: CryptoKey;
-        importKey(key: CryptoKey): Promise;
-        exportKey(alg: Algorithm): Promise;
+        Key: CryptoKey | null;
+        importKey(key: CryptoKey): PromiseLike<this>;
+        exportKey(alg: Algorithm): PromiseLike<CryptoKey>;
     }
 
 }

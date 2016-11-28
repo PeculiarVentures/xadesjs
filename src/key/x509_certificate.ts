@@ -19,7 +19,7 @@ namespace xadesjs {
      * List of OIDs
      * Source: https://msdn.microsoft.com/ru-ru/library/windows/desktop/aa386991(v=vs.85).aspx 
      */
-    const OID: { [key: string]: { short: string, long: string } } = {
+    const OID: { [key: string]: { short?: string, long?: string } } = {
         "2.5.4.3": {
             short: "CN",
             long: "CommonName"
@@ -29,7 +29,6 @@ namespace xadesjs {
             long: "Country"
         },
         "2.5.4.5": {
-            short: null,
             long: "DeviceSerialNumber"
         },
         "0.9.2342.19200300.100.1.25": {
@@ -77,11 +76,9 @@ namespace xadesjs {
             long: "Title"
         },
         "1.2.840.113549.1.9.8": {
-            short: null,
             long: "UnstructuredAddress"
         },
         "1.2.840.113549.1.9.2": {
-            short: null,
             long: "UnstructuredName"
         }
     };
@@ -93,10 +90,10 @@ namespace xadesjs {
 
         protected raw: Uint8Array;
         protected cert_simpl: any;
-        protected publicKey: CryptoKey;
+        protected publicKey: CryptoKey | null = null;
 
         constructor(rawData?: Uint8Array) {
-            this.publicKey = null;
+            this.publicKey;
 
             if (rawData) {
                 this.LoadFromRawData(rawData);
@@ -165,7 +162,7 @@ namespace xadesjs {
         /**
          * Gets the public key from the X509Certificate
          */
-        get PublicKey(): CryptoKey {
+        get PublicKey(): CryptoKey | null {
             return this.publicKey;
         }
 
@@ -181,7 +178,7 @@ namespace xadesjs {
          * @param  {Algorithm} algorithm
          * @returns Promise
          */
-        exportKey(algorithm: Algorithm): Promise {
+        exportKey(algorithm: Algorithm) {
             return new Promise((resolve, reject) => {
                 let asn1_publicKey = org.pkijs.fromBER(this.cert_simpl.subjectPublicKeyInfo.subjectPublicKey.value_block.value_hex);
                 let alg_oid = this.cert_simpl.subjectPublicKeyInfo.algorithm.algorithm_id;

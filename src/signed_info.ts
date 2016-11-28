@@ -7,13 +7,13 @@ namespace xadesjs {
     export class SignedInfo extends XmlObject {
 
         private references: Reference[];
-        private c14nMethod: string;
-        private id: string;
-        private signatureMethod: string;
+        private c14nMethod: string | null;
+        private id: string | null;
+        private signatureMethod: string | null;
         private signatureParams: XmlObject;
         private signatureLength: string;
-        private element: Element;
-        private signedXml: SignedXml = null;
+        private element: Element | null;
+        private signedXml: SignedXml | null = null;
 
         public constructor(signedXml?: SignedXml) {
             super();
@@ -27,10 +27,10 @@ namespace xadesjs {
          * Gets or sets the canonicalization algorithm that is used before signing 
          * for the current SignedInfo object.
          */
-        get CanonicalizationMethod(): string {
+        get CanonicalizationMethod(): string | null {
             return this.c14nMethod;
         }
-        set CanonicalizationMethod(value: string) {
+        set CanonicalizationMethod(value: string | null) {
             this.c14nMethod = value;
             this.element = null;
         }
@@ -53,10 +53,10 @@ namespace xadesjs {
         /**
          * Gets or sets the ID of the current SignedInfo object.
          */
-        get Id(): string {
+        get Id(): string | null {
             return this.id;
         }
-        set Id(value: string) {
+        set Id(value: string | null) {
             this.element = null;
             this.id = value;
         }
@@ -99,10 +99,10 @@ namespace xadesjs {
          * Gets or sets the name of the algorithm used for signature generation 
          * and validation for the current SignedInfo object.
          */
-        get SignatureMethod(): string {
+        get SignatureMethod() {
             return this.signatureMethod;
         }
-        set SignatureMethod(value: string) {
+        set SignatureMethod(value: string | null) {
             this.element = null;
             this.signatureMethod = value;
         }
@@ -205,12 +205,6 @@ namespace xadesjs {
             return xel;
         }
 
-        protected GetAttribute(xel: Element, attribute: string): string {
-            if (!xel.hasAttribute(attribute))
-                return null;
-            return xel.getAttribute(attribute);
-        }
-
         /**
          * Loads a SignedInfo state from an XML element.
          * @param  {Element} value
@@ -223,7 +217,7 @@ namespace xadesjs {
             if ((value.localName !== XmlSignature.ElementNames.SignedInfo) || (value.namespaceURI !== XmlSignature.NamespaceURI))
                 throw new XmlError(XE.CRYPTOGRAPHIC, "value");
 
-            this.id = this.GetAttribute(value, XmlSignature.AttributeNames.Id);
+            this.id = this.getAttribute(value, XmlSignature.AttributeNames.Id);
             this.c14nMethod = XmlSignature.GetAttributeFromElement(value, XmlSignature.AttributeNames.Algorithm, XmlSignature.ElementNames.CanonicalizationMethod);
 
             let sm = XmlSignature.GetChildElement(value, XmlSignature.ElementNames.SignatureMethod, XmlSignature.NamespaceURI);
