@@ -190,7 +190,7 @@ namespace xadesjs.pro {
             let xadesDataObject: DataObject;
             let retVal = new UnsignedProperties();
             xadesDataObject = this.GetXadesDataObject();
-            if (xadesDataObject != null) {
+            if (xadesDataObject) {
                 dataObjectXmlElement = xadesDataObject.GetXml();
 
                 let xmlNodeList = dataObjectXmlElement.getElementsByTagNameNS(XmlXades.NamespaceURI, XmlXades.ElementNames.UnsignedProperties);
@@ -208,7 +208,7 @@ namespace xadesjs.pro {
 
         public set UnsignedProperties(value: UnsignedProperties) {
             let xadesDataObject = this.GetXadesDataObject();
-            if (xadesDataObject != null) {
+            if (xadesDataObject) {
                 let dataObjectXmlElement = xadesDataObject.GetXml();
                 let qualifyingPropertiesXmlNodeList = findChilds(dataObjectXmlElement, XmlXades.ElementNames.QualifyingProperties, XmlXades.NamespaceURI);
                 let unsignedPropertiesXmlNodeList = findChilds(dataObjectXmlElement, XmlXades.ElementNames.UnsignedProperties, XmlXades.NamespaceURI);
@@ -308,14 +308,14 @@ namespace xadesjs.pro {
                 // Clone signature element
                 let signature = new DOMParser().parseFromString(new XMLSerializer().serializeToString(this.Signature.GetXml()), APPLICATION_XML);
                 retVal = super.GetElementById(signature as any, idValue);
-                if (retVal != null) {
+                if (retVal) {
                     return retVal;
                 }
 
                 // if not, search for custom ids
                 for (let idAttr of XadesSignedXml.idAttrs) {
                     retVal = SelectSingleNode(signature, "//*[@" + idAttr + "=\"" + idValue + "\"]") as Element;
-                    if (retVal != null) {
+                    if (retVal) {
                         return retVal;
                     }
                 }
@@ -326,29 +326,29 @@ namespace xadesjs.pro {
                 let xmlDocumentCloned = new DOMParser().parseFromString(new XMLSerializer().serializeToString(document), APPLICATION_XML);
 
                 retVal = super.GetElementById(xmlDocumentCloned, idValue);
-                if (retVal != null) {
+                if (retVal) {
                     return retVal;
                 }
 
                 // if not, search for custom ids
                 for (let idAttr of XadesSignedXml.idAttrs) {
                     retVal = SelectSingleNode(this.cachedXadesObjectDocument, "//*[@" + idAttr + "=\"" + idValue + "\"]") as Element;
-                    if (retVal != null) {
+                    if (retVal) {
                         break;
                     }
                 }
             }
             else {
-                if (document != null) {
+                if (document) {
                     retVal = super.GetElementById(document, idValue);
-                    if (retVal != null) {
+                    if (retVal) {
                         return retVal;
                     }
 
                     // if not, search for custom ids
                     for (let idAttr of XadesSignedXml.idAttrs) {
                         retVal = SelectSingleNode(document, "//*[@" + idAttr + "=\"" + idValue + "\"]") as Element;
-                        if (retVal != null) {
+                        if (retVal) {
                             break;
                         }
                     }
@@ -760,7 +760,7 @@ namespace xadesjs.pro {
                         retVal = (signerRole.CertifiedRoles.Count > 0);
                     }
                     if (retVal === false) {
-                        if (signerRole.ClaimedRoles != null) {
+                        if (signerRole.ClaimedRoles) {
                             retVal = (signerRole.ClaimedRoles.Count > 0);
                         }
                     }

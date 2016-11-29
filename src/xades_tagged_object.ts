@@ -1,21 +1,12 @@
-namespace xadesjs.pro {
+import { XmlXadesObject } from "./xml_xades";
 
-    export class XmlXadesTaggedObject extends XmlXadesObject {
+export abstract class XmlXadesTaggedObject extends XmlXadesObject {
 
-        /**
-         * The name of the element when serializing
-         */
-        protected TagName: string = "TaggedObject";
+    protected name = "TaggedObject";
 
-        protected GetXmlObjectName() {
-            return this.TagName;
-        }
-
-        constructor(tagName: string) {
-            super();
-            this.TagName = tagName;
-        }
-
+    constructor(tagName: string) {
+        super();
+        this.name = tagName;
     }
 
 }

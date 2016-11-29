@@ -58,7 +58,7 @@ namespace xadesjs.pro {
                 retVal = true;
             }
 
-            if (this.Transforms != null && this.Transforms.HasChanged()) {
+            if (this.Transforms && this.Transforms.HasChanged()) {
                 retVal = true;
             }
 

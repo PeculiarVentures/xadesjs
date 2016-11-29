@@ -50,7 +50,7 @@ namespace xadesjs.pro {
             if (this.Id) {
                 retVal = true;
             }
-            if (this.CertRefs != null && this.CertRefs.HasChanged()) {
+            if (this.CertRefs && this.CertRefs.HasChanged()) {
                 retVal = true;
             }
 

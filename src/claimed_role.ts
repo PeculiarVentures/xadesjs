@@ -48,7 +48,7 @@ namespace xadesjs.pro {
             let document = this.CreateDocument();
             let element = this.CreateElement(document);
 
-            if (this.AnyXmlElement != null) {
+            if (this.AnyXmlElement) {
                 element.appendChild(document.importNode(this.AnyXmlElement, true));
             }
 

@@ -37,7 +37,7 @@
   },
   "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
   "dependencies": {
-    "xmldsigjs": "git+ssh+https://github.com/PeculiarVentures/xmldsigjs.git"
+    "xmldsigjs": "C:/github/xmldsigjs"
   },
   "devDependencies": {
     "@types/node": "^6.0.45",

@@ -114,7 +114,7 @@ namespace xadesjs.pro {
             if (this.OCSPRefs && this.OCSPRefs.HasChanged()) {
                 element.appendChild(document.importNode(this.OCSPRefs.GetXml(), true));
             }
-            if (this.OtherRefs != null && this.OtherRefs.HasChanged()) {
+            if (this.OtherRefs && this.OtherRefs.HasChanged()) {
                 element.appendChild(document.importNode(this.OtherRefs.GetXml(), true));
             }
 

@@ -96,7 +96,7 @@ namespace xadesjs.pro {
 
             let element = document.createElementNS(XmlSignature.NamespaceURI, this.GetPrefix() + XmlSignature.ElementNames.Transform);
 
-            if (this.Algorithm != null) {
+            if (this.Algorithm) {
                 element.setAttribute(XmlSignature.AttributeNames.Algorithm, this.Algorithm);
             }
             else {

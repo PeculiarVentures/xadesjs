@@ -77,7 +77,7 @@ namespace xadesjs.pro {
         public HasChanged(): boolean {
             let retVal = false;
 
-            if (this.signaturePolicyId != null && this.signaturePolicyId.HasChanged()) {
+            if (this.signaturePolicyId && this.signaturePolicyId.HasChanged()) {
                 retVal = true;
             }
 
@@ -126,7 +126,7 @@ namespace xadesjs.pro {
                 element.appendChild(xmlSignaturePolicyImplied);
             }
             else {
-                if (this.signaturePolicyId != null && this.signaturePolicyId.HasChanged()) {
+                if (this.signaturePolicyId && this.signaturePolicyId.HasChanged()) {
                     element.appendChild(document.importNode(this.signaturePolicyId.GetXml(), true));
                 }
                 else {

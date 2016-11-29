@@ -69,11 +69,11 @@ namespace xadesjs.pro {
         public HasChanged(): boolean {
             let retVal = false;
 
-            if (this.certDigest != null && this.certDigest.HasChanged()) {
+            if (this.certDigest && this.certDigest.HasChanged()) {
                 retVal = true;
             }
 
-            if (this.issuerSerial != null && this.issuerSerial.HasChanged()) {
+            if (this.issuerSerial && this.issuerSerial.HasChanged()) {
                 retVal = true;
             }
 
@@ -102,14 +102,14 @@ namespace xadesjs.pro {
             let document = this.CreateDocument();
             let element = this.CreateElement(document);
 
-            if (this.certDigest != null && this.certDigest.HasChanged()) {
+            if (this.certDigest && this.certDigest.HasChanged()) {
                 element.appendChild(document.importNode(this.certDigest.GetXml(), true));
             }
             else {
                 throw new XmlError(XE.CRYPTOGRAPHIC, "CertDigest element missing in Cert");
             }
 
-            if (this.issuerSerial != null && this.issuerSerial.HasChanged()) {
+            if (this.issuerSerial && this.issuerSerial.HasChanged()) {
                 element.appendChild(document.importNode(this.issuerSerial.GetXml(), true));
             }
             else {

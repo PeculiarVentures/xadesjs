@@ -1,14 +1,12 @@
 {
     "compilerOptions": {
-        "module": "amd",
+        "module": "commonjs",
+        "moduleResolution": "node",
         "target": "es5",
         "lib": [
             "es5",
             "dom",
             "es2015.promise"
-        ],
-        "typeRoots": [
-          "node_modules/@types"  
         ],
         "noImplicitAny": true,
         "sourceMap": false,
@@ -17,41 +15,10 @@
         "strictNullChecks": true,
         "pretty": true,
         "noImplicitReturns": true,
+        "rootDir": "src",
         "outFile": "build/xades.js"
     },
-    "files": [
-        "src/typings/xpath.d.ts",
-        "src/typings/index.d.ts",
-        "src/common.ts",
-        "src/error.ts",
-        "src/application.ts",
-        "src/xml.ts",
-        "src/utils.ts",
-        "src/convert.ts",
-        "src/algorithm.ts",
-        "src/algorithm/rsa_hash.ts",
-        "src/algorithm/rsa_pkcs1_sign.ts",
-        "src/algorithm/rsa_pss_sign.ts",
-        "src/algorithm/hmac_sign.ts",
-        "src/algorithm/ecdsa_sign.ts",
-        "src/key/x509_certificate.ts",
-        "src/key/x509_data.ts",
-        "src/key/rsa_key.ts",
-        "src/key/ecdsa_key.ts",
-        "src/namespace_manager.ts",
-        "src/canonicalizer.ts",
-        "src/transforms/transform.ts",
-        "src/transforms/base64.ts",
-        "src/transforms/enveloped_signature.ts",
-        "src/transforms/c14n.ts",
-        "src/transforms/exc_c14n.ts",
-        "src/crypto_config.ts",
-        "src/data_object.ts",
-        "src/reference.ts",
-        "src/key_info.ts",
-        "src/signature.ts",
-        "src/signed_info.ts",
-        "src/signed_xml.ts",
-        "src/export.ts"
+    "exclude": [
+        "node_modules"
     ]
 }

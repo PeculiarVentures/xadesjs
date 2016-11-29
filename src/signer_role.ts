@@ -57,7 +57,7 @@ namespace xadesjs.pro {
                 retVal = true;
             }
 
-            if (this.CertifiedRoles != null && this.CertifiedRoles.HasChanged()) {
+            if (this.CertifiedRoles && this.CertifiedRoles.HasChanged()) {
                 retVal = true;
             }
 
