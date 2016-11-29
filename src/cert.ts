@@ -1,123 +1,150 @@
-namespace xadesjs.pro {
+import * as XmlJs from "xmljs";
+
+import { XmlXades } from "./xml";
+import { XmlXadesObject, XmlXadesCollection } from "./xml_xades";
+import { DigestAlgAndValueType } from "./digest_alg_and_value_type";
+import { IssuerSerial } from "./issuer_serial";
+
+/**
+ * <xsd:complexType name="CertIDType">
+ *     <xsd:sequence>
+ *         <xsd:element name="CertDigest" type="DigestAlgAndValueType"/>
+ *         <xsd:element name="IssuerSerial" type="ds:X509IssuerSerialType"/>
+ *     </xsd:sequence>
+ * </xsd:complexType>
+ */
+
+/**
+ * This class contains certificate identification information
+ */
+export class Cert extends XmlXadesObject {
+
+    protected name = XmlXades.ElementNames.Cert;
+
+    // Private variables
+    private certDigest: DigestAlgAndValueType;
+    private issuerSerial: IssuerSerial;
+
+
+    // Public properties
 
     /**
-     * <xsd:complexType name="CertIDType">
-     *     <xsd:sequence>
-     *         <xsd:element name="CertDigest" type="DigestAlgAndValueType"/>
-     *         <xsd:element name="IssuerSerial" type="ds:X509IssuerSerialType"/>
-     *     </xsd:sequence>
-     * </xsd:complexType>
+     * The element CertDigest contains the digest of one of the
+     * certificates referenced in the sequence
      */
+    public get CertDigest(): DigestAlgAndValueType {
+        return this.certDigest;
+    }
+    public set CertDigest(value: DigestAlgAndValueType) {
+        this.certDigest = value;
+    }
+
 
     /**
-     * This class contains certificate identification information
+     * The element IssuerSerial contains the identifier of one of the
+     * certificates referenced in the sequence. Should the
+     * X509IssuerSerial element appear in the signature to denote the same
+     * certificate, its value MUST be consistent with the corresponding
+     * IssuerSerial element.
      */
-    export class Cert extends XmlXadesObject {
-        // Private variables
-        private certDigest: DigestAlgAndValueType;
-        private issuerSerial: IssuerSerial;
+    public get IssuerSerial(): IssuerSerial {
+        return this.issuerSerial;
+    }
+    public set IssuerSerial(value: IssuerSerial) {
+        this.issuerSerial = value;
+    }
 
+    /**
+     * Default constructor
+     */
+    public constructor() {
+        super();
+        this.certDigest = new DigestAlgAndValueType("CertDigest");
+        this.issuerSerial = new IssuerSerial();
+    }
 
-        // Public properties
+    // Protected methods
+    protected GetXmlObjectName() {
+        return XmlXades.ElementNames.Cert;
+    }
 
-        /**
-         * The element CertDigest contains the digest of one of the
-         * certificates referenced in the sequence
-         */
-        public get CertDigest(): DigestAlgAndValueType {
-            return this.certDigest;
-        }
-        public set CertDigest(value: DigestAlgAndValueType) {
-            this.certDigest = value;
-        }
+    // Public methods
 
+    /**
+     * Check to see if something has changed in this instance and needs to be serialized
+     * @returns Flag indicating if a member needs serialization
+     */
+    public HasChanged(): boolean {
+        let retVal = false;
 
-		/**
-		 * The element IssuerSerial contains the identifier of one of the
-		 * certificates referenced in the sequence. Should the
-		 * X509IssuerSerial element appear in the signature to denote the same
-		 * certificate, its value MUST be consistent with the corresponding
-		 * IssuerSerial element.
-		 */
-        public get IssuerSerial(): IssuerSerial {
-            return this.issuerSerial;
-        }
-        public set IssuerSerial(value: IssuerSerial) {
-            this.issuerSerial = value;
-        }
-
-		/**
-		 * Default constructor
-		 */
-        public constructor() {
-            super();
-            this.certDigest = new DigestAlgAndValueType("CertDigest");
-            this.issuerSerial = new IssuerSerial();
+        if (this.certDigest && this.certDigest.HasChanged()) {
+            retVal = true;
         }
 
-        // Protected methods
-        protected GetXmlObjectName() {
-            return XmlXades.ElementNames.Cert;
+        if (this.issuerSerial && this.issuerSerial.HasChanged()) {
+            retVal = true;
         }
 
-        // Public methods
+        return retVal;
+    }
 
-        /**
-		 * Check to see if something has changed in this instance and needs to be serialized
-         * @returns Flag indicating if a member needs serialization
-		 */
-        public HasChanged(): boolean {
-            let retVal = false;
+    /**
+     * Load state from an XML element
+     * @param {Element} element XML element containing new state
+     */
+    public LoadXml(element: Element): void {
+        super.LoadXml(element);
 
-            if (this.certDigest && this.certDigest.HasChanged()) {
-                retVal = true;
-            }
+        this.certDigest = new DigestAlgAndValueType(XmlXades.ElementNames.CertDigest);
+        this.certDigest.LoadXml(this.GetElement(XmlXades.ElementNames.CertDigest, true));
 
-            if (this.issuerSerial && this.issuerSerial.HasChanged()) {
-                retVal = true;
-            }
+        this.issuerSerial = new IssuerSerial();
+        this.issuerSerial.LoadXml(this.GetElement(XmlXades.ElementNames.IssuerSerial, true));
+    }
 
-            return retVal;
+    /**
+     * Returns the XML representation of the this object
+    * @returns XML element containing the state of this object
+     */
+    public GetXml(): Element {
+        let document = this.CreateDocument();
+        let element = this.CreateElement(document);
+
+        if (this.certDigest && this.certDigest.HasChanged()) {
+            element.appendChild(document.importNode(this.certDigest.GetXml(), true));
+        }
+        else {
+            throw new XmlJs.XmlError(XmlJs.XE.CRYPTOGRAPHIC, "CertDigest element missing in Cert");
         }
 
-		/**
-		 * Load state from an XML element
-         * @param {Element} element XML element containing new state
-		 */
-        public LoadXml(element: Element): void {
-            super.LoadXml(element);
-
-            this.certDigest = new DigestAlgAndValueType(XmlXades.ElementNames.CertDigest);
-            this.certDigest.LoadXml(this.GetElement(element, XmlXades.ElementNames.CertDigest));
-
-            this.issuerSerial = new IssuerSerial();
-            this.issuerSerial.LoadXml(this.GetElement(element, XmlXades.ElementNames.IssuerSerial));
+        if (this.issuerSerial && this.issuerSerial.HasChanged()) {
+            element.appendChild(document.importNode(this.issuerSerial.GetXml(), true));
+        }
+        else {
+            throw new XmlJs.XmlError(XmlJs.XE.CRYPTOGRAPHIC, "IssuerSerial element missing in Cert");
         }
 
-		/**
-		 * Returns the XML representation of the this object
-        * @returns XML element containing the state of this object
-		 */
-        public GetXml(): Element {
-            let document = this.CreateDocument();
-            let element = this.CreateElement(document);
+        return element;
+    }
 
-            if (this.certDigest && this.certDigest.HasChanged()) {
-                element.appendChild(document.importNode(this.certDigest.GetXml(), true));
-            }
-            else {
-                throw new XmlError(XE.CRYPTOGRAPHIC, "CertDigest element missing in Cert");
-            }
+}
 
-            if (this.issuerSerial && this.issuerSerial.HasChanged()) {
-                element.appendChild(document.importNode(this.issuerSerial.GetXml(), true));
-            }
-            else {
-                throw new XmlError(XE.CRYPTOGRAPHIC, "IssuerSerial element missing in Cert");
-            }
+export class CertCollection extends XmlJs.Collection<Cert> { }
 
-            return element;
+/**
+ * The CertRefs element contains a collection of Cert elements
+ */
+export class CertRefs extends XmlXadesCollection<Cert> {
+
+    protected name = XmlXades.ElementNames.CertRefs;
+
+    // Protetced methods
+
+    protected OnLoadChildElement(element: Element): any {
+        if (element.namespaceURI === XmlXades.NamespaceURI && element.localName === XmlXades.ElementNames.Cert) {
+            let obj = new Cert();
+            obj.LoadXml(element);
+            return obj;
         }
-
     }
 }

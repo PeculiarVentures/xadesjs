@@ -3,6 +3,8 @@ import * as XmlJs from "xmljs";
 import { XmlXades } from "./xml";
 import { XmlXadesObject } from "./xml_xades";
 import { ObjectIdentifier } from "./object_identifier";
+import { ObjectReferenceCollection, ObjectReference } from "./object_reference";
+import { CommitmentTypeQualifiers } from "./commitment_type_qualifier";
 
 export class CommitmentTypeIndicationCollection extends XmlJs.Collection<CommitmentTypeIndication> { }
 

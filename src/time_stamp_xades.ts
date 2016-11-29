@@ -1,7 +1,8 @@
 import * as XmlJs from "xmljs";
-
+import * as XmlDSigJs from "xmldsigjs";
 import { XmlXades } from "./xml";
 import { XmlXadesObject } from "./xml_xades";
+import { TimeStampGeneric } from "./time_stamp_generic";
 
 /**
  * <xsd:element name="XAdESTimeStamp" type="XAdESTimeStampType"/>
@@ -28,14 +29,14 @@ export class XadesTimeStamp extends TimeStampGeneric {
     /**
      * Identifies data objects that are time-stamped
      */
-    public Includes: Collection<Include>;
+    public Includes: XmlJs.Collection<Include>;
 
     // Constructor
     constructor(tagName: string) {
         super(tagName);
 
         // Default props
-        this.Includes = new Collection<Include>();
+        this.Includes = new XmlJs.Collection<Include>();
     }
 
     // Protected methods
@@ -43,11 +44,11 @@ export class XadesTimeStamp extends TimeStampGeneric {
     protected GetHash(element: Element, alg: string): PromiseLike<Uint8Array> {
         return new Promise((resolve, reject) => {
             let tsp = this.EncapsulatedTimeStamp.GetPki();
-            let transform = CryptoConfig.CreateFromName(this.CanonicalizationMethod);
+            let transform = XmlDSigJs.CryptoConfig.CreateFromName(this.CanonicalizationMethod);
             transform.LoadInnerXml(element);
             let transformedString = transform.GetOutput();
-            let buf = Convert.ToBufferUtf8String(transformedString);
-            Application.crypto.subtle.digest(alg, buf)
+            let buf = XmlJs.Convert.FromUtf8String(transformedString);
+            XmlDSigJs.Application.crypto.subtle.digest(alg, buf)
                 .then((hash: ArrayBuffer) => {
                     return Promise.resolve(new Uint8Array(hash));
                 })
@@ -81,7 +82,7 @@ export class XadesTimeStamp extends TimeStampGeneric {
         let xmlNodeList = element.childNodes;
         for (let i = 0; i < xmlNodeList.length; i++) {
             let node = xmlNodeList.item(i) as Element;
-            if (node.nodeType !== XmlNodeType.Element)
+            if (node.nodeType !== XmlJs.XmlNodeType.Element)
                 continue;
             if (node.nodeName === XmlXades.ElementNames.Include) {
                 let include = new Include();
@@ -109,33 +110,33 @@ export class XadesTimeStamp extends TimeStampGeneric {
 
     Verify(element?: Element): PromiseLike<boolean>;
     Verify(document?: Document): PromiseLike<boolean>;
-    Verify(node: Document | Element = null): PromiseLike<boolean> {
+    Verify(node?: Document | Element): PromiseLike<boolean> {
         return new Promise((resolve, reject) => {
-            let el: Element;
-            if (node && node.nodeType === XmlNodeType.Element)
+            let el: Element | null;
+            if (node && node.nodeType === XmlJs.XmlNodeType.Element)
                 el = node as Element;
             else
-                el = node.ownerDocument.documentElement;
+                el = (node as Document).ownerDocument.documentElement;
 
             if (!node && this.element)
                 el = this.element.ownerDocument.documentElement;
             if (!el)
-                throw new XmlError(XE.CRYPTOGRAPHIC, "Element is needed for verifying");
+                throw new XmlJs.XmlError(XmlJs.XE.CRYPTOGRAPHIC, "Element is needed for verifying");
 
             if (this.Includes.Count) {
                 // find element by URI
                 let id = this.Includes.Item(0).Uri.replace(/^\#/, "");
                 el = this.GetElementById(node as Element, id);
                 if (!el)
-                    throw new XmlError(XE.CRYPTOGRAPHIC, `Element by id '${id}' is not found`);
+                    throw new XmlJs.XmlError(XmlJs.XE.CRYPTOGRAPHIC, `Element by id '${id}' is not found`);
             }
 
             let tsp = this.EncapsulatedTimeStamp.GetPki();
-            let transform = CryptoConfig.CreateFromName(this.CanonicalizationMethod);
+            let transform = XmlDSigJs.CryptoConfig.CreateFromName(this.CanonicalizationMethod);
 
             // Prepare element for canonicalization
             let importedElement = el.ownerDocument.importNode(el, true) as Element;
-            let namespaces = SelectNamespaces(el);
+            let namespaces = XmlJs.SelectNamespaces(el);
             for (let i in namespaces) {
                 let uri = namespaces[i];
                 // add namespaces to imported element
@@ -144,7 +145,7 @@ export class XadesTimeStamp extends TimeStampGeneric {
 
             transform.LoadInnerXml(importedElement);
             let transformedString = transform.GetOutput();
-            tsp.Verify({ data: Convert.ToBufferUtf8String(transformedString).buffer }).then(resolve, reject);
+            tsp.Verify({ data: XmlJs.Convert.FromUtf8String(transformedString).buffer }).then(resolve, reject);
         });
     }
 
@@ -156,7 +157,7 @@ export class XadesTimeStamp extends TimeStampGeneric {
      * @param  {string=SHA256} algorithm Hash algorithm. Default SHA-256
      * @returns PromiseLike
      */
-    Create(element: Element, tspUri: string, uri: string = "", algorithm: string = SHA256): PromiseLike<XadesTimeStamp> {
+    Create(element: Element, tspUri: string, uri: string = "", algorithm: string = XmlDSigJs.SHA256): PromiseLike<XadesTimeStamp> {
         return new Promise((resolve, reject) => {
             let el = element;
 
@@ -165,9 +166,9 @@ export class XadesTimeStamp extends TimeStampGeneric {
                 uri = uri.replace(/^#/, "");
 
                 // Get element by URI
-                el = this.GetElementById(element, uri);
+                el = this.GetElementById(element, uri) !;
                 if (!el)
-                    throw new XmlError(XE.CRYPTOGRAPHIC, `Element with ID '${uri}' is not found`);
+                    throw new XmlJs.XmlError(XmlJs.XE.CRYPTOGRAPHIC, `Element with ID '${uri}' is not found`);
             }
 
 
@@ -236,19 +237,21 @@ export class SignatureTimeStamp extends XadesTimeStamp {
      * @param  {string=SHA256} algorithm Hash algorithm. Default SHA-256
      * @returns PromiseLike
      */
-    Create(element: Element, tspUri: string, uri: string = "", algorithm: string = SHA256): PromiseLike<XadesTimeStamp> {
+    Create(element: Element, tspUri: string, uri: string = "", algorithm: string = XmlDSigJs.SHA256): PromiseLike<XadesTimeStamp> {
         if (!uri) {
-            element = this.GetSignatureValue(element)
+            element = this.GetSignatureValue(element)!;
             if (!element)
-                return Promise.reject(new XmlError(XE.CRYPTOGRAPHIC, "SignatureValue element is missing"));
+                return Promise.reject(new XmlJs.XmlError(XmlJs.XE.CRYPTOGRAPHIC, "SignatureValue element is missing"));
         }
         return super.Create(element, tspUri, uri, algorithm);
     }
 
     Verify(element?: Element): PromiseLike<boolean>;
     Verify(document?: Document): PromiseLike<boolean>;
-    Verify(node: Document | Element = null): PromiseLike<boolean> {
+    Verify(node?: Document | Element): PromiseLike<boolean> {
         if (!node) {
+            if (!this.element)
+                return Promise.reject(new XmlJs.XmlError(XmlJs.XE.CRYPTOGRAPHIC, `SignatureTimeStamp has got empty member element`));
             // get SignatureValue element
             let signature = this.element.parentElement.parentElement.parentElement.parentElement.parentElement;
             node = this.GetSignatureValue(signature);
@@ -257,21 +260,21 @@ export class SignatureTimeStamp extends XadesTimeStamp {
             node = this.GetSignatureValue(node);
         }
         if (!node)
-            return Promise.reject(new XmlError(XE.CRYPTOGRAPHIC, "SignatureValue element is missing"));
+            return Promise.reject(new XmlJs.XmlError(XmlJs.XE.CRYPTOGRAPHIC, "SignatureValue element is missing"));
         return super.Verify(node as Element);
     }
 
     protected GetSignatureValue(node: Document | Element) {
-        let res: Element = null;
-        let nodeList = node.getElementsByTagNameNS(XmlSignature.NamespaceURI, XmlSignature.ElementNames.SignatureValue);
+        let res: Element | null = null;
+        let nodeList = node.getElementsByTagNameNS(XmlDSigJs.XmlSignature.NamespaceURI, XmlDSigJs.XmlSignature.ElementNames.SignatureValue);
         if (nodeList.length)
             res = nodeList.item(0);
         return res;
     }
 }
 
-export class AllDataObjectsTimeStampCollection extends Collection<AllDataObjectsTimeStamp> { }
+export class AllDataObjectsTimeStampCollection extends XmlJs.Collection<AllDataObjectsTimeStamp> { }
 
-export class IndividualDataObjectsTimeStampCollection extends Collection<IndividualDataObjectsTimeStamp> { }
+export class IndividualDataObjectsTimeStampCollection extends XmlJs.Collection<IndividualDataObjectsTimeStamp> { }
 
-export class SignatureTimeStampCollection extends Collection<SignatureTimeStamp> { }
+export class SignatureTimeStampCollection extends XmlJs.Collection<SignatureTimeStamp> { }

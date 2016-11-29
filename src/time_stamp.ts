@@ -2,10 +2,10 @@ import * as XmlJs from "xmljs";
 import * as XmlDSigJs from "xmldsigjs";
 
 import { XmlXades } from "./xml";
-import { XmlXadesObject } from "./xml_xades";
 import { XmlXadesTaggedObject } from "./xades_tagged_object";
 import { EncapsulatedPKIData } from "./encapsulated_pki_data";
 import { XMLTimeStamp } from "./xml_timestamp";
+import { HashDataInfoCollection, HashDataInfo } from "./hash_data_info";
 
 export class AllDataObjectsTimeStampCollection extends XmlJs.Collection<AllDataObjectsTimeStamp> { }
 
@@ -282,7 +282,7 @@ export class TimeStamp extends XmlXadesTaggedObject {
                     // HashDataInfo
                     let hashDataInfo = new HashDataInfo();
                     hashDataInfo.Uri = uri;
-                    hashDataInfo.Transforms.TransformCollection = transforms;
+                    hashDataInfo.Transforms = transforms;
                     this.HashDataInfoCollection.Add(hashDataInfo);
 
                     tspRequest.DigestValue = digestValue;
@@ -325,15 +325,20 @@ export class TimeStamp extends XmlXadesTaggedObject {
             if (!_document)
                 throw new XmlJs.XmlError(XmlJs.XE.CRYPTOGRAPHIC, "Document is needed for verifying");
 
-            let el: Element;
+            const hashDataInfo = this.HashDataInfoCollection.Item(0);
+            if (!hashDataInfo)
+                throw new XmlJs.XmlError(XmlJs.XE.CRYPTOGRAPHIC, "HashDataInfo is empty");
+
+            let el: Element | null;
             // The SignatureTimeStamp encapsulates the time-stamp over the ds:SignatureValue element.
             if (this.name === XmlXades.ElementNames.SignatureTimeStamp) {
-
+                el = null;
+                console.warn("Not implemented");
             }
             else {
                 // find element by URI
-                let id = this.HashDataInfoCollection.Item(0).Uri.replace(/^\#/, "");
-                el = this.GetElementById(_document, id)!;
+                let id = hashDataInfo.Uri.replace(/^\#/, "");
+                el = this.GetElementById(_document, id);
                 if (!el)
                     throw new XmlJs.XmlError(XmlJs.XE.CRYPTOGRAPHIC, `Element by id '${id}' is not found`);
             }
@@ -341,8 +346,9 @@ export class TimeStamp extends XmlXadesTaggedObject {
             let tsp = this.GetTspResponse();
             if (!this.HashDataInfoCollection.Count)
                 throw new XmlJs.XmlError(XmlJs.XE.CRYPTOGRAPHIC, `${this.name} hasn't got HashDataInfo element`);
-            let content = this.GetTransformed(this.HashDataInfoCollection.Item(0).Transforms.TransformCollection);
-            tsp.Verify({ data: XmlJs.Convert.FromUtf8String(content).buffer }).then(resolve, reject);
+            let content = this.GetTransformed(el!, hashDataInfo.Transforms);
+            tsp.Verify({ data: XmlJs.Convert.FromUtf8String(content).buffer })
+                .then(resolve, reject);
         });
     }
 }

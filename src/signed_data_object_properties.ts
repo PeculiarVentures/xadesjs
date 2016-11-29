@@ -2,8 +2,9 @@ import * as XmlJs from "xmljs";
 
 import { XmlXades } from "./xml";
 import { XmlXadesObject } from "./xml_xades";
-import { DataObjectFormatCollection } from "./data_object_format";
-import { CommitmentTypeIndicationCollection } from "./commitment_type_indication";
+import { DataObjectFormatCollection, DataObjectFormat } from "./data_object_format";
+import { CommitmentTypeIndicationCollection, CommitmentTypeIndication } from "./commitment_type_indication";
+import { AllDataObjectsTimeStampCollection, IndividualDataObjectsTimeStampCollection, XadesTimeStamp } from "./time_stamp_xades";
 
 /**
  * <xsd:element name="SignedDataObjectProperties"   type="SignedDataObjectPropertiesType"/>

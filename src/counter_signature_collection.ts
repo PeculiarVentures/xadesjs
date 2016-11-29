@@ -1,5 +1,4 @@
-namespace xadesjs.pro {
+import * as XmlJs from "xmljs";
+import { XadesSignedXml } from "./xades_signed_xml";
 
-    export class CounterSignatureCollection extends Collection<XadesSignedXml> { }
-
-}
+export class CounterSignatureCollection extends XmlJs.Collection<XadesSignedXml> { }

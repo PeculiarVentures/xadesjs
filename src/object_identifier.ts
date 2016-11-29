@@ -2,6 +2,8 @@ import * as XmlJs from "xmljs";
 
 import { XmlXades } from "./xml";
 import { XmlXadesTaggedObject } from "./xades_tagged_object";
+import { Identifier } from "./identifier";
+import { DocumentationReferences } from "./documentation_reference";
 
 /**
  * <xsd:complexType name="ObjectIdentifierType">
