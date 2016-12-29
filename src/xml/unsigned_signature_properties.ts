@@ -2,6 +2,7 @@ import { XmlElement, XmlAttribute } from "xml-core";
 
 import { XmlXades } from "./xml";
 import { XadesObject, XadesCollection } from "./xml_base";
+import { XAdESTimeStamp } from "./xades_time_stamp";
 
 /**
  * 
@@ -28,6 +29,17 @@ import { XadesObject, XadesCollection } from "./xml_base";
  * 
  */
 
+@XmlElement({ localName: XmlXades.ElementNames.SignatureTimeStamp })
+export class SignatureTimeStamp extends XAdESTimeStamp implements UnsignedSignatureProperty { }
+
+@XmlElement({ localName: XmlXades.ElementNames.SigAndRefsTimeStamp })
+export class SigAndRefsTimeStamp extends XAdESTimeStamp implements UnsignedSignatureProperty { }
+
+@XmlElement({ localName: XmlXades.ElementNames.RefsOnlyTimeStamp })
+export class RefsOnlyTimeStamp extends XAdESTimeStamp implements UnsignedSignatureProperty { }
+
+@XmlElement({ localName: XmlXades.ElementNames.ArchiveTimeStamp })
+export class ArchiveTimeStamp extends XAdESTimeStamp implements UnsignedSignatureProperty { }
 
 /**
  * Abstract class for UnsignedSignatureProperties

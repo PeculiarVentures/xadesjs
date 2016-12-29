@@ -3,6 +3,8 @@ import { XmlElement, XmlChildElement, XmlAttribute } from "xml-core";
 import { XmlXades } from "./xml";
 import { XadesObject, XadesCollection } from "./xml_base";
 import { XAdESTimeStamp } from "./xades_time_stamp";
+import { DataObjectFormat } from "./data_object_format";
+import { CommitmentTypeIndication } from "./commitment_type_indication";
 
 /**
  * 

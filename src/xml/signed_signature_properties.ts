@@ -3,6 +3,9 @@ import { XmlElement, XmlChildElement, XmlAttribute } from "xml-core";
 import { XmlXades } from "./xml";
 import { XadesObject } from "./xml_base";
 import { XmlDateTimeConverter } from "./converter";
+import { SigningCertificate } from "./signing_certificate";
+import { SignaturePolicyIdentifier } from "./signature_policy_identifier";
+import { SignatureProductionPlace } from "./signature_product_place";
 
 /**
  * 
