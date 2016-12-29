@@ -5,4 +5,5 @@
 /.vscode
 /test/test.js
 /build
+/lib
 npm-debug.log

@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "moduleResolution": "node",
         "target": "es5",
         "lib": [
             "es5",
@@ -13,12 +12,15 @@
         "noUnusedLocals": true,
         "noUnusedParameters": false,
         "strictNullChecks": true,
+        "watch": true,
         "pretty": true,
         "noImplicitReturns": true,
+        "experimentalDecorators": true,
         "rootDir": "src",
-        "outFile": "build/xades.js"
+        "outDir": "lib"
     },
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "src/pki"
     ]
 }
