@@ -5,14 +5,14 @@
         "lib": [
             "es5",
             "dom",
-            "es2015.promise"
+            "es2015.promise",
+            "es2015.symbol"
         ],
         "noImplicitAny": true,
         "sourceMap": false,
         "noUnusedLocals": true,
         "noUnusedParameters": false,
         "strictNullChecks": true,
-        "watch": true,
         "pretty": true,
         "noImplicitReturns": true,
         "experimentalDecorators": true,

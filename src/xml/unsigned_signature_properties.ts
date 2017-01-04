@@ -3,6 +3,8 @@ import { XmlElement, XmlAttribute } from "xml-core";
 import { XmlXades } from "./xml";
 import { XadesObject, XadesCollection } from "./xml_base";
 import { XAdESTimeStamp } from "./xades_time_stamp";
+import { CompleteCertificateRefs } from "./complete_certificate_refs";
+import { CompleteRevocationRefs } from "./complete_revocation_refs";
 
 /**
  * 
@@ -40,6 +42,12 @@ export class RefsOnlyTimeStamp extends XAdESTimeStamp implements UnsignedSignatu
 
 @XmlElement({ localName: XmlXades.ElementNames.ArchiveTimeStamp })
 export class ArchiveTimeStamp extends XAdESTimeStamp implements UnsignedSignatureProperty { }
+
+@XmlElement({ localName: XmlXades.ElementNames.AttributeCertificateRefs })
+export class AttributeCertificateRefs extends CompleteCertificateRefs implements UnsignedSignatureProperty { }
+
+@XmlElement({ localName: XmlXades.ElementNames.AttributeRevocationRefs })
+export class AttributeRevocationRefs extends CompleteRevocationRefs implements UnsignedSignatureProperty { }
 
 /**
  * Abstract class for UnsignedSignatureProperties

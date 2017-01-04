@@ -3,6 +3,7 @@ import { Signature } from "xmldsigjs";
 
 import { XmlXades } from "./xml";
 import { XadesObject } from "./xml_base";
+import { UnsignedSignatureProperty } from "./unsigned_signature_properties";
 
 /** 
  *
@@ -16,7 +17,7 @@ import { XadesObject } from "./xml_base";
  */
 
 @XmlElement({ localName: XmlXades.ElementNames.CounterSignature })
-export class CounterSignature extends XadesObject {
+export class CounterSignature extends XadesObject implements UnsignedSignatureProperty {
 
     @XmlChildElement({ parser: Signature, required: true })
     Signature: Signature;

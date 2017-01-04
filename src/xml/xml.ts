@@ -14,6 +14,10 @@ export let XmlXades = {
 
     ElementNames: {
         Any: "Any",
+        ByName: "ByName",
+        ByKey: "ByKey",
+        AttributeCertificateRefs: "AttributeCertificateRefs",
+        AttributeRevocationRefs: "AttributeRevocationRefs",
         QualifyingProperties: "QualifyingProperties",
         QualifyingPropertiesReference: "QualifyingPropertiesReference",
         SignedProperties: "SignedProperties",
