@@ -6,6 +6,7 @@ import { XmlDateTimeConverter } from "./converter";
 import { SigningCertificate } from "./signing_certificate";
 import { SignaturePolicyIdentifier } from "./signature_policy_identifier";
 import { SignatureProductionPlace } from "./signature_product_place";
+import { SignerRole } from "./signer_role";
 
 /**
  * 

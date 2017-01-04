@@ -39,7 +39,7 @@ export class CertifiedRole extends EncapsulatedPKIData { }
 export class CertifiedRoles extends XadesCollection<CertifiedRole> { }
 
 @XmlElement({ localName: XmlXades.ElementNames.SignerRole })
-export class SingleRole extends XadesObject {
+export class SignerRole extends XadesObject {
 
     @XmlChildElement({ parser: ClaimedRoles })
     ClaimedRoles: ClaimedRoles;

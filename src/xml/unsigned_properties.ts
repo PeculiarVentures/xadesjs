@@ -3,7 +3,7 @@ import { XmlElement, XmlChildElement, XmlAttribute } from "xml-core";
 import { XmlXades } from "./xml";
 import { XadesObject } from "./xml_base";
 import { UnsignedSignatureProperties } from "./unsigned_signature_properties";
-import { UnsignedDataObjectProperties } from "./unsigned_data_object_properties";
+import { UnsignedDataObjectProperties } from "./unsigned_data_object_property";
 
 /**
  * 

@@ -2,6 +2,7 @@ import { XmlElement, XmlAttribute } from "xml-core";
 
 import { XmlXades } from "./xml";
 import { XadesCollection } from "./xml_base";
+import { Any } from "./any";
 
 /**
  * 
@@ -14,6 +15,9 @@ import { XadesCollection } from "./xml_base";
  * </xsd:complexType>
  * 
  */
+
+@XmlElement({ localName: XmlXades.ElementNames.UnsignedDataObjectProperty })
+export class UnsignedDataObjectProperty extends Any { }
 
 @XmlElement({ localName: XmlXades.ElementNames.UnsignedSignatureProperties, parser: UnsignedDataObjectProperty })
 export class UnsignedDataObjectProperties extends XadesCollection<UnsignedDataObjectProperty> {
