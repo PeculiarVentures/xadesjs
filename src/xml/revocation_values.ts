@@ -51,8 +51,8 @@ export class EncapsulatedCRLValue extends EncapsulatedPKIData { }
 @XmlElement({ localName: XmlXades.ElementNames.CRLValues })
 export class CRLValues extends XadesCollection<EncapsulatedCRLValue> { }
 
-@XmlElement({ localName: XmlXades.ElementNames.CertificateValues })
-export class CertificateValues extends XadesObject {
+@XmlElement({ localName: XmlXades.ElementNames.RevocationValues })
+export class RevocationValues extends XadesObject {
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
     Id: string;

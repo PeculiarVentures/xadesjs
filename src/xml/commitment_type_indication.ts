@@ -1,4 +1,5 @@
 import { XmlElement, XmlChildElement, XmlContent } from "xml-core";
+import { IConverter } from "xml-core";
 
 import { XmlXades } from "./xml";
 import { XadesObject, XadesCollection } from "./xml_base";
@@ -42,18 +43,39 @@ export class ObjectReference extends XadesObject {
 @XmlElement({ localName: "ObjectReferences", parser: ObjectReference })
 export class ObjectReferenceCollection extends XadesCollection<ObjectReference> { }
 
+const XmlAllSignedDataObjectsConverter: IConverter<boolean> = {
+    set: (value: string) => {
+        // if SignaturePolicyImplied exists then return true
+        return true;
+    },
+    get: (value: boolean) => {
+        return void 0;
+    }
+};
+
 @XmlElement({ localName: XmlXades.ElementNames.CommitmentTypeIndication })
 export class CommitmentTypeIndication extends XadesObject {
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.CommitmentTypeId, required: true })
+    @XmlChildElement({
+        localName: XmlXades.ElementNames.CommitmentTypeId,
+        required: true,
+        namespaceURI: XmlXades.NamespaceURI,
+        prefix: XmlXades.DefaultPrefix,
+        parser: ObjectIdentifier,
+    })
     CommitmentTypeId: ObjectIdentifier;
 
     @XmlChildElement({ parser: ObjectReferenceCollection, noRoot: true })
     ObjectReference: ObjectReferenceCollection;
 
-    // TODO: to boolean
-    @XmlChildElement({ localName: XmlXades.ElementNames.AllSignedDataObjects })
-    AllSignedDataObjects: string;
+    @XmlChildElement({
+        localName: XmlXades.ElementNames.AllSignedDataObjects,
+        namespaceURI: XmlXades.NamespaceURI,
+        prefix: XmlXades.DefaultPrefix,
+        converter: XmlAllSignedDataObjectsConverter,
+        defaultValue: false,
+    })
+    AllSignedDataObjects: boolean;
 
     @XmlChildElement({ localName: XmlXades.ElementNames.CommitmentTypeQualifiers, parser: CommitmentTypeQualifier })
     CommitmentTypeQualifiers: CommitmentTypeQualifiers;

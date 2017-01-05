@@ -20,15 +20,35 @@ import { XadesObject } from "./xml_base";
 @XmlElement({ localName: XmlXades.ElementNames.SignatureProductionPlace })
 export class SignatureProductionPlace extends XadesObject {
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.City, defaultValue: "" })
+    @XmlChildElement({
+        localName: XmlXades.ElementNames.City,
+        defaultValue: "",
+        namespaceURI: XmlXades.NamespaceURI,
+        prefix: XmlXades.DefaultPrefix,
+    })
     City: string;
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.StateOrProvince, defaultValue: "" })
+    @XmlChildElement({
+        localName: XmlXades.ElementNames.StateOrProvince,
+        defaultValue: "",
+        namespaceURI: XmlXades.NamespaceURI,
+        prefix: XmlXades.DefaultPrefix,
+    })
     StateOrProvince: string;
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.PostalCode, defaultValue: "" })
+    @XmlChildElement({
+        localName: XmlXades.ElementNames.PostalCode,
+        defaultValue: "",
+        namespaceURI: XmlXades.NamespaceURI,
+        prefix: XmlXades.DefaultPrefix,
+    })
     PostalCode: string;
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.CountryName, defaultValue: "" })
+    @XmlChildElement({
+        localName: XmlXades.ElementNames.CountryName,
+        defaultValue: "",
+        namespaceURI: XmlXades.NamespaceURI,
+        prefix: XmlXades.DefaultPrefix,
+    })
     CountryName: string;
 }

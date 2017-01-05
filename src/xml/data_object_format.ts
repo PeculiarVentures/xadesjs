@@ -25,15 +25,16 @@ export class DataObjectFormat extends XadesObject {
     @XmlAttribute({ localName: XmlXades.AttributeNames.ObjectReference, required: true })
     ObjectReference: string;
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.Description })
+    @XmlChildElement({ localName: XmlXades.ElementNames.Description, namespaceURI: XmlXades.NamespaceURI, prefix: XmlXades.DefaultPrefix })
     Description: string;
 
     @XmlChildElement({ parser: ObjectIdentifier })
     ObjectIdentifier: ObjectIdentifier;
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.MimeType })
+    @XmlChildElement({ localName: XmlXades.ElementNames.MimeType, namespaceURI: XmlXades.NamespaceURI, prefix: XmlXades.DefaultPrefix })
     MimeType: string;
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.Encoding })
+    @XmlChildElement({ localName: XmlXades.ElementNames.Encoding, namespaceURI: XmlXades.NamespaceURI, prefix: XmlXades.DefaultPrefix })
     Encoding: string;
+
 }

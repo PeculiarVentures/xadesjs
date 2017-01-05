@@ -51,17 +51,8 @@ export class Identifier extends XadesObject {
         defaultValue: "",
         required: true
     })
-    Uri: string;
+    Value: string;
 
-    protected OnLoadXml(e: Element) {
-        if (e.textContent)
-            this.Uri = e.textContent;
-    }
-
-    protected OnGetXml(e: Element) {
-        if (this.Uri)
-            e.textContent = this.Uri;
-    }
 }
 
 @XmlElement({

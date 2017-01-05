@@ -29,7 +29,7 @@ import { Any } from "./any";
 @XmlElement({ localName: XmlXades.ElementNames.ClaimedRole })
 export class ClaimedRole extends Any { }
 
-@XmlElement({ localName: XmlXades.ElementNames.CertifiedRoles, parser: ClaimedRole })
+@XmlElement({ localName: XmlXades.ElementNames.ClaimedRoles, parser: ClaimedRole })
 export class ClaimedRoles extends XadesCollection<ClaimedRole> { }
 
 @XmlElement({ localName: XmlXades.ElementNames.CertifiedRole })

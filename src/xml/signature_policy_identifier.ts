@@ -1,5 +1,5 @@
 import { XmlElement, XmlChildElement, XmlContent } from "xml-core";
-import { XmlNumberConverter } from "xml-core";
+import { XmlNumberConverter, IConverter } from "xml-core";
 import { Transforms } from "xmldsigjs";
 
 import { XmlXades } from "./xml";
@@ -65,7 +65,12 @@ export class IntegerList extends XadesCollection<Integer> { }
 @XmlElement({ localName: XmlXades.ElementNames.NoticeRef })
 export class NoticeReference extends XadesObject {
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.Organization, required: true })
+    @XmlChildElement({
+        localName: XmlXades.ElementNames.Organization,
+        namespaceURI: XmlXades.NamespaceURI,
+        prefix: XmlXades.DefaultPrefix,
+        required: true
+    })
     Organization: string;
 
     @XmlChildElement({ localName: XmlXades.ElementNames.NoticeNumbers, parser: IntegerList, required: true })
@@ -73,12 +78,17 @@ export class NoticeReference extends XadesObject {
 
 }
 
+@XmlElement({ localName: XmlXades.ElementNames.SPUserNotice })
 export class SPUserNotice extends XadesObject {
 
     @XmlChildElement({ localName: XmlXades.ElementNames.NoticeRef, parser: NoticeReference })
     NoticeRef: NoticeReference;
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.ExplicitText })
+    @XmlChildElement({
+        localName: XmlXades.ElementNames.ExplicitText,
+        namespaceURI: XmlXades.NamespaceURI,
+        prefix: XmlXades.DefaultPrefix,
+    })
     ExplicitText: string;
 
 }
@@ -89,9 +99,10 @@ export class SigPolicyQualifier extends Any { }
 @XmlElement({ localName: XmlXades.ElementNames.SigPolicyQualifiers, parser: SigPolicyQualifier })
 export class SigPolicyQualifiers extends XadesCollection<SigPolicyQualifier> { }
 
+@XmlElement({ localName: XmlXades.ElementNames.SignaturePolicyId })
 export class SignaturePolicyId extends XadesObject {
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.SigPolicyId, required: true })
+    @XmlChildElement({ localName: XmlXades.ElementNames.SigPolicyId, parser: ObjectIdentifier, required: true })
     SigPolicyId: ObjectIdentifier;
 
     @XmlChildElement({ parser: Transforms })
@@ -105,11 +116,33 @@ export class SignaturePolicyId extends XadesObject {
     SigPolicyQualifiers: SigPolicyQualifiers;
 }
 
+const XmlSignaturePolicyImpliedConverter: IConverter<boolean> = {
+    set: (value: string) => {
+        // if SignaturePolicyImplied exists then return true
+        return true;
+    },
+    get: (value: boolean) => {
+        return void 0;
+    }
+};
+
+@XmlElement({ localName: XmlXades.ElementNames.SignaturePolicyIdentifier })
 export class SignaturePolicyIdentifier extends XadesObject {
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.SignaturePolicyId, required: true })
+    @XmlChildElement({
+        localName: XmlXades.ElementNames.SignaturePolicyId,
+        namespaceURI: XmlXades.NamespaceURI,
+        prefix: XmlXades.DefaultPrefix,
+        parser: SignaturePolicyId,
+    })
     SignaturePolicyId: SignaturePolicyId;
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.SignaturePolicyImplied, required: true })
-    SignaturePolicyImplied: string;
+    @XmlChildElement({
+        localName: XmlXades.ElementNames.SignaturePolicyImplied,
+        namespaceURI: XmlXades.NamespaceURI,
+        prefix: XmlXades.DefaultPrefix,
+        converter: XmlSignaturePolicyImpliedConverter,
+        defaultValue: false
+    })
+    SignaturePolicyImplied: boolean;
 }

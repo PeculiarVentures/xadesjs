@@ -29,9 +29,16 @@ export class IndividualDataObjectsTimeStamp extends XAdESTimeStamp { }
 export class IndividualDataObjectsTimeStampCollection extends XadesCollection<IndividualDataObjectsTimeStamp> {
 }
 
-
 @XmlElement({ localName: XmlXades.ElementNames.AllDataObjectsTimeStamp })
 export class AllDataObjectsTimeStamp extends XAdESTimeStamp { }
+
+@XmlElement({ localName: "DataObjectFormatCollection", parser: DataObjectFormat })
+export class DataObjectFormatCollection extends XadesCollection<DataObjectFormat> {
+}
+
+@XmlElement({ localName: "CommitmentTypeIndicationCollection", parser: CommitmentTypeIndication })
+export class CommitmentTypeIndicationCollection extends XadesCollection<CommitmentTypeIndication> {
+}
 
 @XmlElement({ localName: "AllDataObjectsTimeStampCollection", parser: AllDataObjectsTimeStamp })
 export class AllDataObjectsTimeStampCollection extends XadesCollection<AllDataObjectsTimeStamp> {
@@ -45,16 +52,16 @@ export class SignedDataObjectProperties extends XadesObject {
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
     Id: string;
 
-    @XmlChildElement({ parser: DataObjectFormat, noRoot: true })
-    DataObjectFormat: DataObjectFormat;
+    @XmlChildElement({ parser: DataObjectFormatCollection, noRoot: true })
+    DataObjectFormats: DataObjectFormatCollection;
 
-    @XmlChildElement({ parser: CommitmentTypeIndication, noRoot: true })
-    CommitmentTypeIndication: CommitmentTypeIndication;
+    @XmlChildElement({ parser: CommitmentTypeIndicationCollection, noRoot: true })
+    CommitmentTypeIndications: CommitmentTypeIndicationCollection;
 
     @XmlChildElement({ parser: AllDataObjectsTimeStampCollection, noRoot: true })
-    AllDataObjectsTimeStamp: AllDataObjectsTimeStampCollection;
+    AllDataObjectsTimeStamps: AllDataObjectsTimeStampCollection;
 
     @XmlChildElement({ parser: IndividualDataObjectsTimeStampCollection, noRoot: true })
-    IndividualDataObjectsTimeStamp: IndividualDataObjectsTimeStampCollection;
+    IndividualDataObjectsTimeStamps: IndividualDataObjectsTimeStampCollection;
 
 }
