@@ -36,7 +36,7 @@ import { EncapsulatedPKIData } from "./encapsulated_pki_data";
 @XmlElement({ localName: XmlXades.ElementNames.OtherValue })
 export class OtherValue extends EncapsulatedPKIData { }
 
-@XmlElement({ localName: XmlXades.ElementNames.OCSPValues })
+@XmlElement({ localName: XmlXades.ElementNames.OCSPValues, parser: OtherValue })
 export class OtherValues extends XadesCollection<OtherValue> { }
 
 @XmlElement({ localName: XmlXades.ElementNames.EncapsulatedOCSPValue })
@@ -48,7 +48,7 @@ export class OCSPValues extends XadesCollection<EncapsulatedOCSPValue> { }
 @XmlElement({ localName: XmlXades.ElementNames.EncapsulatedCRLValue })
 export class EncapsulatedCRLValue extends EncapsulatedPKIData { }
 
-@XmlElement({ localName: XmlXades.ElementNames.CRLValues })
+@XmlElement({ localName: XmlXades.ElementNames.CRLValues, parser: EncapsulatedCRLValue })
 export class CRLValues extends XadesCollection<EncapsulatedCRLValue> { }
 
 @XmlElement({ localName: XmlXades.ElementNames.RevocationValues })

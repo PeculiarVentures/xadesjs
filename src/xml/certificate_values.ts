@@ -21,13 +21,13 @@ import { EncapsulatedPKIData } from "./encapsulated_pki_data";
 @XmlElement({ localName: XmlXades.ElementNames.OtherCertificate })
 export class OtherCertificate extends Any { }
 
-@XmlElement({ localName: "OtherCertificateCollection" })
+@XmlElement({ localName: "OtherCertificateCollection", parser: OtherCertificate })
 export class OtherCertificateCollection extends XadesCollection<OtherCertificate> { }
 
 @XmlElement({ localName: XmlXades.ElementNames.EncapsulatedX509Certificate })
 export class EncapsulatedX509Certificate extends EncapsulatedPKIData { }
 
-@XmlElement({ localName: "EncapsulatedX509CertificateCollection" })
+@XmlElement({ localName: "EncapsulatedX509CertificateCollection", parser: EncapsulatedX509Certificate })
 export class EncapsulatedX509CertificateCollection extends XadesCollection<EncapsulatedX509Certificate> { }
 
 @XmlElement({ localName: XmlXades.ElementNames.CertificateValues })

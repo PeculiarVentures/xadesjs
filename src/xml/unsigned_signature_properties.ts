@@ -1,10 +1,13 @@
-import { XmlElement, XmlAttribute } from "xml-core";
+import { XmlElement, XmlAttribute, XmlNodeType } from "xml-core";
 
 import { XmlXades } from "./xml";
 import { XadesObject, XadesCollection } from "./xml_base";
 import { XAdESTimeStamp } from "./xades_time_stamp";
 import { CompleteCertificateRefs } from "./complete_certificate_refs";
 import { CompleteRevocationRefs } from "./complete_revocation_refs";
+import { CounterSignature } from "./counter_signature";
+import { CertificateValues } from "./certificate_values";
+import { RevocationValues } from "./revocation_values";
 
 /**
  * 
@@ -49,6 +52,12 @@ export class AttributeCertificateRefs extends CompleteCertificateRefs implements
 @XmlElement({ localName: XmlXades.ElementNames.AttributeRevocationRefs })
 export class AttributeRevocationRefs extends CompleteRevocationRefs implements UnsignedSignatureProperty { }
 
+@XmlElement({ localName: XmlXades.ElementNames.AttrAuthoritiesCertValues })
+export class AttrAuthoritiesCertValues extends CertificateValues implements UnsignedSignatureProperty { }
+
+@XmlElement({ localName: XmlXades.ElementNames.AttributeRevocationValues })
+export class AttributeRevocationValues extends RevocationValues implements UnsignedSignatureProperty { }
+
 /**
  * Abstract class for UnsignedSignatureProperties
  * 
@@ -65,5 +74,60 @@ export class UnsignedSignatureProperties extends XadesCollection<UnsignedSignatu
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
     Id: string;
+
+    OnLoadXml(element: Element) {
+        debugger;
+        for (let i = 0; i < element.childNodes.length; i++) {
+            const node = element.childNodes.item(i);
+            if (node.nodeType !== XmlNodeType.Element)
+                continue;
+            let XmlClass: typeof UnsignedSignatureProperty | undefined;
+            switch (node.localName) {
+                case XmlXades.ElementNames.CounterSignature:
+                    XmlClass = CounterSignature;
+                    break;
+                case XmlXades.ElementNames.SignatureTimeStamp:
+                    XmlClass = SignatureTimeStamp;
+                    break;
+                case XmlXades.ElementNames.CompleteCertificateRefs:
+                    XmlClass = CompleteCertificateRefs;
+                    break;
+                case XmlXades.ElementNames.CompleteRevocationRefs:
+                    XmlClass = CompleteRevocationRefs;
+                    break;
+                case XmlXades.ElementNames.AttributeCertificateRefs:
+                    XmlClass = AttributeCertificateRefs;
+                    break;
+                case XmlXades.ElementNames.AttributeRevocationRefs:
+                    XmlClass = AttributeRevocationRefs;
+                    break;
+                case XmlXades.ElementNames.SigAndRefsTimeStamp:
+                    XmlClass = SigAndRefsTimeStamp;
+                    break;
+                case XmlXades.ElementNames.RefsOnlyTimeStamp:
+                    XmlClass = RefsOnlyTimeStamp;
+                    break;
+                case XmlXades.ElementNames.CertificateValues:
+                    XmlClass = CertificateValues;
+                    break;
+                case XmlXades.ElementNames.RevocationValues:
+                    XmlClass = RevocationValues;
+                    break;
+                case XmlXades.ElementNames.AttrAuthoritiesCertValues:
+                    XmlClass = AttrAuthoritiesCertValues;
+                    break;
+                case XmlXades.ElementNames.AttributeRevocationValues:
+                    XmlClass = AttributeRevocationValues;
+                    break;
+                case XmlXades.ElementNames.ArchiveTimeStamp:
+                    XmlClass = ArchiveTimeStamp;
+                    break;
+            }
+            if (XmlClass) {
+                const item = XmlClass.LoadXml(node as Element);
+                this.Add(item);
+            }
+        }
+    }
 
 }
