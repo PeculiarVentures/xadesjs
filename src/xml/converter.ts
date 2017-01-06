@@ -14,7 +14,7 @@ export const XmlDateTimeConverter: IConverter<Date> = {
      */
     get: (value: Date) => {
         if (value) {
-            return value.toUTCString();
+            return value.toISOString();
         }
         return undefined;
     }

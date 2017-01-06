@@ -23,4 +23,5 @@ export * from "./unsigned_data_object_property";
 export * from "./unsigned_properties";
 export * from "./unsigned_signature_properties";
 export * from "./xades_time_stamp";
+export * from "./data_object";
 export * from "./xml";
