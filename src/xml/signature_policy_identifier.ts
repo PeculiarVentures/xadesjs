@@ -122,7 +122,7 @@ const XmlSignaturePolicyImpliedConverter: IConverter<boolean> = {
         return true;
     },
     get: (value: boolean) => {
-        return void 0;
+        return "";
     }
 };
 
