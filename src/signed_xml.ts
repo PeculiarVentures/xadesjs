@@ -29,7 +29,7 @@ export interface OptionsXAdES extends XmlDSigJs.OptionsSign {
      * @type {string} base64 string of X509 certificate
      * @memberOf OptionsXAdES
      */
-    signingCertificate?: string;
+    signingCertificate: string;
 
     policy?: OptionsPolicyIdentifier;
     productionPlace?: OptionsProductionPlace;
@@ -117,6 +117,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
             signature.SignedInfo.References.Add(xadesRef);
 
             await this.ApplySigningCertificate(options.signingCertificate);
+            this.ApplySignaturePolicyIdentifier(options.policy);
             this.ApplySignatureProductionPlace(options.productionPlace);
             this.ApplySignerRoles(options.signerRole);
         }
@@ -147,9 +148,15 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         }
     }
 
-    protected ApplySignaturePolicyIdentifier() {
+    protected ApplySignaturePolicyIdentifier(options?: OptionsPolicyIdentifier) {
         if (this.Properties) {
-            // let ssp = this.Properties.SignedProperties.SignedSignatureProperties;
+            let ssp = this.Properties.SignedProperties.SignedSignatureProperties;
+            if (options) {
+
+            }
+            else {
+                ssp.SignaturePolicyIdentifier.SignaturePolicyImplied = true;
+            }
         }
     }
 
