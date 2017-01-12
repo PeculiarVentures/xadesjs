@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>XAdES</title>
+    <style>
+        textarea {
+            width: 100%;
+        }
+    </style>
+<script src="src/helper.js"></script>
+<script src="src/main.js"></script>
+<script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/promise.js"></script>
+<script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/webcrypto-liner.min.js"></script>
+<script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/asmcrypto.js"></script>
+<script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/elliptic.js"></script>
+<script src="../../dist/xades.js"></script>
+</head>
+
+<body>
+    <h2>XAdES::Verify</h2>
+    <div>
+        <div>
+            <h4>Enveloped XAdES signature</h4>
+            <textarea id="xml" cols="30" rows="10" value=""></textarea>
+
+            <input type="button" value="Verify" onclick="verify()">
+        </div>
+        <div id="result">
+            <h3>Result</h3>
+            <pre><code id="signature_info"></code></pre>
+        </div>
+    </div>
+</body>
+
+</html>

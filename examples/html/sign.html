@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>XAdES</title>
+    <style>
+        textarea {
+            width: 100%;
+        }
+    </style>
+<script src="src/helper.js"></script>
+<script src="src/main.js"></script>
+<script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/promise.js"></script>
+<script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/webcrypto-liner.min.js"></script>
+<script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/asmcrypto.js"></script>
+<script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/elliptic.js"></script>
+<script src="../../dist/xades.js"></script>
+</head>
+
+<body>
+    <h2>XAdES::Sign</h2>
+    <div>
+        <div>
+            <h3>Signing params</h3>
+            <h4>Select key algorithm</h4>
+            <select id="key">
+                <option value="rsassa" selected>RSASSA-PKCS1-v1_5</option>
+                <option value="rsapss">RSA-PSS</option>
+                <option value="ecdsa">ECDSA</option>
+            </select>
+            <br/>
+            <lable for="keyValue">Iclude key vallue:</lable>
+            <input id="keyValue" type="checkbox" checked>
+            <h4>Select digest algorithm</h4>
+            <select id="digest">
+                <option value="SHA-1">SHA-1</option>
+                <option value="SHA-256" selected>SHA-256</option>
+                <option value="SHA-384">SHA-384</option>
+                <option value="SHA-512">SHA-512</option>
+            </select>
+            <h4>Type of signature</h4>
+            <lable for="enveloped">Enveloped:</lable>
+            <input id="enveloped" type="checkbox" checked>
+            <h4>Select canon method</h4>
+            <select id="canon">
+                <option value="c14n" selected>c14n</option>
+                <option value="c14n-com">c14n with comment</option>
+                <option value="exc-c14n">exc-c14n</option>
+                <option value="exc-c14n-com">exc-c14n with comment</option>
+            </select>
+            <div>
+                <h4>Set production place</h4>
+                <div>
+                    <label for="country">Country:</label>
+                    <input id="country" type="text">
+                </div>
+                <div>
+                    <label for="state">State:</label>
+                    <input id="state" type="text">
+                </div>
+                <div>
+                    <label for="city">City:</label>
+                    <input id="city" type="text">
+                </div>
+                <div>
+                    <label for="code">Code:</label>
+                    <input id="code" type="text">
+                </div>
+            </div>
+
+            <h4>Set xml</h4>
+            <textarea id="xml" cols="30" rows="10">
+            </textarea>
+
+            <input type="button" value="Sign" onclick="sign()">
+</div>
+<div id="result">
+    <h3>Result</h3>
+    <textarea id="jwk" cols="30" rows="3" placeholder="JWK" readonly></textarea>
+    <textarea id="signature" cols="30" rows="10" placeholder="XML Signature" readonly></textarea>
+</div>
+</div>
+<script>
+        document.getElementById("xml").value = "<root><child>Simple xml</child></root>"
+    </script>
+</body>
+
+</html>
