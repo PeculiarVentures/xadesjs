@@ -159,10 +159,6 @@
                 })
                 .then(function (ks) {
                     keys = ks;
-                    return exportKey(ks.publicKey)
-                })
-                .then(function (jwk) {
-                    res.jwk = jwk;
                 })
                 .then(function () {
                     signature = new XAdES.SignedXml();
