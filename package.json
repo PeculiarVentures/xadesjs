@@ -1,7 +1,7 @@
 {
   "name": "xadesjs",
   "version": "2.0.2",
-  "description": "A pure Javascript implementation of XMLDSIG and XAdES based on WebCrypto ",
+  "description": "A pure Typescript/Javascript implementation of XAdES based on XMLDSIGjs.",
   "main": "dist/index.js",
   "types": "index.d.ts",
   "module": "lib/index.js",
