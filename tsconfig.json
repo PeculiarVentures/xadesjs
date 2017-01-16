@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
-        "target": "es5",
+        "module": "es2015",
+        "moduleResolution": "node",
+        "target": "es2015",
         "lib": [
             "es5",
             "dom",
@@ -17,10 +18,13 @@
         "noImplicitReturns": true,
         "experimentalDecorators": true,
         "rootDir": "src",
-        "outDir": "lib"
+        "outDir": "build",
+        "importHelpers": true
     },
     "exclude": [
         "node_modules",
-        "src/pki"
+        "test",
+        "src/pki",
+        "src/index.ts"
     ]
 }

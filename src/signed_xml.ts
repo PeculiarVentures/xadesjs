@@ -40,16 +40,16 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
     protected properties: XAdES.QualifyingProperties | null = null;
 
-    get Properties() {
+    get Properties(): XAdES.QualifyingProperties | null {
         return this.properties;
     }
 
-    get SignedProperties() {
+    get SignedProperties(): XAdES.SignedProperties {
         if (!this.Properties)
             throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Properties is empty");
         return this.Properties.SignedProperties;
     }
-    get UnsignedProperties() {
+    get UnsignedProperties(): XAdES.UnsignedProperties {
         if (!this.Properties)
             throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Properties is empty");
         return this.Properties.UnsignedProperties;

@@ -41,7 +41,7 @@ const XmlEncodingConverter: IConverter<EncodingType> = {
     }
 };
 
-type EncodingType = "der" | "ber" | "cer" | "per" | "xer" | null;
+export type EncodingType = "der" | "ber" | "cer" | "per" | "xer" | null;
 
 
 @XmlElement({
