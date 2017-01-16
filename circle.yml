@@ -4,6 +4,10 @@ machine:
 
 test:
   pre:
+    - nmp run build:map
+    - nmp run build:test
+
+  override:
     - npm run coverage
 
   post:

@@ -4,4 +4,7 @@
 /src
 /typings
 /build
-/type
+/types
+/test/**/*.ts
+**/*.map
+*.log

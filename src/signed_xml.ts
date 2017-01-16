@@ -29,7 +29,7 @@ export interface OptionsXAdES extends XmlDSigJs.OptionsSign {
      * @type {string} base64 string of X509 certificate
      * @memberOf OptionsXAdES
      */
-    signingCertificate: string;
+    signingCertificate?: string;
 
     policy?: OptionsPolicyIdentifier;
     productionPlace?: OptionsProductionPlace;

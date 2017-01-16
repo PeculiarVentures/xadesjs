@@ -27,7 +27,7 @@ declare namespace XAdES {
          * @type {string} base64 string of X509 certificate
          * @memberOf OptionsXAdES
          */
-        signingCertificate: string;
+        signingCertificate?: string;
         policy?: OptionsPolicyIdentifier;
         productionPlace?: OptionsProductionPlace;
         signerRole?: OptionsSignerRole;

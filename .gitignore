@@ -8,3 +8,5 @@
 /lib
 /dist
 npm-debug.log
+**/*.map
+*.log
