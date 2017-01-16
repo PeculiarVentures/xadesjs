@@ -107,21 +107,23 @@
             var timeStart = new Date().getTime();
             var $xml = document.getElementById("signedXML");
             var $info = document.getElementById("signature_info");
-            var xmlString = $xml.textContent;
-            if (!xmlString)
-                return error(new Error("Unable to get XML"));
-            var xml = XAdES.Parse(xmlString);
-            var signature = new XAdES.SignedXml(xml);
-            var xmlSignatures = XAdES.Select(xml, "//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']");
-            console.log(signature);
-            console.log(xmlSignatures);
+            var signature;
+            Promise.resolve()
+                .then(function(){
+                    var xmlString = $xml.textContent;
+                    if (!xmlString)
+                        return error(new Error("Unable to get XML"));
+                    var xml = XAdES.Parse(xmlString);
+                    signature = new XAdES.SignedXml(xml);
+                    var xmlSignatures = XAdES.Select(xml, "//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']");
 
-            if (!(xmlSignatures && xmlSignatures.length))
-                return error("Cannot get XML signature from XML document");
+                    if (!(xmlSignatures && xmlSignatures.length))
+                        return error("Cannot get XML signature from XML document");
 
-            signature.LoadXml(xmlSignatures[0]);
+                    signature.LoadXml(xmlSignatures[0]);
 
-            signature.Verify()
+                    return signature.Verify();
+                })
                 .then(function (res) {
                     var timeEnd = new Date().getTime();
                     var info = [];
