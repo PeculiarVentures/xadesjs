@@ -5,7 +5,10 @@ declare namespace XAdES {
 
     // xml-core helpers
     export const Select: XmlCore.SelectNodes;
+    export const Convert: XmlCore.Convert;
     export function Parse(xmlstring: string): Document;
+
+    export class Application extends XmlDSigJs.Application { }
 
     // signed_xml
     export interface OptionsSignerRole {
