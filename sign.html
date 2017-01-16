@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>XAdESJS - A pure Javascript implementation of XMLDSIG and XAdES based on Web Crypto</title>
+    <style>
+        .row {
+            display: flex;
+            flex-direction: "row";
+        }
+        .row .col {
+            width: 100%;
+        }
+        .property {
+            padding: 2px 0;
+        }
+        .property label{
+            display: inline-block;
+            min-width: 100px;
+        }
+        .property input{
+            width: 200px;
+        }
+
+        textarea {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <script type="text/javascript">
+        if (window.location.protocol != "https:")
+            window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+    </script>
+    <!--WebCrypto-->
+    <script type="text/javascript" src="https://peculiarventures.github.io/pv-webcrypto-tests/src/promise.js"></script>
+    <script type="text/javascript" src="https://peculiarventures.github.io/pv-webcrypto-tests/src/promise.js"></script>
+    <script type="text/javascript" src="https://peculiarventures.github.io/pv-webcrypto-tests/src/webcrypto-liner.min.js"></script>
+    <script type="text/javascript" src="https://peculiarventures.github.io/pv-webcrypto-tests/src/asmcrypto.js"></script>
+    <script type="text/javascript" src="https://peculiarventures.github.io/pv-webcrypto-tests/src/elliptic.js"></script>
+    <!--XAdESjs-->
+    <script type="text/javascript" src="src/xades.min.js"></script>
+
+    <script type="text/javascript" src="https://cdn.rawgit.com/PrismJS/prism/gh-pages/prism.js"></script>
+
+    <style>.button { background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; }</style>
+
+    <style>#forkongithub a{background:#000;color:#fff;text-decoration:none;font-family:arial,sans-serif;text-align:center;font-weight:bold;padding:5px 40px;font-size:1rem;line-height:2rem;position:relative;transition:0.5s;}#forkongithub a:hover{background:#c11;color:#fff;}#forkongithub a::before,#forkongithub a::after{content:"";width:100%;display:block;position:absolute;top:1px;left:0;height:1px;background:#fff;}#forkongithub a::after{bottom:1px;top:auto;}@media screen and (min-width:800px){#forkongithub{position:fixed;display:block;top:0;right:0;width:200px;overflow:hidden;height:200px;z-index:9999;}#forkongithub a{width:200px;position:absolute;top:60px;right:-60px;transform:rotate(45deg);-webkit-transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg);-o-transform:rotate(45deg);box-shadow:4px 4px 10px rgba(0,0,0,0.8);}}</style>
+
+    <span id="forkongithub"><a href="https://github.com/PeculiarVentures/xadesjs">Fork me on GitHub</a></span>
+
+    <link rel="stylesheet" href="https://cdn.rawgit.com/PrismJS/prism/gh-pages/themes/prism.css" />
+
+    <script type="text/javascript">
+        function error(e) {
+            alert(e.message);
+            console.error(e);
+        }
+
+        function getAlgorithm() {
+            var $key = document.getElementById("key");
+
+            var alg = {};
+            switch ($key.value) {
+                case "rsassa":
+                    alg = {
+                        name: "RSASSA-PKCS1-v1_5",
+                        hash: "SHA-256",
+                        modulusLength: 1024,
+                        publicExponent: new Uint8Array([1, 0, 1]),
+                    };
+                    break;
+                case "rsapss":
+                    alg = {
+                        name: "RSA-PSS",
+                        hash: "SHA-256",
+                        modulusLength: 1024,
+                        publicExponent: new Uint8Array([1, 0, 1]),
+                        saltLength: 32,
+                    };
+                    break;
+                case "ecdsa":
+                    alg = {
+                        name: "ECDSA",
+                        hash: "SHA-256",
+                        namedCurve: "P-256",
+                    };
+                    break;
+            }
+            return alg;
+        }
+
+        function getHashAlgorithm() {
+            return document.getElementById("digest").value;
+        }
+
+        function getCanonMethod() {
+            return document.getElementById("canon").value;
+        }
+
+        function isEnveloped() {
+            return document.getElementById("enveloped").checked;
+        }
+
+        function useKeyValue() {
+            return document.getElementById("keyValue").checked;
+        }
+
+        function getXml() {
+            return document.getElementById("xml").value;
+        }
+
+        function getProductionPlace() {
+            var res = {};
+            ["country", "state", "city", "code"].forEach(function (item) {
+                var $item = document.getElementById(item);
+                if ($item && $item.value)
+                    res[item] = $item.value;
+            });
+
+            return Object.keys(res).length ? res : null;
+        }
+
+        function getSigningCertificate() {
+            return document.getElementById("signingCertificate").value;
+        }
+
+        function getSignerRole() {
+            var role = document.getElementById("claimedRole").value;
+            var res;
+            if (role) {
+                res = role.split(",")
+            }
+            return res;
+        }
+
+        function generateKey(alg) {
+            return crypto.subtle.generateKey(alg, false, ["sign", "verify"])
+        }
+
+        function exportKey(key) {
+            return crypto.subtle.exportKey("jwk", key)
+        }
+
+        function btnSign_onclick() {
+            var transforms = [];
+            if (isEnveloped())
+                transforms.push("enveloped");
+            transforms.push(getCanonMethod());
+            console.log(transforms);
+
+            var alg = getAlgorithm();
+            var keys, signature, res = {};
+            Promise.resolve()
+                .then(function () {
+                    return generateKey(alg);
+                })
+                .then(function (ks) {
+                    keys = ks;
+                    return exportKey(ks.publicKey)
+                })
+                .then(function (jwk) {
+                    res.jwk = jwk;
+                })
+                .then(function () {
+                    signature = new XAdES.SignedXml();
+
+                    return signature.Sign(                  // Signing document
+                        alg,                                    // algorithm 
+                        keys.privateKey,                        // key 
+                        XAdES.Parse(getXml()),                  // document
+                        {                                       // options
+                            keyValue: useKeyValue() ? keys.publicKey : void 0,
+                            references: [
+                                { hash: getHashAlgorithm(), transforms: transforms }
+                            ],
+                            productionPlace: getProductionPlace(),
+                            signerRole: { claimed: getSignerRole() },
+                            signingCertificate: getSigningCertificate()
+                        });
+                })
+                .then(function () {
+                    var sig = signature.toString()
+                    res.signature = sig;
+
+                    var block = document.getElementById("signedXML");
+                    block.textContent = res.signature;
+                    Prism.highlightElement(block);
+                    block.scrollTop = block.scrollHeight;
+                })
+                .catch(function (e) {
+                    error(e);
+                });
+        }
+    </script>
+    <div style="text-align: center">
+        <h1>XADESJS</h1>
+        <h2>A pure Javascript implementation of XMLDSIG and XAdES based on Web Crypto</h2>
+    </div>
+    <div style="left:10%;top:25%;position:relative;width:80%">
+        <div>
+            <div class="row">
+                <div class="col">
+                    <h3>Signing params</h3>
+                    <h4>Select key algorithm</h4>
+                    <select id="key">
+                        <option value="rsassa" selected>RSASSA-PKCS1-v1_5</option>
+                        <option value="rsapss">RSA-PSS</option>
+                        <option value="ecdsa">ECDSA</option>
+                    </select>
+                    <br/>
+                    <lable for="keyValue">Iclude key vallue:</lable>
+                    <input id="keyValue" type="checkbox" checked>
+                    <h4>Select digest algorithm</h4>
+                    <select id="digest">
+                        <option value="SHA-1">SHA-1</option>
+                        <option value="SHA-256" selected>SHA-256</option>
+                        <option value="SHA-384">SHA-384</option>
+                        <option value="SHA-512">SHA-512</option>
+                    </select>
+                    <h4>Type of signature</h4>
+                    <lable for="enveloped">Enveloped:</lable>
+                    <input id="enveloped" type="checkbox" checked>
+                    <h4>Select canon method</h4>
+                    <select id="canon">
+                        <option value="c14n" selected>c14n</option>
+                        <option value="c14n-com">c14n with comment</option>
+                        <option value="exc-c14n">exc-c14n</option>
+                        <option value="exc-c14n-com">exc-c14n with comment</option>
+                    </select>
+                </div>    
+                <div class="col">
+                    <h3>Additional params</h3>
+                    <!-- Production place -->
+                    <div>
+                        <h4>Set production place</h4>
+                        <div class="property">
+                            <label for="country">Country:</label>
+                            <input id="country" type="text">
+                        </div>
+                        <div class="property">
+                            <label for="state">State:</label>
+                            <input id="state" type="text">
+                        </div>
+                        <div class="property">
+                            <label for="city">City:</label>
+                            <input id="city" type="text">
+                        </div>
+                        <div class="property">
+                            <label for="code">Code:</label>
+                            <input id="code" type="text">
+                        </div>
+                    </div>
+                    <!-- Signer role -->
+                    <div>
+                        <h4>Signer role</h4>
+                        <p class=note>Set a list of signer's roles splitted by comma</p>
+                        <div class="property">
+                            <label for="claimedRole">State:</label>
+                            <input id="claimedRole" type="text">
+                        </div>
+                    </div>
+                    <!-- Signing certificate -->
+                    <div>
+                        <h4>Signing certificate</h4>
+                        <p class=note>BASE64 X509 certificate</p>
+                        <textarea id="signingCertificate" rows="5"></textarea>
+                    </div>
+                </div>    
+            </div>
+
+            <h4>Set xml</h4>
+            <textarea id="xml" cols="30" rows="10"><root><child>Test xml document for signing</child></root></textarea>
+        </div>
+        <button id="btnSign" onclick="btnSign_onclick()" class="button">Sign</button>
+        <pre id="signedXML" style="height:400px;"><code class="language-xml"></code></pre>
+    </div>
+</body>
+
+</html>

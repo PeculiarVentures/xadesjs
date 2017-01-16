@@ -2,59 +2,61 @@
 <html>
 
 <head>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8" />
     <title>XAdESJS - A pure Javascript implementation of XMLDSIG and XAdES based on Web Crypto</title>
 </head>
 
 <body>
-    <script type="text/javascript" >
+    <script type="text/javascript">
         if (window.location.protocol != "https:")
             window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
     </script>
     <!--WebCrypto-->
     <script type="text/javascript" src="https://peculiarventures.github.io/pv-webcrypto-tests/src/promise.js"></script>
-    <!--Liner-->
-    <script type="text/javascript" src="https://peculiarventures.github.io/pv-webcrypto-tests/src/index.js"></script>
-    <!--PKIjs-->
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/common.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/asn1.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_schema.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_simpl.js"></script>
+    <script type="text/javascript" src="https://peculiarventures.github.io/pv-webcrypto-tests/src/promise.js"></script>
+    <script type="text/javascript" src="https://peculiarventures.github.io/pv-webcrypto-tests/src/webcrypto-liner.min.js"></script>
+    <script type="text/javascript" src="https://peculiarventures.github.io/pv-webcrypto-tests/src/asmcrypto.js"></script>
+    <script type="text/javascript" src="https://peculiarventures.github.io/pv-webcrypto-tests/src/elliptic.js"></script>
     <!--XAdESjs-->
-    <script type="text/javascript" src="https://cdn.rawgit.com/PeculiarVentures/xadesjs/master/built/xades.js"></script>
-    
+    <script type="text/javascript" src="src/xades.min.js"></script>
+
     <script type="text/javascript" src="https://cdn.rawgit.com/PrismJS/prism/gh-pages/prism.js"></script>
-    
+
     <style>.button { background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; }</style>
-    
+
     <style>#forkongithub a{background:#000;color:#fff;text-decoration:none;font-family:arial,sans-serif;text-align:center;font-weight:bold;padding:5px 40px;font-size:1rem;line-height:2rem;position:relative;transition:0.5s;}#forkongithub a:hover{background:#c11;color:#fff;}#forkongithub a::before,#forkongithub a::after{content:"";width:100%;display:block;position:absolute;top:1px;left:0;height:1px;background:#fff;}#forkongithub a::after{bottom:1px;top:auto;}@media screen and (min-width:800px){#forkongithub{position:fixed;display:block;top:0;right:0;width:200px;overflow:hidden;height:200px;z-index:9999;}#forkongithub a{width:200px;position:absolute;top:60px;right:-60px;transform:rotate(45deg);-webkit-transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg);-o-transform:rotate(45deg);box-shadow:4px 4px 10px rgba(0,0,0,0.8);}}</style>
-    
+
     <span id="forkongithub"><a href="https://github.com/PeculiarVentures/xadesjs">Fork me on GitHub</a></span>
-    
+
     <link rel="stylesheet" href="https://cdn.rawgit.com/PrismJS/prism/gh-pages/themes/prism.css" />
-    
+
     <script type="text/javascript">
+        function error(e) {
+            alert(e.message);
+            console.error(e);
+        }
+
         // Generate RSA key pair
         var privateKey, publicKey;
         window.crypto.subtle.generateKey(
-        {
-            name: "RSASSA-PKCS1-v1_5",
-            modulusLength: 2048, //can be 1024, 2048, or 4096
-            publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
-            hash: {name: "SHA-256"}, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
-        },
-        false, //whether the key is extractable (i.e. can be used in exportKey)
-        ["sign", "verify"] //can be any combination of "sign" and "verify"
+            {
+                name: "RSASSA-PKCS1-v1_5",
+                modulusLength: 2048, //can be 1024, 2048, or 4096
+                publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+                hash: { name: "SHA-256" }, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
+            },
+            false, //whether the key is extractable (i.e. can be used in exportKey)
+            ["sign", "verify"] //can be any combination of "sign" and "verify"
         )
-        .then(function(keyPair){
-            // Push ganerated keys to global variable
-            privateKey = keyPair.privateKey;
-            publicKey = keyPair.publicKey;
-            console.log("Sucessfully generated key");
-        })    
-        .catch(function (e) {
-            console.error(e);
-        });
+            .then(function (keyPair) {
+                // Push ganerated keys to global variable
+                privateKey = keyPair.privateKey;
+                publicKey = keyPair.publicKey;
+                console.log("Sucessfully generated key");
+            })
+            .catch(function (e) {
+                console.error(e);
+            });
 
         function SignXml(xmlString, key, algorithm) {
             return new Promise(function (resolve, reject) {
@@ -100,43 +102,105 @@
                     .then(resolve, reject);
             })
         }
-        
-        function btnVerify_onclick() {
-             var xmlString = document.getElementById("signedXML").innerText;
-        
-             var signedDocument = new DOMParser().parseFromString(xmlString, "application/xml");
-             var xmlSignature = signedDocument.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 
-             var signedXml = new xadesjs.SignedXml(signedDocument);
-             signedXml.LoadXml(xmlSignature[0]);
-             signedXml.CheckSignature()
-             .then(function (signedDocument) {
-                     alert("Successfully Verified");
-                     console.log("Sucessfully Verified");
-             })
-             .catch(function (e) {
-                     alert("Invalid signature")
-                     console.log("Invalid signature");
-                     console.error(e);
-             });
-         }
+        function btnVerify_onclick() {
+            var timeStart = new Date().getTime();
+            var $xml = document.getElementById("signedXML");
+            var $info = document.getElementById("signature_info");
+            var xmlString = $xml.textContent;
+            if (!xmlString)
+                return error(new Error("Unable to get XML"));
+            var xml = XAdES.Parse(xmlString);
+            var signature = new XAdES.SignedXml(xml);
+            var xmlSignatures = XAdES.Select(xml, "//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']");
+            console.log(signature);
+            console.log(xmlSignatures);
+
+            if (!(xmlSignatures && xmlSignatures.length))
+                return error("Cannot get XML signature from XML document");
+
+            signature.LoadXml(xmlSignatures[0]);
+
+            signature.Verify()
+                .then(function (res) {
+                    var timeEnd = new Date().getTime();
+                    var info = [];
+                    info.push("Signature valid: " + res.toString());
+                    info.push("Time: " + (timeEnd - timeStart).toString() + "ms");
+                    info.push("=================================");
+                    var si = signature.XmlSignature.SignedInfo;
+                    info.push("Signature method: " + si.SignatureMethod.Algorithm);
+                    info.push("Canonicalization method: " + si.CanonicalizationMethod.Algorithm);
+                    info.push("References:");
+                    si.References.ForEach(function (ref, index) {
+                        info.push("  Reference #" + (index + 1));
+                        ref.Type && info.push("    Type: " + ref.Type);
+                        ref.Uri && info.push("    Uri: " + ref.Uri);
+                        info.push("    Digest method: " + ref.DigestMethod.Algorithm);
+                        ref.Transforms.ForEach(function (transform) {
+                            info.push("    Transform: " + transform.Algorithm);
+                        });
+                    });
+
+                    var ssp = signature.SignedProperties.SignedSignatureProperties;
+                    info.push("Signed signature properties:");
+                    info.push("  Signing time: " + ssp.SigningTime);
+                    if (ssp.SigningCertificate.Count) {
+                        info.push("Signing certificate:");
+                        ssp.SigningCertificate.ForEach(function (cert) {
+                            info.push("  Issuer name: " + cert.IssuerSerial.X509IssuerName);
+                            info.push("  Serial number: " + cert.IssuerSerial.X509SerialNumber);
+                            info.push("  Digest method: " + cert.CertDigest.DigestMethod.Algorithm);
+                            info.push("  Digest: " + XAdES.Convert.ToHex(cert.CertDigest.DigestValue));
+                        });
+                    }
+                    if (ssp.SignatureProductionPlace.Element) {
+                        info.push("  Production place:");
+                        ssp.SignatureProductionPlace.CountryName && info.push("    Country:" + ssp.SignatureProductionPlace.CountryName);
+                        ssp.SignatureProductionPlace.StateOrProvince && info.push("    State or province:" + ssp.SignatureProductionPlace.StateOrProvince);
+                        ssp.SignatureProductionPlace.City && info.push("    City:" + ssp.SignatureProductionPlace.City);
+                        ssp.SignatureProductionPlace.PostalCode && info.push("    Post code:" + ssp.SignatureProductionPlace.PostalCode);
+                    }
+                    if (ssp.SignaturePolicyIdentifier.Element) {
+                        info.push("  Signature policy identifier:");
+                        var spi = ssp.SignaturePolicyIdentifier;
+                        spi.SignaturePolicyImplied && info.push("    Implied: true");
+                        spi.SignaturePolicyId.Element && info.push("    Id: true");
+                    }
+                    if (signature.SignedProperties.SignedDataObjectProperties.Element) {
+                        info.push("Signed data object properties:");
+                        var sdop = signature.SignedProperties.SignedDataObjectProperties;
+                        sdop.DataObjectFormats.Count && info.push("  Data object format count: " + sdop.DataObjectFormats.Count);
+                        sdop.CommitmentTypeIndications.Count && info.push("  Commitment type indication count: " + sdop.CommitmentTypeIndications.Count);
+                        sdop.AllDataObjectsTimeStamps.Count && info.push("  All data objects TimeStamp count: " + sdop.AllDataObjectsTimeStamps.Count);
+                        sdop.IndividualDataObjectsTimeStamps.Count && info.push("  Individual data objects TimeStamp count: " + sdop.IndividualDataObjectsTimeStamps.Count);
+                    }
+                    if (signature.UnsignedProperties.Element) {
+                        info.push("Unsigned properties: true");
+                    }
+                    $info.textContent = info.join("\n");
+                })
+                .catch(function (e) {
+                    error(e);
+                });
+        }
         function btnSign_onclick() {
-             var xmlString = document.getElementById("signedXML").innerText;
-             
-             SignXml(xmlString, privateKey, { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-256" } })
-             .then(function (signedDocument) {
-                 alert("Successfully Signed");
-                 console.log("Successfully Signed");
-                 
-                 var block = document.getElementById("signedXML");
-                 block.textContent = signedDocument;
-                 Prism.highlightElement(block);
-                 block.scrollTop = block.scrollHeight;
-             })
-             .catch(function (e) {
-                     alert("Error signing document: " + e);
-                     console.log("Error signing document: " + e);
-             });
+            var xmlString = document.getElementById("signedXML").innerText;
+
+            SignXml(xmlString, privateKey, { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-256" } })
+                .then(function (signedDocument) {
+                    alert("Successfully Signed");
+                    console.log("Successfully Signed");
+
+                    var block = document.getElementById("signedXML");
+                    block.textContent = signedDocument;
+                    Prism.highlightElement(block);
+                    block.scrollTop = block.scrollHeight;
+                })
+                .catch(function (e) {
+                    alert("Error signing document: " + e);
+                    console.log("Error signing document: " + e);
+                });
         }
     </script>
     <div style="text-align: center">
@@ -144,9 +208,14 @@
         <h2>A pure Javascript implementation of XMLDSIG and XAdES based on Web Crypto</h2>
     </div>
     <div style="left:10%;top:25%;position:relative;width:80%">
-        <pre id="signedXML" style="height:400px;" contenteditable="true" data-src="https://cdn.rawgit.com/PeculiarVentures/xadesjs/master/test/static/tl-mp.xml"><code class="language-xml"></code></pre>
-        <button id="btnSign" onclick="btnSign_onclick()" class="button">Sign</button>
+        <pre id="signedXML" style="height:400px;" contenteditable="true" data-src="http://cdn.rawgit.com/PeculiarVentures/xmldsigjs/master/test/static/tl-mp.xml"><code class="language-xml"></code></pre>
+        <!--<button id="btnSign" onclick="btnSign_onclick()" class="button">Sign</button>-->
         <button id="btnVerify" onclick="btnVerify_onclick()" class="button">Verify</button>
+        <div id="result">
+            <h3>Signature info:</h3>
+            <pre><code id="signature_info"></code></pre>
+        </div>
     </div>
 </body>
+
 </html>
