@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import * as XmlCore from "xml-core";
 let WebCrypto = require("node-webcrypto-ossl");
-import * as XAdES from "../";
+import * as XAdES from "../../";
 
 context("XAdES signing", () => {
 

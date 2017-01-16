@@ -41,7 +41,7 @@ They differ slightly based on what is included in the signature:
 npm install xadesjs
 ```
 
-The npm module has a `dist` foldder with the following files:
+The npm module has a `dist` folder with the following files:
 
 | Name            | Size   | Description                                    |
 |-----------------|--------|------------------------------------------------|
