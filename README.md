@@ -1,9 +1,9 @@
 # XAdESjs
 
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/PeculiarVentures/xadesjs/master/LICENSE.md)
-[![CircleCI](https://circleci.com/gh/PeculiarVentures/xadesjs.svg?style=svg)](https://circleci.com/gh/PeculiarVentures/xadesjs)
+[![Build Status](https://travis-ci.org/PeculiarVentures/xadesjs.svg?branch=master)](https://travis-ci.org/PeculiarVentures/xadesjs)
 [![Coverage Status](https://coveralls.io/repos/github/PeculiarVentures/xadesjs/badge.svg?branch=master)](https://coveralls.io/github/PeculiarVentures/xadesjs?branch=master) 
-[![npm version](https://badge.fury.io/js/xadesjs.svg)](https://badge.fury.io/js/xadesjs)
+[![NPM version](https://badge.fury.io/js/xadesjs.png)](http://badge.fury.io/xadesjs)
 
 [![NPM](https://nodei.co/npm-dl/xadesjs.png?months=2&height=2)](https://nodei.co/npm/xadesjs/)
 
@@ -45,7 +45,7 @@ npm module has `dist` foldder with files
 | Name            | Size   | Description                                    |
 |-----------------|--------|------------------------------------------------|
 | index.js        | 105 Kb | UMD module with external modules. Has comments | 
-| xades.js        | 806 Kb | UMD bundle module. Has comments                | 
+| xades.js        | 803 Kb | UMD bundle module. Has comments                | 
 | xades.min.js    | 296 Kb | minified UMD bundle module                     |
 
 There is `lib` folder with ES2015 JS file which you can use with `rollup` compiler
@@ -54,7 +54,7 @@ There is `lib` folder with ES2015 JS file which you can use with `rollup` compil
 
 ### CRYPTOGRAPHIC ALGORITHM SUPPORT 
 
-|                   | SHA1 | SHA2-256 | SHA2-384 | SHA2-512 |
+| Name              | SHA1 | SHA2-256 | SHA2-384 | SHA2-512 |
 |-------------------|------|----------|----------|----------|
 | RSASSA-PKCS1-v1_5 | X    | X        | X        | X        |
 | RSA-PSS           | X    | X        | X        | X        |
@@ -103,10 +103,97 @@ xadesjs.Application.setEngine("PKCS11", new WebCrypto({
 
 ## WARNING
 
-**Using XMLDSIG is a bit like running with scissors, that said it is needed for interoperability with a number of systems, for this reason, we have done this implementation.** 
+**Using XAdES is a bit like running with scissors, that said it is needed for interoperability with a number of systems, for this reason, we have done this implementation.** 
 
-**Given the nuances in handling XMLDSIG securely at this time you should consider this solution suitable for research and experimentation, further code and security review is needed before utilization in a production application.**
+**Given the nuances in handling XAdES securely at this time you should consider this solution suitable for research and experimentation, further code and security review is needed before utilization in a production application.**
 
+## Usage
+
+### Sign
+
+```typescript
+SignedXml.Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsXAdES): PromiseLike<Signature>;
+```
+
+__Parameters__
+
+| Name          | Description                                                             |
+|:--------------|:------------------------------------------------------------------------|
+| algorithm     | Signing [Algorithm](https://www.w3.org/TR/WebCryptoAPI/#algorithms)     |
+| key           | Signing [Key](https://www.w3.org/TR/WebCryptoAPI/#cryptokey-interface)  |
+| data          | XML document which must be signed                                       |
+| options       | Additional options                                                      |
+
+#### Options
+```typescript
+interface OptionsXAdES {
+    /**
+     * Public key for KeyInfo block
+     */
+    keyValue?: CryptoKey;
+    /**
+     * List of X509 Certificates
+     */
+    x509?: string[];
+    /**
+     * List of Reference
+     * Default is Reference with hash alg SHA-256 and exc-c14n transform  
+     */
+    references?: OptionsSignReference[];
+
+    // Signed signature properties
+
+    signingCertificate?: string;
+    policy?: OptionsPolicyIdentifier;
+    productionPlace?: OptionsProductionPlace;
+    signerRole?: OptionsSignerRole;
+}
+
+interface OptionsSignReference {
+    /**
+     * Id of Reference
+     */
+    id?: string;
+    uri?: string;
+    /**
+     * Hash algorithm
+     */
+    hash: AlgorithmIdentifier;
+    /**
+     * List of transforms
+     */
+    transforms?: OptionsSignTransform[];
+}
+
+type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64";
+
+interface OptionsSignerRole {
+    claimed?: string[];
+    certified?: string[];
+}
+
+interface OptionsProductionPlace {
+    city?: string;
+    state?: string;
+    code?: string;
+    country?: string;
+}
+
+interface OptionsPolicyIdentifier {
+}
+```
+
+### Verify
+
+```typescript
+Verify(key?: CryptoKey): PromiseLike<boolean>;
+```
+
+__Parameters__
+
+| Name          | Description                                                             |
+|:--------------|:------------------------------------------------------------------------|
+| key           | Verifying [Key](https://www.w3.org/TR/WebCryptoAPI/#cryptokey-interface). Optional. If key not set it looks for keys in KeyInfo element of Signature.  |
 
 ## EXAMPLES
 
@@ -177,8 +264,8 @@ function SignXml(xmlString, keys, algorithm) {
 }
 ```
 
-
 #### In the browser
+
 ```html
 <!DOCTYPE html>
 <html>
@@ -257,73 +344,74 @@ function SignXml(xmlString, keys, algorithm) {
 </html>
 ````
 
-### Check XMLDSIG Signature 
+### Check XAdES Signature 
 
 #### In Node
 
 ```javascript
-var xadesjs = require("./built/xades.js");
-var DOMParser = require("xmldom").DOMParser;
+var XAdES = require("xadesjs");
 var WebCrypto = require("node-webcrypto-ossl").default;
 
-xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
+XAdES.Application.setEngine("OpenSSL", new WebCrypto());
 
 var fs = require("fs");
-var xmlString = fs.readFileSync("./xadesjs/test/static/valid_signature.xml","utf8");
+var xmlString = fs.readFileSync("some.xml","utf8");
 
-var signedDocument = new DOMParser().parseFromString(xmlString, "application/xml");
+var signedDocument = XAdES.Parse(xmlString, "application/xml");
 var xmlSignature = signedDocument.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 
 var signedXml = new xadesjs.SignedXml(signedDocument);
 signedXml.LoadXml(xmlSignature[0]);
-signedXml.CheckSignature()
-.then(function (signedDocument) {
-        console.log("Successfully Verified");
-})
-.catch(function (e) {
+signedXml.Verify()
+    .then(res => {
+        console.log((res ? "Valid" : "Invalid") + " signature");
+    })
+    .catch(function (e) {
         console.error(e);
-});
+    });
 ```
 
 #### In the browser
-```HTML
+
+```html
 <!DOCTYPE html>
 <html>
 
 <head>
-    <meta charset="utf-8"/>
-    <title>XADESJS Verify Sample</title>
+    <meta charset="utf-8" />
+    <title>XADESJS Signature Sample</title>
 </head>
 
 <body>
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/common.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/ASN1.js/master/org/pkijs/asn1.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_schema.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/GlobalSign/PKI.js/master/org/pkijs/x509_simpl.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/PeculiarVentures/xadesjs/master/built/xades.js"></script>
-    
+    <pre id="signature"><code></code></pre>
+    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/promise.js"></script>
+    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/webcrypto-liner.min.js"></script>
+    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/asmcrypto.js"></script>
+    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/elliptic.js"></script>
+    <script type="text/javascript" src="dist/xades.js"></script>
     <script type="text/javascript">
+        "use strict";
         fetch("https://cdn.rawgit.com/PeculiarVentures/xadesjs/master/test/static/valid_signature.xml")
-        .then(function(response) {
-            return response.text()
-        }).then(function(body) {
-            var xmlString = body;
-            
-            var signedDocument = new DOMParser().parseFromString(xmlString, "application/xml");
-            var xmlSignature = signedDocument.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
+            .then(response => response.text())
+            .then(body => {
+                var xmlString = body;
 
-            var signedXml = new xadesjs.SignedXml(signedDocument);
-            signedXml.LoadXml(xmlSignature[0]);
-            signedXml.CheckSignature()
-            .then(function (signedDocument) {
-                    console.log("Successfully Verified");
+                var signedDocument = XAdES.Parse(xmlString);
+                var xmlSignature = signedDocument.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
+
+                var signedXml = new xadesjs.SignedXml(signedDocument);
+                signedXml.LoadXml(xmlSignature[0]);
+                signedXml.Verify()
+                    .then(function (signedDocument) {
+                        alert((res ? "Valid" : "Invalid") + " signature");
+                    })
+                    .catch(function (e) {
+                        alert(e.message);
+                    });
             })
-            .catch(function (e) {
-                    console.error(e);
-            });
-        })
     </script>
 </body>
+
 </html>
 ```
 
@@ -334,14 +422,6 @@ signedXml.CheckSignature()
 ```
 npm test
 ```
-
-### In the browser
-To run the browser test you need to run the server, from the test directory run: 
-```
-npm start
-```
-
-And the then browse to `http://localhost:3000'.
 
 ## THANKS AND ACKNOWLEDGEMENT
 This project takes inspiration (style, approach, design and code) from both the [Mono System.Security.Cryptography.Xml](https://github.com/mono/mono/tree/master/mcs/class/System.Security/System.Security.Cryptography.Xml) implementation as well as [xml-crypto](https://github.com/yaronn/xml-crypto).
