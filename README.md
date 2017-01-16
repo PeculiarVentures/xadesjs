@@ -8,7 +8,9 @@
 [![NPM](https://nodei.co/npm-dl/xadesjs.png?months=2&height=2)](https://nodei.co/npm/xadesjs/)
 
 
-[XAdES](https://en.wikipedia.org/wiki/XAdES) is short for "XML Advanced Electronic Signatures", it is a superset of XMLDSIG. This library aims to provide an implementation of both XMLDSIG and XAdES-BES in Typescript/Javascript that uses Web Crypto for cryptographic operations so it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)).
+[XAdES](https://en.wikipedia.org/wiki/XAdES) is short for "XML Advanced Electronic Signatures", it is a superset of XMLDSIG. This library aims to provide an implementation of XAdES in Typescript/Javascript that is built on [XMLDSIGjs](https://github.com/PeculiarVentures/xmldsigjs).
+
+Since it is based on [XMLDSIGjs](https://github.com/PeculiarVentures/xmldsigjs) and that library uses Web Crypto for cryptographic operations it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)).
 
 There are seven different profiles of XAdES, they are:
 - Basic Electronic Signature (XAdES-BES)
@@ -31,8 +33,7 @@ They differ slightly based on what is included in the signature:
 | XAdES-X-L  | Yes                        | Yes                              | Yes                            | Yes                      | No                                       |
 | XAdES-A    | Yes                        | Yes                              | Yes                            | Yes                      | Yes                                      |
 
-- Only XAdES-BES is fully (as shown in **BOLD**) supported by XAdESjs
-- Other variants are supported by XAdESjs-PRO which is a layer on XAdESjs. XAdESjs-PRO is availible under a commercial license, [email](mailto:info@peculiarventures.com) for more information.
+- Only XAdES-BES (in *BOLD*) is fully supported by XAdESjs, for the other variants can be fully decoded and verified but the caller must to the verification on their own.
 
 ## INSTALLING
 
@@ -40,7 +41,7 @@ They differ slightly based on what is included in the signature:
 npm install xadesjs
 ```
 
-npm module has `dist` foldder with files
+The npm module has `dist` foldder with the following files:
 
 | Name            | Size   | Description                                    |
 |-----------------|--------|------------------------------------------------|
@@ -48,7 +49,7 @@ npm module has `dist` foldder with files
 | xades.js        | 803 Kb | UMD bundle module. Has comments                | 
 | xades.min.js    | 296 Kb | minified UMD bundle module                     |
 
-There is `lib` folder with ES2015 JS file which you can use with `rollup` compiler
+Ther is also a `lib` folder with an ES2015 JS file which you can use with `rollup` bundler.
  
 ## COMPATABILITY
 
@@ -104,8 +105,6 @@ xadesjs.Application.setEngine("PKCS11", new WebCrypto({
 ## WARNING
 
 **Using XAdES is a bit like running with scissors, that said it is needed for interoperability with a number of systems, for this reason, we have done this implementation.** 
-
-**Given the nuances in handling XAdES securely at this time you should consider this solution suitable for research and experimentation, further code and security review is needed before utilization in a production application.**
 
 ## Usage
 
@@ -427,6 +426,7 @@ npm test
 This project takes inspiration (style, approach, design and code) from both the [Mono System.Security.Cryptography.Xml](https://github.com/mono/mono/tree/master/mcs/class/System.Security/System.Security.Cryptography.Xml) implementation as well as [xml-crypto](https://github.com/yaronn/xml-crypto).
 
 ## RELATED
+- [xmldsigjs](https://github.com/PeculiarVentures/xmldsigjs)
 - [Why XML Security is Broken](https://www.cs.auckland.ac.nz/~pgut001/pubs/xmlsec.txt)
 - [ETSI EN 319 132-1 - XML Advanced Electronic Signatures (XAdES)](http://www.etsi.org/deliver/etsi_en/319100_319199/31913201/01.01.00_30/en_31913201v010100v.pdf)
 - [ETSI EN 319 132-2 - XML Advanced Electronic Signatures (XAdES)](http://www.etsi.org/deliver/etsi_en/319100_319199/31913202/01.01.00_30/en_31913202v010100v.pdf)
