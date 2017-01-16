@@ -17,6 +17,8 @@
     "build:test": "tsc -p test",
     "build:types": "tsc --declaration --declarationDir types",
     "build:web": "rollup -c rollup.config.web.js && babel dist/xades.js --comment=false --compact=false  --out-file dist/xades.js",
+    "prepublish": "npm run build",
+    "pub": "npm version patch && npm publish && git push",
     "sync": "git ac && git pull --rebase && git push",
     "coverage": "nyc npm test",
     "precoveragehtml": "npm run coverage",
