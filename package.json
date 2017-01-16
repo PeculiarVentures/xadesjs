@@ -39,6 +39,9 @@
     "ec"
   ],
   "author": "Peculiar Ventures, Inc.",
+  "contributors": [
+    "Miroshin Stepan<microshine@mail.ru>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/PeculiarVentures/xadesjs/issues"
