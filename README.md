@@ -33,7 +33,7 @@ They differ slightly based on what is included in the signature:
 | XAdES-X-L  | Yes                        | Yes                              | Yes                            | Yes                      | No                                       |
 | XAdES-A    | Yes                        | Yes                              | Yes                            | Yes                      | Yes                                      |
 
-- Only XAdES-BES (in *BOLD*) is fully supported by XAdESjs, for the other variants can be fully decoded and verified but the caller must to the verification on their own.
+- Only XAdES-BES (in *BOLD*) is fully supported by XAdESjs. For the other variants can be created, decoded and verified but the caller must do the construction and policy to ensure compliant messages on their own.
 
 ## INSTALLING
 
@@ -41,7 +41,7 @@ They differ slightly based on what is included in the signature:
 npm install xadesjs
 ```
 
-The npm module has `dist` foldder with the following files:
+The npm module has a `dist` foldder with the following files:
 
 | Name            | Size   | Description                                    |
 |-----------------|--------|------------------------------------------------|
@@ -49,7 +49,7 @@ The npm module has `dist` foldder with the following files:
 | xades.js        | 803 Kb | UMD bundle module. Has comments                | 
 | xades.min.js    | 296 Kb | minified UMD bundle module                     |
 
-Ther is also a `lib` folder with an ES2015 JS file which you can use with `rollup` bundler.
+There is also a `lib` folder with an ES2015 JS file which you can use with `rollup` bundler.
  
 ## COMPATABILITY
 
@@ -104,7 +104,7 @@ xadesjs.Application.setEngine("PKCS11", new WebCrypto({
 
 ## WARNING
 
-**Using XAdES is a bit like running with scissors, that said it is needed for interoperability with a number of systems, for this reason, we have done this implementation.** 
+**Using XMLDSIG is a bit like running with scissors, that said it is needed for interoperability with a number of systems, for this reason, we have done this implementation.** 
 
 ## Usage
 
@@ -196,7 +196,7 @@ __Parameters__
 
 ## EXAMPLES
 
-### Create XAdES Signature
+### Create XAdES-BES Signature
 
 #### In Node
 
@@ -343,7 +343,7 @@ function SignXml(xmlString, keys, algorithm) {
 </html>
 ````
 
-### Check XAdES Signature 
+### Check XAdES-BES Signature 
 
 #### In Node
 
