@@ -3,7 +3,7 @@
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/PeculiarVentures/xadesjs/master/LICENSE.md)
 [![Build Status](https://travis-ci.org/PeculiarVentures/xadesjs.svg?branch=master)](https://travis-ci.org/PeculiarVentures/xadesjs)
 [![Coverage Status](https://coveralls.io/repos/github/PeculiarVentures/xadesjs/badge.svg?branch=master)](https://coveralls.io/github/PeculiarVentures/xadesjs?branch=master) 
-[![NPM version](https://badge.fury.io/js/xadesjs.png)](http://badge.fury.io/xadesjs)
+[![npm version](https://badge.fury.io/js/xadesjs.svg)](https://badge.fury.io/js/xadesjs)
 
 [![NPM](https://nodei.co/npm-dl/xadesjs.png?months=2&height=2)](https://nodei.co/npm/xadesjs/)
 
