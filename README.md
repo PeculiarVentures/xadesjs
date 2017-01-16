@@ -82,7 +82,7 @@ To use [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-
 
 ```javascript
 var xadesjs = require("./built/xades.js");
-var WebCrypto = require("node-webcrypto-ossl").default;
+var WebCrypto = require("node-webcrypto-ossl");
 
 xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
 ```
