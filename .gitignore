@@ -1,12 +1,11 @@
-/node_modules
+/.vscode
 /.nyc_output/
 /coverage/
-/.vscode
+/node_modules
 /test/**/*.js
 /build
 /types
 /lib
 /dist
-npm-debug.log
 **/*.map
 *.log
