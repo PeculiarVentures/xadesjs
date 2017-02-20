@@ -7,17 +7,17 @@
   "module": "lib/index.js",
   "jsnext:main": "lib/index.js",
   "scripts": {
+    "prepublish": "npm run build",
     "start": "node test/html/server.js",
     "test": "mocha test/**/*.js",
     "test:local": "nyc --reporter=lcov npm test",
-    "build": "npm run build:lib && npm run build:es5",
+    "build": "npm run build:lib && npm run build:es5 && npm run build:web",
     "build:es5": "rollup -c",
     "build:lib": "rollup -c rollup.config.lib.js",
     "build:map": "rollup -c --dev",
     "build:test": "tsc -p test",
     "build:types": "tsc --declaration --declarationDir types",
-    "build:web": "rollup -c rollup.config.web.js && babel dist/xades.js --comment=false --compact=false  --out-file dist/xades.js",
-    "prepublish": "npm run build",
+    "build:web": "rollup -c rollup.config.web.js && babel dist/xades.js --comment=false --out-file dist/xades.js",
     "pub": "npm version patch && npm publish && git push",
     "sync": "git ac && git pull --rebase && git push",
     "coverage": "nyc npm test",
@@ -49,7 +49,7 @@
   "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
   "dependencies": {
     "tslib": "^1.5.0",
-    "xmldsigjs": "^2.0.5"
+    "xmldsigjs": "^2.0.6"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.37",
@@ -58,7 +58,7 @@
     "babelrc-rollup": "^3.0.0",
     "coveralls": "^2",
     "mocha": "^3",
-    "node-webcrypto-ossl": "^1.0.16",
+    "node-webcrypto-ossl": "^1.0.19",
     "nyc": "^8",
     "rollup": "^0.41.4",
     "rollup-plugin-babel": "^2.7.1",
