@@ -5,15 +5,15 @@ import { XmlXades } from "./xml";
 import { XadesObject } from "./xml_base";
 import { UnsignedSignatureProperty } from "./unsigned_signature_properties";
 
-/** 
+/**
  *
  * <xsd:element name="CounterSignature" type="CounterSignatureType"/>
  * <xsd:complexType name="CounterSignatureType">
  *     <xsd:sequence>
  *         <xsd:element ref="ds:Signature"/>
  *     </xsd:sequence>
- * </xsd:complexType> 
- * 
+ * </xsd:complexType>
+ *
  */
 
 @XmlElement({ localName: XmlXades.ElementNames.CounterSignature })

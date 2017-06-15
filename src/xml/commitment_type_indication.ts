@@ -7,7 +7,7 @@ import { ObjectIdentifier } from "./object_identifier";
 import { Any } from "./any";
 
 /**
- * 
+ *
  * <xsd:element name="CommitmentTypeIndication" type="CommitmentTypeIndicationType"/>
  * <xsd:complexType name="CommitmentTypeIndicationType">
  *     <xsd:sequence>
@@ -24,7 +24,7 @@ import { Any } from "./any";
  *         <xsd:element name="CommitmentTypeQualifier" type="AnyType" minOccurs="0" maxOccurs="unbounded"/>
  *     </xsd:sequence>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({ localName: XmlXades.ElementNames.CommitmentTypeQualifier })

@@ -1,7 +1,7 @@
 namespace xadesjs.pki {
     /**
      * List of OIDs
-     * Source: https://msdn.microsoft.com/ru-ru/library/windows/desktop/aa386991(v=vs.85).aspx 
+     * Source: https://msdn.microsoft.com/ru-ru/library/windows/desktop/aa386991(v=vs.85).aspx
      */
     export const OID: { [key: string]: { short: string, long: string } } = {
         "2.5.4.3": {
@@ -167,21 +167,21 @@ namespace xadesjs.pki {
     };
 
     /**
-     * Converts X500Name to string 
+     * Converts X500Name to string
      * @param  {RDN} name X500Name
-     * @param  {string} spliter Splitter char. Default ','
+     * @param  {string} splitter Splitter char. Default ','
      * @returns string Formated string
      * Example:
      * > C=Some name, O=Some organization name, C=RU
      */
-    export function NameToString(name: RDN, spliter: string = ","): string {
+    export function NameToString(name: RDN, splitter: string = ","): string {
         let res: string[] = [];
         for (let type_and_value of name.types_and_values) {
             let type = type_and_value.type;
             let _name = OID[type].short;
             res.push(`${_name ? _name : type}=${type_and_value.value.value_block.value}`);
         }
-        return res.join(spliter + " ");
+        return res.join(splitter + " ");
     }
 
     export let HashOID: { [key: string]: string } = {};
@@ -210,13 +210,13 @@ namespace xadesjs.pki {
     export interface IASN1Item {
 
         /**
-         * Converts object to ASN1 raw 
+         * Converts object to ASN1 raw
          * @returns Uint8Array
          */
         Encode(): Uint8Array;
 
         /**
-         * Decode the encoded ASN1 raw 
+         * Decode the encoded ASN1 raw
          */
         Decode(raw: Uint8Array): void;
     }
@@ -253,7 +253,7 @@ namespace xadesjs.pki {
         }
 
         /**
-         * Converts object to ASN1 raw 
+         * Converts object to ASN1 raw
          * @returns Uint8Array
          */
         Encode(): Uint8Array {
@@ -261,7 +261,7 @@ namespace xadesjs.pki {
         }
 
         /**
-         * Decode the encoded ASN1 raw 
+         * Decode the encoded ASN1 raw
          */
         Decode(raw: Uint8Array): void {
             throw new PKIError("Not implemented");

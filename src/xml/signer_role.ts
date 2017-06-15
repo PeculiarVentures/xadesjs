@@ -5,7 +5,7 @@ import { XadesObject, XadesCollection } from "./xml_base";
 import { EncapsulatedPKIData } from "./encapsulated_pki_data";
 import { Any } from "./any";
 /**
- * 
+ *
  * <xsd:element name="SignerRole" type="SignerRoleType"/>
  * <xsd:complexType name="SignerRoleType">
  *     <xsd:sequence>
@@ -23,7 +23,7 @@ import { Any } from "./any";
  *         <xsd:element name="CertifiedRole" type="EncapsulatedPKIDataType" maxOccurs="unbounded"/>
  *     </xsd:sequence>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({ localName: XmlXades.ElementNames.ClaimedRole })

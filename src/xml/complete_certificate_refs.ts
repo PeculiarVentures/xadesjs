@@ -6,7 +6,7 @@ import { CertIDList } from "./signing_certificate";
 import { UnsignedSignatureProperty } from "./unsigned_signature_properties";
 
 /**
- * 
+ *
  * <xsd:element name="CompleteCertificateRefs" type="CompleteCertificateRefsType"/>
  * <xsd:complexType name="CompleteCertificateRefsType">
  *     <xsd:sequence>
@@ -14,7 +14,7 @@ import { UnsignedSignatureProperty } from "./unsigned_signature_properties";
  *     </xsd:sequence>
  *     <xsd:attribute name="Id" type="xsd:ID" use="optional"/>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({ localName: XmlXades.ElementNames.CompleteCertificateRefs })

@@ -6,7 +6,7 @@ import { SignedProperties } from "./signed_properties";
 import { UnsignedProperties } from "./unsigned_properties";
 
 /**
- * 
+ *
  * <xsd:element name="QualifyingProperties" type="QualifyingPropertiesType"/>
  * <xsd:complexType name="QualifyingPropertiesType">
  *     <xsd:sequence>
@@ -16,7 +16,7 @@ import { UnsignedProperties } from "./unsigned_properties";
  *     <xsd:attribute name="Target" type="xsd:anyURI" use="required"/>
  *     <xsd:attribute name="Id" type="xsd:ID" use="optional"/>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({

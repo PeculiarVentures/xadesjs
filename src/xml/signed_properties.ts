@@ -7,7 +7,7 @@ import { SignedDataObjectProperties } from "./signed_data_object_properties";
 
 
 /**
- * 
+ *
  * <xsd:element name="SignedProperties" type="SignedPropertiesType"/>
  * <xsd:complexType name="SignedPropertiesType">
  *     <xsd:sequence>
@@ -16,7 +16,7 @@ import { SignedDataObjectProperties } from "./signed_data_object_properties";
  *     </xsd:sequence>
  *     <xsd:attribute name="Id" type="xsd:ID" use="optional"/>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({

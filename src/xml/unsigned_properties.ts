@@ -6,7 +6,7 @@ import { UnsignedSignatureProperties } from "./unsigned_signature_properties";
 import { UnsignedDataObjectProperties } from "./unsigned_data_object_property";
 
 /**
- * 
+ *
  * <xsd:element name="UnsignedProperties" type="UnsignedPropertiesType"/>
  * <xsd:complexType name="UnsignedPropertiesType">
  *     <xsd:sequence>
@@ -15,7 +15,7 @@ import { UnsignedDataObjectProperties } from "./unsigned_data_object_property";
  *     </xsd:sequence>
  *     <xsd:attribute name="Id" type="xsd:ID" use="optional"/>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({

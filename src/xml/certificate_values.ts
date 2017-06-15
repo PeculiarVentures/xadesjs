@@ -6,7 +6,7 @@ import { Any } from "./any";
 import { EncapsulatedPKIData } from "./encapsulated_pki_data";
 
 /**
- * 
+ *
  * <xsd:element name="CertificateValues" type="CertificateValuesType"/>
  * <xsd:complexType name="CertificateValuesType">
  *     <xsd:choice minOccurs="0" maxOccurs="unbounded">
@@ -15,7 +15,7 @@ import { EncapsulatedPKIData } from "./encapsulated_pki_data";
  *     </xsd:choice>
  *     <xsd:attribute name="Id" type="xsd:ID" use="optional"/>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({ localName: XmlXades.ElementNames.OtherCertificate })

@@ -9,7 +9,7 @@ import { SignatureProductionPlace } from "./signature_product_place";
 import { SignerRole } from "./signer_role";
 
 /**
- * 
+ *
  * <xsd:element name="SignedSignatureProperties" type="SignedSignaturePropertiesType"/>
  * <xsd:complexType name="SignedSignaturePropertiesType">
  *     <xsd:sequence>
@@ -21,7 +21,7 @@ import { SignerRole } from "./signer_role";
  *     </xsd:sequence>
  *     <xsd:attribute name="Id" type="xsd:ID" use="optional"/>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({

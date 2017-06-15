@@ -9,7 +9,7 @@ import { ObjectIdentifier } from "./object_identifier";
 import { DigestAlgAndValueType } from "./signing_certificate";
 
 /**
- * 
+ *
  * <xsd:element name="SignaturePolicyIdentifier" type="SignaturePolicyIdentifierType"/>
  * <xsd:complexType name="SignaturePolicyIdentifierType">
  *     <xsd:choice>
@@ -49,7 +49,7 @@ import { DigestAlgAndValueType } from "./signing_certificate";
  *         <xsd:element name="int" type="xsd:integer" minOccurs="0" maxOccurs="unbounded"/>
  *     </xsd:sequence>
  * </xsd:complexType>
- *  
+ *
  */
 
 @XmlElement({ localName: "int" })

@@ -5,7 +5,7 @@ import { XmlXades } from "./xml";
 import { XadesObject } from "./xml_base";
 
 /**
- * 
+ *
  * <xsd:element name="EncapsulatedPKIData" type="EncapsulatedPKIDataType"/>
  * <xsd:complexType name="EncapsulatedPKIDataType">
  *   <xsd:simpleContent>
@@ -15,7 +15,7 @@ import { XadesObject } from "./xml_base";
  * 	   </xsd:extension>
  *   </xsd:simpleContent>
  * </xsd:complexType>
- * 
+ *
  */
 
 

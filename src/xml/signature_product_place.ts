@@ -4,7 +4,7 @@ import { XmlXades } from "./xml";
 import { XadesObject } from "./xml_base";
 
 /**
- * 
+ *
  * <xsd:element name="SignatureProductionPlace" type="SignatureProductionPlaceType"/>
  * <xsd:complexType name="SignatureProductionPlaceType">
  *     <xsd:sequence>
@@ -14,7 +14,7 @@ import { XadesObject } from "./xml_base";
  *         <xsd:element name="CountryName" type="xsd:string" minOccurs="0"/>
  *     </xsd:sequence>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({ localName: XmlXades.ElementNames.SignatureProductionPlace })

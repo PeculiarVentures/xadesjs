@@ -7,7 +7,7 @@ import { DataObjectFormat } from "./data_object_format";
 import { CommitmentTypeIndication } from "./commitment_type_indication";
 
 /**
- * 
+ *
  * <xsd:element name="SignedDataObjectProperties" type="SignedDataObjectPropertiesType"/>
  * <xsd:complexType name="SignedDataObjectPropertiesType">
  *     <xsd:sequence>
@@ -18,7 +18,7 @@ import { CommitmentTypeIndication } from "./commitment_type_indication";
  *     </xsd:sequence>
  *     <xsd:attribute name="Id" type="xsd:ID" use="optional"/>
  * </xsd:complexType>
- * 
+ *
  */
 
 

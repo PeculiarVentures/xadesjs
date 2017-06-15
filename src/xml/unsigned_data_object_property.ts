@@ -5,7 +5,7 @@ import { XadesCollection } from "./xml_base";
 import { Any } from "./any";
 
 /**
- * 
+ *
  * <xsd:element name="UnsignedDataObjectProperties" type="UnsignedDataObjectPropertiesType"/>
  * <xsd:complexType name="UnsignedDataObjectPropertiesType">
  *     <xsd:sequence>
@@ -13,7 +13,7 @@ import { Any } from "./any";
  *     </xsd:sequence>
  *     <xsd:attribute name="Id" type="xsd:ID" use="optional"/>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({ localName: XmlXades.ElementNames.UnsignedDataObjectProperty })

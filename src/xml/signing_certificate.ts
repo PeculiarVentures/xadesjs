@@ -6,7 +6,7 @@ import { XmlXades } from "./xml";
 import { XadesObject, XadesCollection } from "./xml_base";
 
 /**
- * 
+ *
  * <xsd:element name="SigningCertificate" type="CertIDListType"/>
  * <xsd:complexType name="CertIDListType">
  *     <xsd:sequence>
@@ -26,7 +26,7 @@ import { XadesObject, XadesCollection } from "./xml_base";
  *         <xsd:element ref="ds:DigestValue"/>
  *     </xsd:sequence>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({ localName: XmlXades.ElementNames.DigestAlgAndValue })

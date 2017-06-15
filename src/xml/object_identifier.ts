@@ -5,7 +5,7 @@ import { XmlXades } from "./xml";
 import { XadesObject, XadesCollection } from "./xml_base";
 
 /**
- * 
+ *
  * <!-- Start ObjectIdentifierType-->
  * <xsd:element name="ObjectIdentifier" type="ObjectIdentifierType"/>
  * <xsd:complexType name="ObjectIdentifierType">
@@ -34,7 +34,7 @@ import { XadesObject, XadesCollection } from "./xml_base";
  *   </xsd:sequence>
  * </xsd:complexType>
  * <!-- End ObjectIdentifierType-->
- * 
+ *
  */
 
 @XmlElement({
@@ -45,7 +45,7 @@ export class Identifier extends XadesObject {
     @XmlAttribute({
         localName: XmlXades.AttributeNames.Qualifier,
     })
-    Qualifier: "OIDAsURI" | "OIDAsURN"; // 
+    Qualifier: "OIDAsURI" | "OIDAsURN"; //
 
     @XmlContent({
         defaultValue: "",

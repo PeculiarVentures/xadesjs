@@ -5,7 +5,7 @@ import { XadesObject } from "./xml_base";
 import { ObjectIdentifier } from "./object_identifier";
 
 /**
- * 
+ *
  * <xsd:element name="DataObjectFormat" type="DataObjectFormatType"/>
  * <xsd:complexType name="DataObjectFormatType">
  *     <xsd:sequence>
@@ -16,7 +16,7 @@ import { ObjectIdentifier } from "./object_identifier";
  *     </xsd:sequence>
  *     <xsd:attribute name="ObjectReference" type="xsd:anyURI" use="required"/>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({ localName: XmlXades.ElementNames.DataObjectFormat })

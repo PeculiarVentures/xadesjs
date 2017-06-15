@@ -5,7 +5,7 @@ import { XadesObject, XadesCollection } from "./xml_base";
 import { EncapsulatedPKIData } from "./encapsulated_pki_data";
 
 /**
- * 
+ *
  * <xsd:element name="RevocationValues" type="RevocationValuesType"/>
  * <xsd:complexType name="RevocationValuesType">
  *     <xsd:sequence>
@@ -30,7 +30,7 @@ import { EncapsulatedPKIData } from "./encapsulated_pki_data";
  *         <xsd:element name="OtherValue" type="AnyType" maxOccurs="unbounded"/>
  *     </xsd:sequence>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({ localName: XmlXades.ElementNames.OtherValue })

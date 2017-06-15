@@ -6,7 +6,7 @@ import { XadesObject } from "./xml_base";
 import { ReferenceInfos, EncapsulatedTimeStampCollection, XMLTimeStampCollection } from "./generic_time_stamp";
 
 /**
- * 
+ *
  * <xsd:element name="OtherTimeStamp" type="OtherTimeStampType"/>
  * <xsd:complexType name="OtherTimeStampType">
  *     <xsd:complexContent>
@@ -23,7 +23,7 @@ import { ReferenceInfos, EncapsulatedTimeStampCollection, XMLTimeStampCollection
  *         </xsd:restriction>
  *     </xsd:complexContent>
  * </xsd:complexType>
- * 
+ *
  */
 
 

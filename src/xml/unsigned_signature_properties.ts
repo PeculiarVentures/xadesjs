@@ -10,7 +10,7 @@ import { CertificateValues } from "./certificate_values";
 import { RevocationValues } from "./revocation_values";
 
 /**
- * 
+ *
  * <xsd:element name="UnsignedSignatureProperties" type="UnsignedSignaturePropertiesType"/>
  * <xsd:complexType name="UnsignedSignaturePropertiesType">
  *     <xsd:choice maxOccurs="unbounded">
@@ -31,7 +31,7 @@ import { RevocationValues } from "./revocation_values";
  *     </xsd:choice>
  *     <xsd:attribute name="Id" type="xsd:ID" use="optional"/>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({ localName: XmlXades.ElementNames.SignatureTimeStamp })
@@ -60,7 +60,7 @@ export class AttributeRevocationValues extends RevocationValues implements Unsig
 
 /**
  * Abstract class for UnsignedSignatureProperties
- * 
+ *
  * @export
  * @class UnsignedSignatureProperty
  * @extends {XadesObject}

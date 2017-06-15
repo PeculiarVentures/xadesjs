@@ -8,7 +8,7 @@ import { EncapsulatedPKIData } from "./encapsulated_pki_data";
 import { Any } from "./any";
 
 /**
- * 
+ *
  * <xsd:element name="Include" type="IncludeType"/>
  * <xsd:complexType name="IncludeType">
  *   <xsd:attribute name="URI" type="xsd:anyURI" use="required"/>
@@ -37,7 +37,7 @@ import { Any } from "./any";
  *   </xsd:sequence>
  *   <xsd:attribute name="Id" type="xsd:ID" use="optional"/>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({

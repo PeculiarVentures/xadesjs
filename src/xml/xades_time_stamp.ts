@@ -6,7 +6,7 @@ import { XadesObject } from "./xml_base";
 import { Include, EncapsulatedTimeStampCollection, XMLTimeStampCollection } from "./generic_time_stamp";
 
 /**
- * 
+ *
  * <xsd:element name="XAdESTimeStamp" type="XAdESTimeStampType"/>
  * <xsd:complexType name="XAdESTimeStampType">
  *     <xsd:complexContent>

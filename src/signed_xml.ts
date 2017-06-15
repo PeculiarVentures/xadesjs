@@ -25,7 +25,7 @@ export interface OptionsXAdES extends XmlDSigJs.OptionsSign {
 
     /**
      * Sets a certificate of signer for signature. Optional
-     * 
+     *
      * @type {string} base64 string of X509 certificate
      * @memberOf OptionsXAdES
      */
@@ -58,7 +58,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     constructor(node?: Document | Element) {
         super(node);
 
-        this.CreateQualyingProperties();
+        this.CreateQualifyingProperties();
     }
 
     LoadXml(value: Element | string) {
@@ -83,9 +83,9 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     }
 
 
-    protected CreateQualyingProperties() {
+    protected CreateQualifyingProperties() {
         if (this.Properties)
-            throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Cannot create QualifyingProperties cause currensignature has got one. You must create CounterSignature");
+            throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Cannot create QualifyingProperties cause current signature has got one. You must create CounterSignature");
 
         let rnd = XmlDSigJs.Application.crypto.getRandomValues(new Uint8Array(6)) as Uint8Array;
         let id = XmlCore.Convert.ToHex(rnd);

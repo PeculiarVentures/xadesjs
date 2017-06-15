@@ -9,7 +9,7 @@ import { Any } from "./any";
 import { UnsignedSignatureProperty } from "./unsigned_signature_properties";
 
 /**
- * 
+ *
  * <xsd:element name="CompleteRevocationRefs" type="CompleteRevocationRefsType"/>
  * <xsd:complexType name="CompleteRevocationRefsType">
  *     <xsd:sequence>
@@ -67,7 +67,7 @@ import { UnsignedSignatureProperty } from "./unsigned_signature_properties";
  *         <xsd:element name="OtherRef" type="AnyType" maxOccurs="unbounded"/>
  *     </xsd:sequence>
  * </xsd:complexType>
- * 
+ *
  */
 
 @XmlElement({ localName: XmlXades.ElementNames.OtherRef })
