@@ -1,6 +1,6 @@
 {
   "name": "xadesjs",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "A pure Typescript/Javascript implementation of XAdES based on XMLDSIGjs.",
   "main": "dist/index.js",
   "types": "index.d.ts",
