@@ -7,7 +7,6 @@
   "module": "lib/index.js",
   "jsnext:main": "lib/index.js",
   "scripts": {
-    "prepublish": "npm run build",
     "start": "node test/html/server.js",
     "test": "mocha test/**/*.js",
     "test:local": "nyc --reporter=lcov npm test",
@@ -18,7 +17,7 @@
     "build:test": "tsc -p test",
     "build:types": "tsc --declaration --declarationDir types",
     "build:web": "rollup -c rollup.config.web.js && babel dist/xades.js --out-file dist/xades.js",
-    "pub": "npm version patch && npm publish && git push",
+    "pub": "npm run build && npm version patch && npm publish && git push",
     "sync": "git ac && git pull --rebase && git push",
     "coverage": "nyc npm test",
     "precoveragehtml": "npm run coverage",
