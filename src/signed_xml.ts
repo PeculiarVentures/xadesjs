@@ -38,7 +38,12 @@ export interface OptionsXAdES extends XmlDSigJs.OptionsSign {
 
 export class SignedXml extends XmlDSigJs.SignedXml {
 
+    protected signatureContainer: XAdES.XadesSignatures | null = null;
     protected properties: XAdES.QualifyingProperties | null = null;
+
+    get XmlSignatureContainer(): XAdES.XadesSignatures | null {
+        return this.signatureContainer;
+    }
 
     get Properties(): XAdES.QualifyingProperties | null {
         return this.properties;
@@ -55,14 +60,30 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         return this.Properties.UnsignedProperties;
     }
 
-    constructor(node?: Document | Element) {
+    constructor(node?: Document | Element, useContainer?: boolean) {
         super(node);
+
+        if (useContainer) {
+            this.signatureContainer = new XAdES.XadesSignatures();
+            this.signatureContainer.Add(this.XmlSignature)
+        }
 
         this.CreateQualifyingProperties();
     }
 
-    LoadXml(value: Element | string) {
+    GetXml() {
+        return this.XmlSignatureContainer
+            ? this.XmlSignatureContainer.GetXml()
+            : super.GetXml()
+    }
+
+    LoadXml(value: Element | string, useContainer?: boolean) {
         super.LoadXml(value as string);
+
+        if (useContainer) {
+            this.XmlSignatureContainer = new XAdES.XadesSignatures();
+            this.XmlSignatureContainer.Add(this.XmlSignature)
+        }
 
         let properties: XAdES.QualifyingProperties | null = null;
         this.XmlSignature.ObjectList.Some(item => {
@@ -82,6 +103,11 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         this.properties = properties;
     }
 
+    toString() {
+        return this.XmlSignatureContainer
+            ? this.XmlSignatureContainer.toString()
+            : super.toString()
+    }
 
     protected CreateQualifyingProperties() {
         if (this.Properties)
@@ -97,6 +123,14 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
         this.properties = dataObject.QualifyingProperties;
         this.XmlSignature.ObjectList.Add(dataObject);
+    }
+
+    protected GetSignatureNamespaces(): { [index: string]: string } {
+        let namespaces = super.GetSignatureNamespaces()
+        if (this.XmlSignatureContainer) {
+            namespaces[this.XmlSignatureContainer.prefix] = this.XmlSignatureContainer.namespaceURI
+        }
+        return namespaces
     }
 
     protected async ApplySignOptions(signature: XmlDSigJs.Signature, algorithm: Algorithm, key: CryptoKey, options: OptionsXAdES) {
