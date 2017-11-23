@@ -2,7 +2,7 @@
 
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/PeculiarVentures/xadesjs/master/LICENSE.md)
 [![CircleCI](https://circleci.com/gh/PeculiarVentures/xadesjs.svg?style=svg)](https://circleci.com/gh/PeculiarVentures/xadesjs)
-[![Coverage Status](https://coveralls.io/repos/github/PeculiarVentures/xadesjs/badge.svg?branch=master)](https://coveralls.io/github/PeculiarVentures/xadesjs?branch=master) 
+[![Coverage Status](https://coveralls.io/repos/github/PeculiarVentures/xadesjs/badge.svg?branch=master)](https://coveralls.io/github/PeculiarVentures/xadesjs?branch=master)
 [![npm version](https://badge.fury.io/js/xadesjs.svg)](https://badge.fury.io/js/xadesjs)
 
 [![NPM](https://nodei.co/npm-dl/xadesjs.png?months=2&height=2)](https://nodei.co/npm/xadesjs/)
@@ -45,15 +45,15 @@ The npm module has a `dist` folder with the following files:
 
 | Name            | Size   | Description                                    |
 |-----------------|--------|------------------------------------------------|
-| index.js        | 105 Kb | UMD module with external modules. Has comments | 
-| xades.js        | 803 Kb | UMD bundle module. Has comments                | 
+| index.js        | 105 Kb | UMD module with external modules. Has comments |
+| xades.js        | 803 Kb | UMD bundle module. Has comments                |
 | xades.min.js    | 296 Kb | minified UMD bundle module                     |
 
 There is also a `lib` folder with an ES2015 JS file which you can use with `rollup` bundler.
- 
+
 ## COMPATABILITY
 
-### CRYPTOGRAPHIC ALGORITHM SUPPORT 
+### CRYPTOGRAPHIC ALGORITHM SUPPORT
 
 | Name              | SHA1 | SHA2-256 | SHA2-384 | SHA2-512 |
 |-------------------|------|----------|----------|----------|
@@ -104,7 +104,7 @@ xadesjs.Application.setEngine("PKCS11", new WebCrypto({
 
 ## WARNING
 
-**Using XMLDSIG is a bit like running with scissors, that said it is needed for interoperability with a number of systems, for this reason, we have done this implementation.** 
+**Using XMLDSIG is a bit like running with scissors, that said it is needed for interoperability with a number of systems, for this reason, we have done this implementation.**
 
 ## Usage
 
@@ -143,7 +143,7 @@ interface OptionsXAdES {
     // Signed signature properties
 
     signingCertificate?: string;
-    policy?: OptionsPolicyIdentifier;
+    policy?: OptionsPolicyId;
     productionPlace?: OptionsProductionPlace;
     signerRole?: OptionsSignerRole;
 }
@@ -178,7 +178,7 @@ interface OptionsProductionPlace {
     country?: string;
 }
 
-interface OptionsPolicyIdentifier {
+interface OptionsPolicyId {
 }
 ```
 
@@ -242,8 +242,8 @@ function SignXml(xmlString, keys, algorithm) {
             var signedXml = new xadesjs.SignedXml();
 
             return signedXml.Sign(               // Signing document
-                algorithm,                              // algorithm 
-                keys.privateKey,                        // key 
+                algorithm,                              // algorithm
+                keys.privateKey,                        // key
                 xmlDoc,                                 // document
                 {                                       // options
                     keyValue: keys.publicKey,
@@ -316,8 +316,8 @@ function SignXml(xmlString, keys, algorithm) {
                     signedXml = new XAdES.SignedXml();
 
                     return signedXml.Sign(               // Signing document
-                        algorithm,                              // algorithm 
-                        keys.privateKey,                        // key 
+                        algorithm,                              // algorithm
+                        keys.privateKey,                        // key
                         xmlDoc,                                 // document
                         {                                       // options
                             keyValue: keys.publicKey,
@@ -343,7 +343,7 @@ function SignXml(xmlString, keys, algorithm) {
 </html>
 ````
 
-### Check XAdES-BES Signature 
+### Check XAdES-BES Signature
 
 #### In Node
 

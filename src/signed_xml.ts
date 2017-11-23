@@ -17,8 +17,28 @@ export interface OptionsProductionPlace {
     country?: string;
 }
 
-export interface OptionsPolicyIdentifier {
+export interface OptionsNoticeReference {
+    organization: string;
+    noticeNumbers: number[];
+}
 
+export interface OptionsPolicyUserNotice {
+    noticeRef?: OptionsNoticeReference;
+    explicitText?: string;
+}
+
+export interface OptionsPolicyIdentifier {
+    qualifier: XAdES.IdentifierQualifier;
+    value: string;
+    description?: string;
+    references?: string[];
+}
+
+export interface OptionsPolicyId {
+    identifier: OptionsPolicyIdentifier;
+    transforms?: XmlDSigJs.OptionsSignTransform[];
+    hash: AlgorithmIdentifier;
+    qualifiers?: (OptionsPolicyUserNotice | string)[];
 }
 
 export interface OptionsXAdES extends XmlDSigJs.OptionsSign {
@@ -31,7 +51,7 @@ export interface OptionsXAdES extends XmlDSigJs.OptionsSign {
      */
     signingCertificate?: string;
 
-    policy?: OptionsPolicyIdentifier;
+    policy?: OptionsPolicyId | boolean;
     productionPlace?: OptionsProductionPlace;
     signerRole?: OptionsSignerRole;
 }
@@ -65,7 +85,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
         if (useContainer) {
             this.signatureContainer = new XAdES.XadesSignatures();
-            this.signatureContainer.Add(this.XmlSignature)
+            this.signatureContainer.Add(this.XmlSignature);
         }
 
         this.CreateQualifyingProperties();
@@ -74,15 +94,15 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     GetXml() {
         return this.XmlSignatureContainer
             ? this.XmlSignatureContainer.GetXml()
-            : super.GetXml()
+            : super.GetXml();
     }
 
     LoadXml(value: Element | string, useContainer?: boolean) {
         super.LoadXml(value as string);
 
         if (useContainer) {
-            this.XmlSignatureContainer = new XAdES.XadesSignatures();
-            this.XmlSignatureContainer.Add(this.XmlSignature)
+            this.signatureContainer = new XAdES.XadesSignatures();
+            this.XmlSignatureContainer!.Add(this.XmlSignature);
         }
 
         let properties: XAdES.QualifyingProperties | null = null;
@@ -106,7 +126,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     toString() {
         return this.XmlSignatureContainer
             ? this.XmlSignatureContainer.toString()
-            : super.toString()
+            : super.toString();
     }
 
     protected CreateQualifyingProperties() {
@@ -126,11 +146,11 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     }
 
     protected GetSignatureNamespaces(): { [index: string]: string } {
-        let namespaces = super.GetSignatureNamespaces()
+        let namespaces = super.GetSignatureNamespaces();
         if (this.XmlSignatureContainer) {
-            namespaces[this.XmlSignatureContainer.prefix] = this.XmlSignatureContainer.namespaceURI
+            namespaces[this.XmlSignatureContainer.Prefix] = this.XmlSignatureContainer.NamespaceURI;
         }
-        return namespaces
+        return namespaces;
     }
 
     protected async ApplySignOptions(signature: XmlDSigJs.Signature, algorithm: Algorithm, key: CryptoKey, options: OptionsXAdES) {
@@ -151,7 +171,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
             signature.SignedInfo.References.Add(xadesRef);
 
             await this.ApplySigningCertificate(options.signingCertificate);
-            this.ApplySignaturePolicyIdentifier(options.policy);
+            await this.ApplySignaturePolicyIdentifier(options.policy);
             this.ApplySignatureProductionPlace(options.productionPlace);
             this.ApplySignerRoles(options.signerRole);
         }
@@ -182,11 +202,85 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         }
     }
 
-    protected ApplySignaturePolicyIdentifier(options?: OptionsPolicyIdentifier) {
+    protected async ApplySignaturePolicyIdentifier(options?: OptionsPolicyId | boolean) {
         if (this.Properties) {
             let ssp = this.Properties.SignedProperties.SignedSignatureProperties;
-            if (options) {
+            if (options && typeof options === "object") {
+                let policyId = new XAdES.SignaturePolicyId();
 
+                policyId.SigPolicyId = new XAdES.SigPolicyId();
+                policyId.SigPolicyId.Identifier = new XAdES.Identifier();
+                policyId.SigPolicyId.Identifier.Qualifier = options.identifier.qualifier;
+                policyId.SigPolicyId.Identifier.Value = options.identifier.value;
+                if (options.identifier.description) {
+                    policyId.SigPolicyId.Description = options.identifier.description;
+                }
+                if (options.identifier.references) {
+                    policyId.SigPolicyId.DocumentationReferences = new XAdES.DocumentationReferences();
+                    options.identifier.references.forEach(referenceValue => {
+                        let reference = new XAdES.DocumentationReference();
+                        reference.Uri = referenceValue;
+                        policyId.SigPolicyId.DocumentationReferences.Add(reference);
+                    });
+                }
+
+                if (options.transforms && options.transforms.length) {
+                    policyId.Transforms = new XmlDSigJs.Transforms();
+                    options.transforms.forEach(transform => {
+                        policyId.Transforms.Add(this.ResolveTransform(transform));
+                    });
+                }
+
+                policyId.SigPolicyHash = new XAdES.SigPolicyHash();
+                policyId.SigPolicyHash.DigestMethod = new XmlDSigJs.DigestMethod();
+                const digestAlgorithm = XmlDSigJs.CryptoConfig.GetHashAlgorithm(options.hash);
+                policyId.SigPolicyHash.DigestMethod.Algorithm = digestAlgorithm.namespaceURI;
+                let identifierDoc = policyId.SigPolicyId.Identifier.GetXml()!.cloneNode(true) as Element;
+                this.CopyNamespaces(identifierDoc, identifierDoc, true);
+                this.InjectNamespaces(this.GetSignatureNamespaces(), identifierDoc, true);
+                let identifierContent: any = null;
+                if (policyId.Transforms && policyId.Transforms.Count) {
+                    identifierContent = this.ApplyTransforms(policyId.Transforms, identifierDoc);
+                } else {
+                    let c14n = new XmlDSigJs.XmlDsigC14NTransform();
+                    c14n.LoadInnerXml(identifierDoc);
+                    identifierContent = c14n.GetOutput();
+                }
+                policyId.SigPolicyHash.DigestValue = await digestAlgorithm.Digest(identifierContent);
+
+                if (options.qualifiers) {
+                    policyId.SigPolicyQualifiers = new XAdES.SigPolicyQualifiers();
+                    options.qualifiers.forEach(qualifierValue => {
+                        let container = new XAdES.SigPolicyQualifier();
+                        if (typeof qualifierValue === "string") {
+                            let qualifier = new XAdES.SPURI();
+                            qualifier.Value = qualifierValue;
+                            container.Add(qualifier);
+                        } else {
+                            let qualifier = new XAdES.SPUserNotice();
+                            if (qualifierValue.explicitText) {
+                                qualifier.ExplicitText = qualifierValue.explicitText;
+                            }
+                            if (qualifierValue.noticeRef) {
+                                qualifier.NoticeRef = new XAdES.NoticeReference();
+                                qualifier.NoticeRef.Organization = qualifierValue.noticeRef.organization;
+                                qualifier.NoticeRef.NoticeNumbers = new XAdES.IntegerList();
+                                if (qualifierValue.noticeRef.noticeNumbers) {
+                                    qualifierValue.noticeRef.noticeNumbers.forEach(numberValue => {
+                                        let noticeNumber = new XAdES.Integer();
+                                        noticeNumber.Value = numberValue;
+                                        qualifier.NoticeRef.NoticeNumbers.Add(noticeNumber);
+                                    });
+                                }
+                            }
+                            container.Add(qualifier);
+                        }
+                        policyId.SigPolicyQualifiers.Add(container);
+                    });
+                }
+
+                ssp.SignaturePolicyIdentifier.SignaturePolicyId = policyId;
+                ssp.SignaturePolicyIdentifier.SignaturePolicyImplied = false;
             }
             else {
                 ssp.SignaturePolicyIdentifier.SignaturePolicyImplied = true;

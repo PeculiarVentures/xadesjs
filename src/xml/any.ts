@@ -1,7 +1,7 @@
 import { XmlElement, XmlContent } from "xml-core";
 
 import { XmlXades } from "./xml";
-import { XadesObject } from "./xml_base";
+import { XadesObject, XadesCollection } from "./xml_base";
 
 /**
  * <xsd:element name="Any" type="AnyType"/>
@@ -22,3 +22,8 @@ export class Any extends XadesObject {
     Value: string;
 
 }
+
+@XmlElement({
+    localName: XmlXades.ElementNames.Any
+})
+export class AnyCollection extends XadesCollection<XadesObject> { }

@@ -37,6 +37,8 @@ import { XadesObject, XadesCollection } from "./xml_base";
  *
  */
 
+export type IdentifierQualifier = "OIDAsURI" | "OIDAsURN";
+
 @XmlElement({
     localName: XmlXades.ElementNames.Identifier
 })
@@ -45,7 +47,7 @@ export class Identifier extends XadesObject {
     @XmlAttribute({
         localName: XmlXades.AttributeNames.Qualifier,
     })
-    Qualifier: "OIDAsURI" | "OIDAsURN"; //
+    Qualifier: IdentifierQualifier;
 
     @XmlContent({
         defaultValue: "",
