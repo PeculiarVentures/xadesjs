@@ -1,8 +1,8 @@
-import { XmlElement, XmlAttribute } from "xml-core";
+import { XmlAttribute, XmlElement } from "xml-core";
 
+import { Any } from "./any";
 import { XmlXades } from "./xml";
 import { XadesCollection } from "./xml_base";
-import { Any } from "./any";
 
 /**
  *
@@ -23,6 +23,6 @@ export class UnsignedDataObjectProperty extends Any { }
 export class UnsignedDataObjectProperties extends XadesCollection<UnsignedDataObjectProperty> {
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    Id: string;
+    public Id: string;
 
 }

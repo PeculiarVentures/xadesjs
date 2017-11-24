@@ -1,4 +1,4 @@
-import { XmlElement, XmlChildElement } from "xml-core";
+import { XmlChildElement, XmlElement } from "xml-core";
 import { DataObject as XmlDSigDataObject, XmlSignature } from "xmldsigjs";
 
 import { QualifyingProperties } from "./qualifying_properties";
@@ -7,6 +7,6 @@ import { QualifyingProperties } from "./qualifying_properties";
 export class DataObject extends XmlDSigDataObject {
 
     @XmlChildElement({parser: QualifyingProperties})
-    QualifyingProperties: QualifyingProperties;
+    public QualifyingProperties: QualifyingProperties;
 
 }

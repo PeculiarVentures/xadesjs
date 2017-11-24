@@ -1,4 +1,4 @@
-import { XmlElement, XmlAttribute } from "xml-core";
+import { XmlAttribute, XmlElement } from "xml-core";
 
 import { XmlXades } from "./xml";
 import { XadesObject } from "./xml_base";
@@ -17,9 +17,9 @@ import { XadesObject } from "./xml_base";
 export class QualifyingPropertiesReference extends XadesObject {
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.URI, required: true })
-    Uri: string;
+    public Uri: string;
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    Id: string;
+    public Id: string;
 
 }

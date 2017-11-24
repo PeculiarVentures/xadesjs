@@ -1,10 +1,10 @@
-import { XmlElement, XmlChildElement, XmlContent } from "xml-core";
+import { XmlChildElement, XmlContent, XmlElement } from "xml-core";
 import { IConverter } from "xml-core";
 
-import { XmlXades } from "./xml";
-import { XadesObject, XadesCollection } from "./xml_base";
-import { ObjectIdentifier } from "./object_identifier";
 import { Any } from "./any";
+import { ObjectIdentifier } from "./object_identifier";
+import { XmlXades } from "./xml";
+import { XadesCollection, XadesObject } from "./xml_base";
 
 /**
  *
@@ -37,7 +37,7 @@ export class CommitmentTypeQualifiers extends XadesCollection<CommitmentTypeQual
 export class ObjectReference extends XadesObject {
 
     @XmlContent({ required: true })
-    Value: string;
+    public Value: string;
 }
 
 @XmlElement({ localName: "ObjectReferences", parser: ObjectReference })
@@ -50,7 +50,7 @@ const XmlAllSignedDataObjectsConverter: IConverter<boolean> = {
     },
     get: (value: boolean) => {
         return void 0;
-    }
+    },
 };
 
 @XmlElement({ localName: XmlXades.ElementNames.CommitmentTypeIndication })
@@ -63,10 +63,10 @@ export class CommitmentTypeIndication extends XadesObject {
         prefix: XmlXades.DefaultPrefix,
         parser: ObjectIdentifier,
     })
-    CommitmentTypeId: ObjectIdentifier;
+    public CommitmentTypeId: ObjectIdentifier;
 
     @XmlChildElement({ parser: ObjectReferenceCollection, noRoot: true })
-    ObjectReference: ObjectReferenceCollection;
+    public ObjectReference: ObjectReferenceCollection;
 
     @XmlChildElement({
         localName: XmlXades.ElementNames.AllSignedDataObjects,
@@ -75,9 +75,9 @@ export class CommitmentTypeIndication extends XadesObject {
         converter: XmlAllSignedDataObjectsConverter,
         defaultValue: false,
     })
-    AllSignedDataObjects: boolean;
+    public AllSignedDataObjects: boolean;
 
     @XmlChildElement({ localName: XmlXades.ElementNames.CommitmentTypeQualifiers, parser: CommitmentTypeQualifier })
-    CommitmentTypeQualifiers: CommitmentTypeQualifiers;
+    public CommitmentTypeQualifiers: CommitmentTypeQualifiers;
 
 }

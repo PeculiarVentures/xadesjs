@@ -25,5 +25,3 @@ export * from "./unsigned_signature_properties";
 export * from "./xades_time_stamp";
 export * from "./data_object";
 export * from "./xml";
-export * from "./xades_signatures";
-export * from "./asic";

@@ -1,9 +1,9 @@
-import { XmlElement, XmlChildElement, XmlAttribute } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 
+import { UnsignedDataObjectProperties } from "./unsigned_data_object_property";
+import { UnsignedSignatureProperties } from "./unsigned_signature_properties";
 import { XmlXades } from "./xml";
 import { XadesObject } from "./xml_base";
-import { UnsignedSignatureProperties } from "./unsigned_signature_properties";
-import { UnsignedDataObjectProperties } from "./unsigned_data_object_property";
 
 /**
  *
@@ -19,17 +19,17 @@ import { UnsignedDataObjectProperties } from "./unsigned_data_object_property";
  */
 
 @XmlElement({
-    localName: XmlXades.ElementNames.UnsignedProperties
+    localName: XmlXades.ElementNames.UnsignedProperties,
 })
 export class UnsignedProperties extends XadesObject {
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    Id: string;
+    public Id: string;
 
     @XmlChildElement({parser: UnsignedSignatureProperties})
-    UnsignedSignatureProperties: UnsignedSignatureProperties;
+    public UnsignedSignatureProperties: UnsignedSignatureProperties;
 
     @XmlChildElement({parser: UnsignedDataObjectProperties})
-    UnsignedDataObjectProperties: UnsignedDataObjectProperties;
+    public UnsignedDataObjectProperties: UnsignedDataObjectProperties;
 
 }

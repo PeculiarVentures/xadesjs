@@ -1,9 +1,9 @@
-import { XmlElement, XmlChildElement, XmlAttribute } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 
-import { XmlXades } from "./xml";
-import { XadesObject } from "./xml_base";
 import { SignedProperties } from "./signed_properties";
 import { UnsignedProperties } from "./unsigned_properties";
+import { XmlXades } from "./xml";
+import { XadesObject } from "./xml_base";
 
 /**
  *
@@ -20,19 +20,20 @@ import { UnsignedProperties } from "./unsigned_properties";
  */
 
 @XmlElement({
-    localName: XmlXades.ElementNames.QualifyingProperties
+    localName: XmlXades.ElementNames.QualifyingProperties,
 })
 export class QualifyingProperties extends XadesObject {
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Target, required: true })
-    Target: string;
+    public Target: string;
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    Id: string;
+    public Id: string;
 
     @XmlChildElement({ parser: SignedProperties })
-    SignedProperties: SignedProperties;
+    public SignedProperties: SignedProperties;
 
     @XmlChildElement({ parser: UnsignedProperties })
-    UnsignedProperties: UnsignedProperties;
+    public UnsignedProperties: UnsignedProperties;
+
 }

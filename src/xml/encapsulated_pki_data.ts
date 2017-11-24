@@ -1,4 +1,4 @@
-import { XmlElement, XmlContent, XmlAttribute } from "xml-core";
+import { XmlAttribute, XmlContent, XmlElement } from "xml-core";
 import { IConverter, XmlBase64Converter } from "xml-core";
 
 import { XmlXades } from "./xml";
@@ -18,8 +18,6 @@ import { XadesObject } from "./xml_base";
  *
  */
 
-
-
 const XmlEncodingConverter: IConverter<EncodingType> = {
     get: (value: EncodingType) => {
         switch (value) {
@@ -33,39 +31,39 @@ const XmlEncodingConverter: IConverter<EncodingType> = {
         return void 0;
     },
     set: (value: string) => {
-        let regexp = /#(\w+)$/;
-        let res = regexp.exec(value);
-        if (res)
+        const regexp = /#(\w+)$/;
+        const res = regexp.exec(value);
+        if (res) {
             return res[1].toLowerCase() as EncodingType;
+        }
         return null;
-    }
+    },
 };
 
 export type EncodingType = "der" | "ber" | "cer" | "per" | "xer" | null;
 
-
 @XmlElement({
-    localName: "EncapsulatedPKIData"
+    localName: "EncapsulatedPKIData",
 })
 export class EncapsulatedPKIData extends XadesObject {
 
     @XmlAttribute({
         localName: XmlXades.AttributeNames.Id,
-        defaultValue: ""
+        defaultValue: "",
     })
-    Id: string;
+    public Id: string;
 
     @XmlAttribute({
         localName: XmlXades.AttributeNames.Encoding,
         defaultValue: null,
         converter: XmlEncodingConverter,
     })
-    Encoding: EncodingType;
+    public Encoding: EncodingType;
 
     @XmlContent({
         required: true,
         converter: XmlBase64Converter,
     })
-    Value: Uint8Array;
+    public Value: Uint8Array;
 
 }

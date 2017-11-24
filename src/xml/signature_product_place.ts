@@ -1,4 +1,4 @@
-import { XmlElement, XmlChildElement } from "xml-core";
+import { XmlChildElement, XmlElement } from "xml-core";
 
 import { XmlXades } from "./xml";
 import { XadesObject } from "./xml_base";
@@ -26,7 +26,7 @@ export class SignatureProductionPlace extends XadesObject {
         namespaceURI: XmlXades.NamespaceURI,
         prefix: XmlXades.DefaultPrefix,
     })
-    City: string;
+    public City: string;
 
     @XmlChildElement({
         localName: XmlXades.ElementNames.StateOrProvince,
@@ -34,7 +34,7 @@ export class SignatureProductionPlace extends XadesObject {
         namespaceURI: XmlXades.NamespaceURI,
         prefix: XmlXades.DefaultPrefix,
     })
-    StateOrProvince: string;
+    public StateOrProvince: string;
 
     @XmlChildElement({
         localName: XmlXades.ElementNames.PostalCode,
@@ -42,7 +42,7 @@ export class SignatureProductionPlace extends XadesObject {
         namespaceURI: XmlXades.NamespaceURI,
         prefix: XmlXades.DefaultPrefix,
     })
-    PostalCode: string;
+    public PostalCode: string;
 
     @XmlChildElement({
         localName: XmlXades.ElementNames.CountryName,
@@ -50,5 +50,5 @@ export class SignatureProductionPlace extends XadesObject {
         namespaceURI: XmlXades.NamespaceURI,
         prefix: XmlXades.DefaultPrefix,
     })
-    CountryName: string;
+    public CountryName: string;
 }
