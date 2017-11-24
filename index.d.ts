@@ -21,7 +21,7 @@ declare namespace XAdES {
         code?: string;
         country?: string;
     }
-    export interface OptionsPolicyIdentifier {
+    export interface OptionsPolicyId {
     }
     export interface OptionsXAdES extends XmlDSigJs.OptionsSign {
         /**
@@ -31,7 +31,7 @@ declare namespace XAdES {
          * @memberOf OptionsXAdES
          */
         signingCertificate?: string;
-        policy?: OptionsPolicyIdentifier;
+        policy?: OptionsPolicyId;
         productionPlace?: OptionsProductionPlace;
         signerRole?: OptionsSignerRole;
     }
@@ -46,7 +46,7 @@ declare namespace XAdES {
         protected ApplySignOptions(signature: XmlDSigJs.Signature, algorithm: Algorithm, key: CryptoKey, options: OptionsXAdES): Promise<void>;
         Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsXAdES): PromiseLike<XmlDSigJs.Signature>;
         protected ApplySigningCertificate(base64string?: string): Promise<void>;
-        protected ApplySignaturePolicyIdentifier(options?: OptionsPolicyIdentifier): void;
+        protected ApplySignaturePolicyIdentifier(options?: OptionsPolicyId): void;
         protected ApplySignatureProductionPlace(options?: OptionsProductionPlace): void;
         protected ApplySignerRoles(options?: OptionsSignerRole): void;
         protected VerifySigningCertificate(): Promise<XmlDSigJs.X509Certificate | null>;

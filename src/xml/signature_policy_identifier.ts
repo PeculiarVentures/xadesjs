@@ -4,7 +4,7 @@ import { Transforms } from "xmldsigjs";
 
 import { XmlXades } from "./xml";
 import { XadesObject, XadesCollection } from "./xml_base";
-import { Any } from "./any";
+import { AnyCollection } from "./any";
 import { ObjectIdentifier } from "./object_identifier";
 import { DigestAlgAndValueType } from "./signing_certificate";
 
@@ -52,6 +52,15 @@ import { DigestAlgAndValueType } from "./signing_certificate";
  *
  */
 
+@XmlElement({ localName: XmlXades.ElementNames.SigPolicyId })
+export class SigPolicyId extends ObjectIdentifier { }
+
+@XmlElement({ localName: XmlXades.ElementNames.SigPolicyHash })
+export class SigPolicyHash extends DigestAlgAndValueType { }
+
+@XmlElement({ localName: XmlXades.ElementNames.SigPolicyQualifier })
+export class SigPolicyQualifier extends AnyCollection { }
+
 @XmlElement({ localName: "int" })
 export class Integer extends XadesObject {
 
@@ -93,8 +102,13 @@ export class SPUserNotice extends XadesObject {
 
 }
 
-@XmlElement({ localName: XmlXades.ElementNames.SigPolicyQualifier })
-export class SigPolicyQualifier extends Any { }
+@XmlElement({ localName: XmlXades.ElementNames.SPURI })
+export class SPURI extends XadesObject {
+
+    @XmlContent()
+    Value: string;
+
+}
 
 @XmlElement({ localName: XmlXades.ElementNames.SigPolicyQualifiers, parser: SigPolicyQualifier })
 export class SigPolicyQualifiers extends XadesCollection<SigPolicyQualifier> { }
@@ -102,15 +116,14 @@ export class SigPolicyQualifiers extends XadesCollection<SigPolicyQualifier> { }
 @XmlElement({ localName: XmlXades.ElementNames.SignaturePolicyId })
 export class SignaturePolicyId extends XadesObject {
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.SigPolicyId, parser: ObjectIdentifier, required: true })
-    SigPolicyId: ObjectIdentifier;
+    @XmlChildElement({ localName: XmlXades.ElementNames.SigPolicyId, parser: SigPolicyId, required: true })
+    SigPolicyId: SigPolicyId;
 
     @XmlChildElement({ parser: Transforms })
     Transforms: Transforms;
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.SigPolicyHash, parser: DigestAlgAndValueType, required: true })
-    SigPolicyHash: DigestAlgAndValueType;
-
+    @XmlChildElement({ localName: XmlXades.ElementNames.SigPolicyHash, parser: SigPolicyHash, required: true })
+    SigPolicyHash: SigPolicyHash;
 
     @XmlChildElement({ localName: XmlXades.ElementNames.SigPolicyQualifiers, parser: SigPolicyQualifiers })
     SigPolicyQualifiers: SigPolicyQualifiers;
