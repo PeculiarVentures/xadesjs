@@ -1,7 +1,7 @@
-import { XmlElement, XmlContent } from "xml-core";
+import { XmlContent, XmlElement } from "xml-core";
 
 import { XmlXades } from "./xml";
-import { XadesObject, XadesCollection } from "./xml_base";
+import { XadesCollection, XadesObject } from "./xml_base";
 
 /**
  * <xsd:element name="Any" type="AnyType"/>
@@ -14,16 +14,16 @@ import { XadesObject, XadesCollection } from "./xml_base";
  */
 
 @XmlElement({
-    localName: XmlXades.ElementNames.Any
+    localName: XmlXades.ElementNames.Any,
 })
 export class Any extends XadesObject {
 
     @XmlContent()
-    Value: string;
+    public Value: string;
 
 }
 
 @XmlElement({
-    localName: XmlXades.ElementNames.Any
+    localName: XmlXades.ElementNames.Any,
 })
 export class AnyCollection extends XadesCollection<XadesObject> { }

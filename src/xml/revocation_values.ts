@@ -1,8 +1,8 @@
-import { XmlElement, XmlChildElement, XmlAttribute } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 
-import { XmlXades } from "./xml";
-import { XadesObject, XadesCollection } from "./xml_base";
 import { EncapsulatedPKIData } from "./encapsulated_pki_data";
+import { XmlXades } from "./xml";
+import { XadesCollection, XadesObject } from "./xml_base";
 
 /**
  *
@@ -55,15 +55,15 @@ export class CRLValues extends XadesCollection<EncapsulatedCRLValue> { }
 export class RevocationValues extends XadesObject {
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    Id: string;
+    public Id: string;
 
     @XmlChildElement({ parser: CRLValues })
-    CRLValues: CRLValues;
+    public CRLValues: CRLValues;
 
     @XmlChildElement({ parser: OCSPValues })
-    OCSPValues: OCSPValues;
+    public OCSPValues: OCSPValues;
 
     @XmlChildElement({ parser: OtherValues })
-    OtherValues: OtherValues;
+    public OtherValues: OtherValues;
 
 }

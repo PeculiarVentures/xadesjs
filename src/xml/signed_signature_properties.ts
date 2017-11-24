@@ -1,12 +1,12 @@
-import { XmlElement, XmlChildElement, XmlAttribute } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 
-import { XmlXades } from "./xml";
-import { XadesObject } from "./xml_base";
 import { XmlDateTimeConverter } from "./converter";
-import { SigningCertificate } from "./signing_certificate";
 import { SignaturePolicyIdentifier } from "./signature_policy_identifier";
 import { SignatureProductionPlace } from "./signature_product_place";
 import { SignerRole } from "./signer_role";
+import { SigningCertificate } from "./signing_certificate";
+import { XmlXades } from "./xml";
+import { XadesObject } from "./xml_base";
 
 /**
  *
@@ -25,12 +25,12 @@ import { SignerRole } from "./signer_role";
  */
 
 @XmlElement({
-    localName: XmlXades.ElementNames.SignedSignatureProperties
+    localName: XmlXades.ElementNames.SignedSignatureProperties,
 })
 export class SignedSignatureProperties extends XadesObject {
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    Id: string;
+    public Id: string;
 
     @XmlChildElement({
         localName: XmlXades.ElementNames.SigningTime,
@@ -38,18 +38,18 @@ export class SignedSignatureProperties extends XadesObject {
         prefix: XmlXades.DefaultPrefix,
         converter: XmlDateTimeConverter,
     })
-    SigningTime: Date;
+    public SigningTime: Date;
 
     @XmlChildElement({ parser: SigningCertificate })
-    SigningCertificate: SigningCertificate;
+    public SigningCertificate: SigningCertificate;
 
     @XmlChildElement({ parser: SignaturePolicyIdentifier })
-    SignaturePolicyIdentifier: SignaturePolicyIdentifier;
+    public SignaturePolicyIdentifier: SignaturePolicyIdentifier;
 
     @XmlChildElement({ parser: SignatureProductionPlace })
-    SignatureProductionPlace: SignatureProductionPlace;
+    public SignatureProductionPlace: SignatureProductionPlace;
 
     @XmlChildElement({ parser: SignerRole })
-    SignerRole: SignerRole;
+    public SignerRole: SignerRole;
 
 }

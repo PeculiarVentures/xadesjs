@@ -1,9 +1,9 @@
-import { XmlElement, XmlAttribute, XmlChildElement } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 import { XmlBase64Converter } from "xml-core";
-import { XmlSignature, X509IssuerSerial, DigestMethod } from "xmldsigjs";
+import { DigestMethod, X509IssuerSerial, XmlSignature } from "xmldsigjs";
 
 import { XmlXades } from "./xml";
-import { XadesObject, XadesCollection } from "./xml_base";
+import { XadesCollection, XadesObject } from "./xml_base";
 
 /**
  *
@@ -36,7 +36,7 @@ export class DigestAlgAndValueType extends XadesObject {
         parser: DigestMethod,
         required: true,
     })
-    DigestMethod: DigestMethod;
+    public DigestMethod: DigestMethod;
 
     @XmlChildElement({
         localName: XmlSignature.ElementNames.DigestValue,
@@ -45,7 +45,7 @@ export class DigestAlgAndValueType extends XadesObject {
         converter: XmlBase64Converter,
         required: true,
     })
-    DigestValue: Uint8Array;
+    public DigestValue: Uint8Array;
 
 }
 
@@ -56,13 +56,13 @@ export class IssuerSerial extends X509IssuerSerial { }
 export class Cert extends XadesObject {
 
     @XmlChildElement({ localName: XmlXades.ElementNames.CertDigest, parser: DigestAlgAndValueType, required: true })
-    CertDigest: DigestAlgAndValueType;
+    public CertDigest: DigestAlgAndValueType;
 
     @XmlChildElement({ parser: IssuerSerial, required: true })
-    IssuerSerial: X509IssuerSerial;
+    public IssuerSerial: X509IssuerSerial;
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.URI })
-    Uri: string;
+    public Uri: string;
 
 }
 

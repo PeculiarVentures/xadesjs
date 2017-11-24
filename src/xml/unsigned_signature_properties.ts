@@ -1,13 +1,13 @@
-import { XmlElement, XmlAttribute, XmlNodeType } from "xml-core";
+import { XmlAttribute, XmlElement, XmlNodeType } from "xml-core";
 
-import { XmlXades } from "./xml";
-import { XadesObject, XadesCollection } from "./xml_base";
-import { XAdESTimeStamp } from "./xades_time_stamp";
+import { CertificateValues } from "./certificate_values";
 import { CompleteCertificateRefs } from "./complete_certificate_refs";
 import { CompleteRevocationRefs } from "./complete_revocation_refs";
 import { CounterSignature } from "./counter_signature";
-import { CertificateValues } from "./certificate_values";
 import { RevocationValues } from "./revocation_values";
+import { XAdESTimeStamp } from "./xades_time_stamp";
+import { XmlXades } from "./xml";
+import { XadesCollection, XadesObject } from "./xml_base";
 
 /**
  *
@@ -73,14 +73,14 @@ export class UnsignedSignatureProperty extends XadesObject {
 export class UnsignedSignatureProperties extends XadesCollection<UnsignedSignatureProperty> {
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    Id: string;
+    public Id: string;
 
-    OnLoadXml(element: Element) {
-        debugger;
+    public OnLoadXml(element: Element) {
         for (let i = 0; i < element.childNodes.length; i++) {
             const node = element.childNodes.item(i);
-            if (node.nodeType !== XmlNodeType.Element)
+            if (node.nodeType !== XmlNodeType.Element) {
                 continue;
+            }
             let XmlClass: typeof UnsignedSignatureProperty | undefined;
             switch (node.localName) {
                 case XmlXades.ElementNames.CounterSignature:

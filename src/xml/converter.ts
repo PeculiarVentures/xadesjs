@@ -17,5 +17,5 @@ export const XmlDateTimeConverter: IConverter<Date> = {
             return value.toISOString();
         }
         return undefined;
-    }
+    },
 };

@@ -1,8 +1,8 @@
-import { XmlElement, XmlAttribute, XmlChildElement } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 
+import { ObjectIdentifier } from "./object_identifier";
 import { XmlXades } from "./xml";
 import { XadesObject } from "./xml_base";
-import { ObjectIdentifier } from "./object_identifier";
 
 /**
  *
@@ -23,18 +23,18 @@ import { ObjectIdentifier } from "./object_identifier";
 export class DataObjectFormat extends XadesObject {
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.ObjectReference, required: true })
-    ObjectReference: string;
+    public ObjectReference: string;
 
     @XmlChildElement({ localName: XmlXades.ElementNames.Description, namespaceURI: XmlXades.NamespaceURI, prefix: XmlXades.DefaultPrefix })
-    Description: string;
+    public Description: string;
 
     @XmlChildElement({ parser: ObjectIdentifier })
-    ObjectIdentifier: ObjectIdentifier;
+    public ObjectIdentifier: ObjectIdentifier;
 
     @XmlChildElement({ localName: XmlXades.ElementNames.MimeType, namespaceURI: XmlXades.NamespaceURI, prefix: XmlXades.DefaultPrefix })
-    MimeType: string;
+    public MimeType: string;
 
     @XmlChildElement({ localName: XmlXades.ElementNames.Encoding, namespaceURI: XmlXades.NamespaceURI, prefix: XmlXades.DefaultPrefix })
-    Encoding: string;
+    public Encoding: string;
 
 }

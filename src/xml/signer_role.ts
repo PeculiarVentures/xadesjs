@@ -1,9 +1,10 @@
-import { XmlElement, XmlChildElement } from "xml-core";
+import { XmlChildElement, XmlElement } from "xml-core";
 
-import { XmlXades } from "./xml";
-import { XadesObject, XadesCollection } from "./xml_base";
-import { EncapsulatedPKIData } from "./encapsulated_pki_data";
 import { Any } from "./any";
+import { EncapsulatedPKIData } from "./encapsulated_pki_data";
+import { XmlXades } from "./xml";
+import { XadesCollection, XadesObject } from "./xml_base";
+
 /**
  *
  * <xsd:element name="SignerRole" type="SignerRoleType"/>
@@ -42,8 +43,9 @@ export class CertifiedRoles extends XadesCollection<CertifiedRole> { }
 export class SignerRole extends XadesObject {
 
     @XmlChildElement({ parser: ClaimedRoles })
-    ClaimedRoles: ClaimedRoles;
+    public ClaimedRoles: ClaimedRoles;
 
     @XmlChildElement({ parser: CertifiedRoles })
-    CertifiedRoles: CertifiedRoles;
+    public CertifiedRoles: CertifiedRoles;
+
 }

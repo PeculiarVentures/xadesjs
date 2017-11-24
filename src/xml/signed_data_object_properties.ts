@@ -1,10 +1,10 @@
-import { XmlElement, XmlChildElement, XmlAttribute } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 
-import { XmlXades } from "./xml";
-import { XadesObject, XadesCollection } from "./xml_base";
-import { XAdESTimeStamp } from "./xades_time_stamp";
-import { DataObjectFormat } from "./data_object_format";
 import { CommitmentTypeIndication } from "./commitment_type_indication";
+import { DataObjectFormat } from "./data_object_format";
+import { XAdESTimeStamp } from "./xades_time_stamp";
+import { XmlXades } from "./xml";
+import { XadesCollection, XadesObject } from "./xml_base";
 
 /**
  *
@@ -20,7 +20,6 @@ import { CommitmentTypeIndication } from "./commitment_type_indication";
  * </xsd:complexType>
  *
  */
-
 
 @XmlElement({ localName: XmlXades.ElementNames.IndividualDataObjectsTimeStamp })
 export class IndividualDataObjectsTimeStamp extends XAdESTimeStamp { }
@@ -45,23 +44,23 @@ export class AllDataObjectsTimeStampCollection extends XadesCollection<AllDataOb
 }
 
 @XmlElement({
-    localName: XmlXades.ElementNames.SignedDataObjectProperties
+    localName: XmlXades.ElementNames.SignedDataObjectProperties,
 })
 export class SignedDataObjectProperties extends XadesObject {
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    Id: string;
+    public Id: string;
 
     @XmlChildElement({ parser: DataObjectFormatCollection, noRoot: true })
-    DataObjectFormats: DataObjectFormatCollection;
+    public DataObjectFormats: DataObjectFormatCollection;
 
     @XmlChildElement({ parser: CommitmentTypeIndicationCollection, noRoot: true })
-    CommitmentTypeIndications: CommitmentTypeIndicationCollection;
+    public CommitmentTypeIndications: CommitmentTypeIndicationCollection;
 
     @XmlChildElement({ parser: AllDataObjectsTimeStampCollection, noRoot: true })
-    AllDataObjectsTimeStamps: AllDataObjectsTimeStampCollection;
+    public AllDataObjectsTimeStamps: AllDataObjectsTimeStampCollection;
 
     @XmlChildElement({ parser: IndividualDataObjectsTimeStampCollection, noRoot: true })
-    IndividualDataObjectsTimeStamps: IndividualDataObjectsTimeStampCollection;
+    public IndividualDataObjectsTimeStamps: IndividualDataObjectsTimeStampCollection;
 
 }

@@ -1,11 +1,11 @@
-import { XmlElement, XmlChildElement, XmlAttribute } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 import { XmlBase64Converter } from "xml-core";
-import { XmlSignature, CanonicalizationMethod } from "xmldsigjs";
+import { CanonicalizationMethod, XmlSignature } from "xmldsigjs";
 
-import { XmlXades } from "./xml";
-import { XadesObject, XadesCollection } from "./xml_base";
-import { EncapsulatedPKIData } from "./encapsulated_pki_data";
 import { Any } from "./any";
+import { EncapsulatedPKIData } from "./encapsulated_pki_data";
+import { XmlXades } from "./xml";
+import { XadesCollection, XadesObject } from "./xml_base";
 
 /**
  *
@@ -41,7 +41,7 @@ import { Any } from "./any";
  */
 
 @XmlElement({
-    localName: XmlXades.ElementNames.Include
+    localName: XmlXades.ElementNames.Include,
 })
 export class Include extends XadesObject {
     @XmlAttribute({
@@ -49,25 +49,25 @@ export class Include extends XadesObject {
         defaultValue: "",
         required: true,
     })
-    Uri: string;
+    public Uri: string;
 
     @XmlAttribute({
         localName: XmlXades.AttributeNames.ReferencedData,
         defaultValue: false,
     })
-    ReferencedData: boolean;
+    public ReferencedData: boolean;
 }
 
 @XmlElement({
-    localName: XmlXades.ElementNames.ReferenceInfo
+    localName: XmlXades.ElementNames.ReferenceInfo,
 })
 export class ReferenceInfo extends XadesObject {
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.URI, defaultValue: "" })
-    Uri: string;
+    public Uri: string;
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    Id: string;
+    public Id: string;
 
     @XmlChildElement({
         localName: XmlSignature.ElementNames.DigestMethod,
@@ -75,7 +75,7 @@ export class ReferenceInfo extends XadesObject {
         prefix: XmlSignature.DefaultPrefix,
         required: true,
     })
-    DigestMethod: string;
+    public DigestMethod: string;
 
     @XmlChildElement({
         localName: XmlSignature.ElementNames.DigestMethod,
@@ -84,7 +84,7 @@ export class ReferenceInfo extends XadesObject {
         converter: XmlBase64Converter,
         required: true,
     })
-    DigestValue: Uint8Array;
+    public DigestValue: Uint8Array;
 
 }
 
@@ -107,25 +107,25 @@ export class XMLTimeStampCollection extends XadesCollection<XMLTimeStamp> {
 }
 
 @XmlElement({
-    localName: "GenericTimeStamp"
+    localName: "GenericTimeStamp",
 })
 export class GenericTimeStamp extends XadesObject {
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    Id: string;
+    public Id: string;
 
     @XmlChildElement({ parser: Include })
-    Include: Include;
+    public Include: Include;
 
     @XmlChildElement({ parser: ReferenceInfos, noRoot: true })
-    ReferenceInfo: ReferenceInfos;
+    public ReferenceInfo: ReferenceInfos;
 
     @XmlChildElement({ parser: CanonicalizationMethod })
-    CanonicalizationMethod: CanonicalizationMethod;
+    public CanonicalizationMethod: CanonicalizationMethod;
 
     @XmlChildElement({ parser: EncapsulatedTimeStampCollection, noRoot: true })
-    EncapsulatedTimeStamp: EncapsulatedTimeStampCollection;
+    public EncapsulatedTimeStamp: EncapsulatedTimeStampCollection;
 
     @XmlChildElement({ parser: XMLTimeStampCollection, noRoot: true })
-    XMLTimeStamp: XMLTimeStampCollection;
+    public XMLTimeStamp: XMLTimeStampCollection;
 }

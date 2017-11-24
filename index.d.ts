@@ -3,14 +3,18 @@ import * as XmlDSigJs from "xmldsigjs";
 
 declare namespace XAdES {
 
-    // xml-core helpers
+    //#region xml-core helpers
+
     export const Select: XmlCore.SelectNodes;
     export const Convert: XmlCore.Convert;
-    export function Parse(xmlstring: string): Document;
+    export function Parse(xmlString: string): Document;
 
     export class Application extends XmlDSigJs.Application { }
 
-    // signed_xml
+    //#endregion
+
+    //#region signed_xml
+
     export interface OptionsSignerRole {
         claimed?: string[];
         certified?: string[];
@@ -21,7 +25,25 @@ declare namespace XAdES {
         code?: string;
         country?: string;
     }
+    export interface OptionsNoticeReference {
+        organization: string;
+        noticeNumbers: number[];
+    }
+    export interface OptionsPolicyUserNotice {
+        noticeRef?: OptionsNoticeReference;
+        explicitText?: string;
+    }
+    export interface OptionsPolicyIdentifier {
+        qualifier: xml.IdentifierQualifier;
+        value: string;
+        description?: string;
+        references?: string[];
+    }
     export interface OptionsPolicyId {
+        identifier: OptionsPolicyIdentifier;
+        transforms?: XmlDSigJs.OptionsSignTransform[];
+        hash: AlgorithmIdentifier;
+        qualifiers?: Array<OptionsPolicyUserNotice | string>;
     }
     export interface OptionsXAdES extends XmlDSigJs.OptionsSign {
         /**
@@ -36,15 +58,15 @@ declare namespace XAdES {
         signerRole?: OptionsSignerRole;
     }
     export class SignedXml extends XmlDSigJs.SignedXml {
+        public readonly Properties: XAdES.xml.QualifyingProperties | null;
+        public readonly SignedProperties: XAdES.xml.SignedProperties;
+        public readonly UnsignedProperties: XAdES.xml.UnsignedProperties;
         protected properties: XAdES.xml.QualifyingProperties | null;
-        readonly Properties: XAdES.xml.QualifyingProperties | null;
-        readonly SignedProperties: XAdES.xml.SignedProperties;
-        readonly UnsignedProperties: XAdES.xml.UnsignedProperties;
         constructor(node?: Document | Element);
-        LoadXml(value: Element | string): void;
+        public LoadXml(value: Element | string): void;
+        public Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsXAdES): PromiseLike<XmlDSigJs.Signature>;
         protected CreateQualyingProperties(): void;
         protected ApplySignOptions(signature: XmlDSigJs.Signature, algorithm: Algorithm, key: CryptoKey, options: OptionsXAdES): Promise<void>;
-        Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsXAdES): PromiseLike<XmlDSigJs.Signature>;
         protected ApplySigningCertificate(base64string?: string): Promise<void>;
         protected ApplySignaturePolicyIdentifier(options?: OptionsPolicyId): void;
         protected ApplySignatureProductionPlace(options?: OptionsProductionPlace): void;
@@ -52,16 +74,24 @@ declare namespace XAdES {
         protected VerifySigningCertificate(): Promise<XmlDSigJs.X509Certificate | null>;
     }
 
+    //#endregion
+
 }
 
 declare namespace XAdES.xml {
 
-    // any
+    //#region any
+
     export class Any extends XadesObject {
-        Value: string;
+        public Value: string;
     }
 
-    // certificate_values
+    export class AnyCollection extends XadesCollection<XadesObject> { }
+
+    //#endregion
+
+    //#region certificate_values
+
     export class OtherCertificate extends Any {
     }
     export class OtherCertificateCollection extends XadesCollection<OtherCertificate> {
@@ -71,110 +101,134 @@ declare namespace XAdES.xml {
     export class EncapsulatedX509CertificateCollection extends XadesCollection<EncapsulatedX509Certificate> {
     }
     export class CertificateValues extends XadesObject {
-        Id: string;
-        EncapsulatedX509Certificates: EncapsulatedX509CertificateCollection;
-        OtherCertificates: OtherCertificateCollection;
+        public Id: string;
+        public EncapsulatedX509Certificates: EncapsulatedX509CertificateCollection;
+        public OtherCertificates: OtherCertificateCollection;
     }
 
-    // commitment_type_indication
+    //#endregion
+
+    //#region commitment_type_indication
+
     export class CommitmentTypeQualifier extends Any {
     }
     export class CommitmentTypeQualifiers extends XadesCollection<CommitmentTypeQualifier> {
     }
     export class ObjectReference extends XadesObject {
-        Value: string;
+        public Value: string;
     }
     export class ObjectReferenceCollection extends XadesCollection<ObjectReference> {
     }
     export class CommitmentTypeIndication extends XadesObject {
-        CommitmentTypeId: ObjectIdentifier;
-        ObjectReference: ObjectReferenceCollection;
-        AllSignedDataObjects: boolean;
-        CommitmentTypeQualifiers: CommitmentTypeQualifiers;
+        public CommitmentTypeId: ObjectIdentifier;
+        public ObjectReference: ObjectReferenceCollection;
+        public AllSignedDataObjects: boolean;
+        public CommitmentTypeQualifiers: CommitmentTypeQualifiers;
     }
 
-    // complete_certificate_refs
+    //#endregion
+
+    //#region complete_certificate_refs
+
     export class CompleteCertificateRefs extends XadesObject implements UnsignedSignatureProperty {
-        Id: string;
-        CertRefs: CertIDList;
+        public Id: string;
+        public CertRefs: CertIDList;
     }
 
-    // complete_revocation_refs
+    //#endregion
+
+    //#region  complete_revocation_refs
+
     export class OtherRef extends Any {
     }
     export class OtherRefs extends XadesCollection<OtherRef> {
     }
     export class ResponderID extends XadesObject {
-        ByName: string;
-        ByKey: Uint8Array;
+        public ByName: string;
+        public ByKey: Uint8Array;
     }
     export class OCSPIdentifier extends XadesObject {
-        URI: string;
-        ResponderID: ResponderID;
-        ProducedAt: Date;
+        public URI: string;
+        public ResponderID: ResponderID;
+        public ProducedAt: Date;
     }
     export class OCSPRef extends XadesObject {
-        OCSPIdentifier: OCSPIdentifier;
-        DigestAlgAndValue: DigestAlgAndValueType;
+        public OCSPIdentifier: OCSPIdentifier;
+        public DigestAlgAndValue: DigestAlgAndValueType;
     }
     export class OCSPRefs extends XadesCollection<OCSPRef> {
     }
     export class CRLIdentifier extends XadesObject {
-        URI: string;
-        Issuer: string;
-        IssueTime: Date;
-        Number: number;
+        public URI: string;
+        public Issuer: string;
+        public IssueTime: Date;
+        public Number: number;
     }
     export class CRLRef extends XadesObject {
-        DigestAlgAndValue: DigestAlgAndValueType;
-        CRLIdentifier: CRLIdentifier;
+        public DigestAlgAndValue: DigestAlgAndValueType;
+        public CRLIdentifier: CRLIdentifier;
     }
     export class CRLRefs extends XadesCollection<CRLRef> {
     }
     export class CompleteRevocationRefs extends XadesObject implements UnsignedSignatureProperty {
-        Id: string;
-        CRLRefs: CRLRefs;
-        OCSPRefs: OCSPRefs;
-        OtherRefs: OtherRefs;
+        public Id: string;
+        public CRLRefs: CRLRefs;
+        public OCSPRefs: OCSPRefs;
+        public OtherRefs: OtherRefs;
     }
 
-    // counter_signature
+    //#endregion
+
+    //#region counter_signature
+
     export class CounterSignature extends XadesObject implements UnsignedSignatureProperty {
-        Signature: XmlDSigJs.Signature;
+        public Signature: XmlDSigJs.Signature;
     }
 
-    // data_object
+    //#endregion
+
+    //#region data_object
+
     export class DataObject extends XmlDSigJs.DataObject {
-        QualifyingProperties: QualifyingProperties;
+        public QualifyingProperties: QualifyingProperties;
     }
 
-    // data_object_format
+    //#endregion
+
+    //#region data_object_format
+
     export class DataObjectFormat extends XadesObject {
-        ObjectReference: string;
-        Description: string;
-        ObjectIdentifier: ObjectIdentifier;
-        MimeType: string;
-        Encoding: string;
+        public ObjectReference: string;
+        public Description: string;
+        public ObjectIdentifier: ObjectIdentifier;
+        public MimeType: string;
+        public Encoding: string;
     }
 
-    // encapsulated_pki_data
+    //#endregion
+
+    //#region encapsulated_pki_data
+
     export type EncodingType = "der" | "ber" | "cer" | "per" | "xer" | null;
     export class EncapsulatedPKIData extends XadesObject {
-        Id: string;
-        Encoding: EncodingType;
-        Value: Uint8Array;
+        public Id: string;
+        public Encoding: EncodingType;
+        public Value: Uint8Array;
     }
 
-    // generic_time_stamp
+    //#endregion
+
+    //#region generic_time_stamp
+
     export class Include extends XadesObject {
-        Uri: string;
-        ReferencedData: boolean;
+        public Uri: string;
+        public ReferencedData: boolean;
     }
     export class ReferenceInfo extends XadesObject {
-        Uri: string;
-        Id: string;
-        DigestMethod: string;
-        DigestValue: Uint8Array;
+        public Uri: string;
+        public Id: string;
+        public DigestMethod: string;
+        public DigestValue: Uint8Array;
     }
     export class ReferenceInfos extends XadesCollection<ReferenceInfo> {
     }
@@ -187,56 +241,73 @@ declare namespace XAdES.xml {
     export class XMLTimeStampCollection extends XadesCollection<XMLTimeStamp> {
     }
     export class GenericTimeStamp extends XadesObject {
-        Id: string;
-        Include: Include;
-        ReferenceInfo: ReferenceInfos;
-        CanonicalizationMethod: XmlDSigJs.CanonicalizationMethod;
-        EncapsulatedTimeStamp: EncapsulatedTimeStampCollection;
-        XMLTimeStamp: XMLTimeStampCollection;
+        public Id: string;
+        public Include: Include;
+        public ReferenceInfo: ReferenceInfos;
+        public CanonicalizationMethod: XmlDSigJs.CanonicalizationMethod;
+        public EncapsulatedTimeStamp: EncapsulatedTimeStampCollection;
+        public XMLTimeStamp: XMLTimeStampCollection;
     }
 
-    // object_identifier
+    //#endregion
+
+    //#region object_identifier
+
+    export type IdentifierQualifier = "OIDAsURI" | "OIDAsURN";
+
     export class Identifier extends XadesObject {
-        Qualifier: "OIDAsURI" | "OIDAsURN";
-        Value: string;
+        public Qualifier: "OIDAsURI" | "OIDAsURN";
+        public Value: string;
     }
     export class DocumentationReference extends XadesObject {
-        Uri: string;
+        public Uri: string;
         protected OnLoadXml(e: Element): void;
         protected OnGetXml(e: Element): void;
     }
     export class DocumentationReferences extends XadesCollection<DocumentationReference> {
     }
     export class ObjectIdentifier extends XadesObject {
-        Identifier: Identifier;
-        Description: string;
-        DocumentationReferences: DocumentationReferences;
+        public Identifier: Identifier;
+        public Description: string;
+        public DocumentationReferences: DocumentationReferences;
     }
 
-    // other_time_stamp
+    //#endregion
+
+    //#region other_time_stamp
+
     export class OtherTimeStamp extends XadesObject {
-        Id: string;
-        ReferenceInfo: ReferenceInfos;
-        CanonicalizationMethod: XmlDSigJs.CanonicalizationMethod;
-        EncapsulatedTimeStamp: EncapsulatedTimeStampCollection;
-        XMLTimeStamp: XMLTimeStampCollection;
+        public Id: string;
+        public ReferenceInfo: ReferenceInfos;
+        public CanonicalizationMethod: XmlDSigJs.CanonicalizationMethod;
+        public EncapsulatedTimeStamp: EncapsulatedTimeStampCollection;
+        public XMLTimeStamp: XMLTimeStampCollection;
     }
 
-    // qualifying_properties
+    //#endregion
+
+    //#region qualifying_properties
+
     export class QualifyingProperties extends XadesObject {
-        Target: string;
-        Id: string;
-        SignedProperties: SignedProperties;
-        UnsignedProperties: UnsignedProperties;
+        public Target: string;
+        public Id: string;
+        public SignedProperties: SignedProperties;
+        public UnsignedProperties: UnsignedProperties;
     }
 
-    // qualifying_properties_reference
+    //#endregion
+
+    //#region qualifying_properties_reference
+
     export class QualifyingPropertiesReference extends XadesObject {
-        Uri: string;
-        Id: string;
+        public Uri: string;
+        public Id: string;
     }
 
-    // revocation_values
+    //#endregion
+
+    //#region revocation_values
+
     export class OtherValue extends EncapsulatedPKIData {
     }
     export class OtherValues extends XadesCollection<OtherValue> {
@@ -250,47 +321,55 @@ declare namespace XAdES.xml {
     export class CRLValues extends XadesCollection<EncapsulatedCRLValue> {
     }
     export class RevocationValues extends XadesObject {
-        Id: string;
-        CRLValues: CRLValues;
-        OCSPValues: OCSPValues;
-        OtherValues: OtherValues;
+        public Id: string;
+        public CRLValues: CRLValues;
+        public OCSPValues: OCSPValues;
+        public OtherValues: OtherValues;
     }
 
-    // signature_policy_identifier
+    //#endregion
+
+    //#region signature_policy_identifier
+    export class SigPolicyId extends ObjectIdentifier { }
+    export class SigPolicyHash extends DigestAlgAndValueType { }
+    export class SigPolicyQualifier extends AnyCollection { }
     export class Integer extends XadesObject {
-        Value: number;
+        public Value: number;
     }
     export class IntegerList extends XadesCollection<Integer> {
     }
     export class NoticeReference extends XadesObject {
-        Organization: string;
-        NoticeNumbers: IntegerList;
+        public Organization: string;
+        public NoticeNumbers: IntegerList;
     }
     export class SPUserNotice extends XadesObject {
-        NoticeRef: NoticeReference;
-        ExplicitText: string;
+        public NoticeRef: NoticeReference;
+        public ExplicitText: string;
     }
-    export class SigPolicyQualifier extends Any {
+    export class SPURI extends XadesObject {
+        public Value: string;
     }
-    export class SigPolicyQualifiers extends XadesCollection<SigPolicyQualifier> {
-    }
+    export class SigPolicyQualifiers extends XadesCollection<SigPolicyQualifier> { }
     export class SignaturePolicyId extends XadesObject {
-        SigPolicyId: ObjectIdentifier;
-        Transforms: XmlDSigJs.Transforms;
-        SigPolicyHash: DigestAlgAndValueType;
-        SigPolicyQualifiers: SigPolicyQualifiers;
+        public SigPolicyId: ObjectIdentifier;
+        public Transforms: XmlDSigJs.Transforms;
+        public SigPolicyHash: DigestAlgAndValueType;
+        public SigPolicyQualifiers: SigPolicyQualifiers;
     }
     export class SignaturePolicyIdentifier extends XadesObject {
-        SignaturePolicyId: SignaturePolicyId;
-        SignaturePolicyImplied: boolean;
+        public SignaturePolicyId: SignaturePolicyId;
+        public SignaturePolicyImplied: boolean;
     }
 
-    // signature_product_place
+    //#endregion
+
+    //#region signature_product_place
+
     export class SignatureProductionPlace extends XadesObject {
-        City: string;
-        StateOrProvince: string;
-        PostalCode: string;
-        CountryName: string;
+        public City: string;
+        public StateOrProvince: string;
+        public PostalCode: string;
+        public CountryName: string;
     }
 
     // signed_data_object_properties
@@ -307,31 +386,40 @@ declare namespace XAdES.xml {
     export class AllDataObjectsTimeStampCollection extends XadesCollection<AllDataObjectsTimeStamp> {
     }
     export class SignedDataObjectProperties extends XadesObject {
-        Id: string;
-        DataObjectFormats: DataObjectFormatCollection;
-        CommitmentTypeIndications: CommitmentTypeIndicationCollection;
-        AllDataObjectsTimeStamps: AllDataObjectsTimeStampCollection;
-        IndividualDataObjectsTimeStamps: IndividualDataObjectsTimeStampCollection;
+        public Id: string;
+        public DataObjectFormats: DataObjectFormatCollection;
+        public CommitmentTypeIndications: CommitmentTypeIndicationCollection;
+        public AllDataObjectsTimeStamps: AllDataObjectsTimeStampCollection;
+        public IndividualDataObjectsTimeStamps: IndividualDataObjectsTimeStampCollection;
     }
 
-    // signed_properties
+    //#endregion
+
+    //#region signed_properties
+
     export class SignedProperties extends XadesObject {
-        Id: string;
-        SignedSignatureProperties: SignedSignatureProperties;
-        SignedDataObjectProperties: SignedDataObjectProperties;
+        public Id: string;
+        public SignedSignatureProperties: SignedSignatureProperties;
+        public SignedDataObjectProperties: SignedDataObjectProperties;
     }
 
-    // signed_signature_properties
+    //#endregion
+
+    //#region signed_signature_properties
+
     export class SignedSignatureProperties extends XadesObject {
-        Id: string;
-        SigningTime: Date;
-        SigningCertificate: SigningCertificate;
-        SignaturePolicyIdentifier: SignaturePolicyIdentifier;
-        SignatureProductionPlace: SignatureProductionPlace;
-        SignerRole: SignerRole;
+        public Id: string;
+        public SigningTime: Date;
+        public SigningCertificate: SigningCertificate;
+        public SignaturePolicyIdentifier: SignaturePolicyIdentifier;
+        public SignatureProductionPlace: SignatureProductionPlace;
+        public SignerRole: SignerRole;
     }
 
-    // signer_role
+    //#endregion
+
+    //#region signer_role
+
     export class ClaimedRole extends Any {
     }
     export class ClaimedRoles extends XadesCollection<ClaimedRole> {
@@ -341,42 +429,53 @@ declare namespace XAdES.xml {
     export class CertifiedRoles extends XadesCollection<CertifiedRole> {
     }
     export class SignerRole extends XadesObject {
-        ClaimedRoles: ClaimedRoles;
-        CertifiedRoles: CertifiedRoles;
+        public ClaimedRoles: ClaimedRoles;
+        public CertifiedRoles: CertifiedRoles;
     }
 
-    // signing_certificate
+    //#endregion
+
+    //#region signing_certificate
+
     export class DigestAlgAndValueType extends XadesObject {
-        DigestMethod: XmlDSigJs.DigestMethod;
-        DigestValue: Uint8Array;
+        public DigestMethod: XmlDSigJs.DigestMethod;
+        public DigestValue: Uint8Array;
     }
     export class IssuerSerial extends XmlDSigJs.X509IssuerSerial {
     }
     export class Cert extends XadesObject {
-        CertDigest: DigestAlgAndValueType;
-        IssuerSerial: XmlDSigJs.X509IssuerSerial;
-        Uri: string;
+        public CertDigest: DigestAlgAndValueType;
+        public IssuerSerial: XmlDSigJs.X509IssuerSerial;
+        public Uri: string;
     }
     export class CertIDList extends XadesCollection<Cert> {
     }
     export class SigningCertificate extends CertIDList {
     }
 
-    // unsigned_data_object_property
+    //#endregion
+
+    //#region unsigned_data_object_property
+
     export class UnsignedDataObjectProperty extends Any {
     }
     export class UnsignedDataObjectProperties extends XadesCollection<UnsignedDataObjectProperty> {
-        Id: string;
+        public Id: string;
     }
 
-    // unsigned_properties
+    //#endregion
+
+    //#region unsigned_properties
+
     export class UnsignedProperties extends XadesObject {
-        Id: string;
-        UnsignedSignatureProperties: UnsignedSignatureProperties;
-        UnsignedDataObjectProperties: UnsignedDataObjectProperties;
+        public Id: string;
+        public UnsignedSignatureProperties: UnsignedSignatureProperties;
+        public UnsignedDataObjectProperties: UnsignedDataObjectProperties;
     }
 
-    // unsigned_signature_properties
+    //#endregion
+
+    //#region unsigned_signature_properties
     export class SignatureTimeStamp extends XAdESTimeStamp implements UnsignedSignatureProperty {
     }
     export class SigAndRefsTimeStamp extends XAdESTimeStamp implements UnsignedSignatureProperty {
@@ -403,18 +502,23 @@ declare namespace XAdES.xml {
     export class UnsignedSignatureProperty extends XadesObject {
     }
     export class UnsignedSignatureProperties extends XadesCollection<UnsignedSignatureProperty> {
-        Id: string;
-        OnLoadXml(element: Element): void;
+        public Id: string;
+        public OnLoadXml(element: Element): void;
     }
 
-    // xades_time_stamp
+    //#endregion
+
+    //#region xades_time_stamp
+
     export class XAdESTimeStamp extends XadesObject {
-        Id: string;
-        Include: Include;
-        CanonicalizationMethod: XmlDSigJs.CanonicalizationMethod;
-        EncapsulatedTimeStamp: EncapsulatedTimeStampCollection;
-        XMLTimeStamp: XMLTimeStampCollection;
+        public Id: string;
+        public Include: Include;
+        public CanonicalizationMethod: XmlDSigJs.CanonicalizationMethod;
+        public EncapsulatedTimeStamp: EncapsulatedTimeStampCollection;
+        public XMLTimeStamp: XMLTimeStampCollection;
     }
+
+    //#endregion
 
     // xml
     export let XmlXades: {

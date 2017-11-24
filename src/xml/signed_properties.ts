@@ -1,10 +1,9 @@
-import { XmlElement, XmlChildElement, XmlAttribute } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 
+import { SignedDataObjectProperties } from "./signed_data_object_properties";
+import { SignedSignatureProperties } from "./signed_signature_properties";
 import { XmlXades } from "./xml";
 import { XadesObject } from "./xml_base";
-import { SignedSignatureProperties } from "./signed_signature_properties";
-import { SignedDataObjectProperties } from "./signed_data_object_properties";
-
 
 /**
  *
@@ -20,17 +19,17 @@ import { SignedDataObjectProperties } from "./signed_data_object_properties";
  */
 
 @XmlElement({
-    localName: XmlXades.ElementNames.SignedProperties
+    localName: XmlXades.ElementNames.SignedProperties,
 })
 export class SignedProperties extends XadesObject {
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    Id: string;
+    public Id: string;
 
     @XmlChildElement({parser: SignedSignatureProperties})
-    SignedSignatureProperties: SignedSignatureProperties;
+    public SignedSignatureProperties: SignedSignatureProperties;
 
     @XmlChildElement({parser: SignedDataObjectProperties})
-    SignedDataObjectProperties: SignedDataObjectProperties;
+    public SignedDataObjectProperties: SignedDataObjectProperties;
 
 }

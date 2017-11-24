@@ -38,7 +38,7 @@ export interface OptionsPolicyId {
     identifier: OptionsPolicyIdentifier;
     transforms?: XmlDSigJs.OptionsSignTransform[];
     hash: AlgorithmIdentifier;
-    qualifiers?: (OptionsPolicyUserNotice | string)[];
+    qualifiers?: Array<OptionsPolicyUserNotice | string>;
 }
 
 export interface OptionsXAdES extends XmlDSigJs.OptionsSign {
@@ -65,13 +65,15 @@ export class SignedXml extends XmlDSigJs.SignedXml {
     }
 
     get SignedProperties(): XAdES.SignedProperties {
-        if (!this.Properties)
+        if (!this.Properties) {
             throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Properties is empty");
+        }
         return this.Properties.SignedProperties;
     }
     get UnsignedProperties(): XAdES.UnsignedProperties {
-        if (!this.Properties)
+        if (!this.Properties) {
             throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Properties is empty");
+        }
         return this.Properties.UnsignedProperties;
     }
 
@@ -81,15 +83,17 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         this.CreateQualifyingProperties();
     }
 
-    LoadXml(value: Element | string, useContainer?: boolean) {
+    //#region Public methods
+
+    public LoadXml(value: Element | string, useContainer?: boolean) {
         super.LoadXml(value as string);
 
         let properties: XAdES.QualifyingProperties | null = null;
-        this.XmlSignature.ObjectList.Some(item => {
+        this.XmlSignature.ObjectList.Some((item) => {
             if (item.Element) {
                 // Looking for <QualifyingProperties>
                 for (let i = 0; i < item.Element.childNodes.length; i++) {
-                    let node = item.Element.childNodes.item(i);
+                    const node = item.Element.childNodes.item(i);
                     if (node.nodeType === XmlCore.XmlNodeType.Element && node.localName === XAdES.XmlXades.ElementNames.QualifyingProperties) {
                         properties = XAdES.QualifyingProperties.LoadXml(node as Element);
                         return true;
@@ -102,15 +106,24 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         this.properties = properties;
     }
 
-    protected CreateQualifyingProperties() {
-        if (this.Properties)
-            throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Cannot create QualifyingProperties cause current signature has got one. You must create CounterSignature");
+    public Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsXAdES): PromiseLike<XmlDSigJs.Signature> {
+        return super.Sign.apply(this, arguments);
+    }
 
-        let rnd = XmlDSigJs.Application.crypto.getRandomValues(new Uint8Array(6)) as Uint8Array;
-        let id = XmlCore.Convert.ToHex(rnd);
+    //#endregion
+
+    //#region Protected methods
+
+    protected CreateQualifyingProperties() {
+        if (this.Properties) {
+            throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Cannot create QualifyingProperties cause current signature has got one. You must create CounterSignature");
+        }
+
+        const rnd = XmlDSigJs.Application.crypto.getRandomValues(new Uint8Array(6)) as Uint8Array;
+        const id = XmlCore.Convert.ToHex(rnd);
 
         this.XmlSignature.Id = `id-${id}`;
-        let dataObject = new XAdES.DataObject();
+        const dataObject = new XAdES.DataObject();
         dataObject.QualifyingProperties.Target = `#${this.XmlSignature.Id}`;
         dataObject.QualifyingProperties.SignedProperties.Id = `xades-${this.XmlSignature.Id}`;
 
@@ -122,13 +135,13 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         await super.ApplySignOptions(signature, algorithm, key, options);
         if (this.Properties) {
             // Add SigningTime
-            let sigProps = this.Properties.SignedProperties.SignedSignatureProperties;
+            const sigProps = this.Properties.SignedProperties.SignedSignatureProperties;
             sigProps.SigningTime = new Date();
 
             // Add reference for SignedProperties
-            let signingAlg = XmlCore.assign({}, algorithm, key.algorithm);
-            let xadesRefHash = signingAlg.hash;
-            let xadesRef = new XmlDSigJs.Reference();
+            const signingAlg = XmlCore.assign({}, algorithm, key.algorithm);
+            const xadesRefHash = signingAlg.hash;
+            const xadesRef = new XmlDSigJs.Reference();
             xadesRef.Type = XADES_REFERENCE_TYPE;
             xadesRef.Uri = `#${this.Properties.SignedProperties.Id}`;
             xadesRef.DigestMethod.Algorithm = XmlDSigJs.CryptoConfig.GetHashAlgorithm(xadesRefHash).namespaceURI;
@@ -142,24 +155,20 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         }
     }
 
-    Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsXAdES): PromiseLike<XmlDSigJs.Signature> {
-        return super.Sign.apply(this, arguments);
-    }
-
     protected async ApplySigningCertificate(base64string?: string) {
         if (this.Properties && base64string) {
-            let raw = XmlCore.Convert.FromBase64(base64string);
-            let cert = new XmlDSigJs.X509Certificate(raw);
+            const raw = XmlCore.Convert.FromBase64(base64string);
+            const cert = new XmlDSigJs.X509Certificate(raw);
 
-            let ssp = this.Properties.SignedProperties.SignedSignatureProperties;
+            const ssp = this.Properties.SignedProperties.SignedSignatureProperties;
             if (ssp.SigningCertificate.Count) {
                 throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Signature can contain only one SigningCertificate");
             }
-            let signingCertificate = new XAdES.Cert();
+            const signingCertificate = new XAdES.Cert();
             signingCertificate.IssuerSerial.X509IssuerName = cert.Issuer;
             signingCertificate.IssuerSerial.X509SerialNumber = cert.SerialNumber; // TODO: Must be Big number here
 
-            let alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm("SHA-256");
+            const alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm("SHA-256");
             signingCertificate.CertDigest.DigestMethod.Algorithm = alg.namespaceURI;
             signingCertificate.CertDigest.DigestValue = new Uint8Array(await cert.Thumbprint(alg.algorithm.name as any));
 
@@ -169,9 +178,9 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
     protected async ApplySignaturePolicyIdentifier(options?: OptionsPolicyId | boolean) {
         if (this.Properties) {
-            let ssp = this.Properties.SignedProperties.SignedSignatureProperties;
+            const ssp = this.Properties.SignedProperties.SignedSignatureProperties;
             if (options && typeof options === "object") {
-                let policyId = new XAdES.SignaturePolicyId();
+                const policyId = new XAdES.SignaturePolicyId();
 
                 policyId.SigPolicyId = new XAdES.SigPolicyId();
                 policyId.SigPolicyId.Identifier = new XAdES.Identifier();
@@ -182,8 +191,8 @@ export class SignedXml extends XmlDSigJs.SignedXml {
                 }
                 if (options.identifier.references) {
                     policyId.SigPolicyId.DocumentationReferences = new XAdES.DocumentationReferences();
-                    options.identifier.references.forEach(referenceValue => {
-                        let reference = new XAdES.DocumentationReference();
+                    options.identifier.references.forEach((referenceValue) => {
+                        const reference = new XAdES.DocumentationReference();
                         reference.Uri = referenceValue;
                         policyId.SigPolicyId.DocumentationReferences.Add(reference);
                     });
@@ -191,7 +200,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
                 if (options.transforms && options.transforms.length) {
                     policyId.Transforms = new XmlDSigJs.Transforms();
-                    options.transforms.forEach(transform => {
+                    options.transforms.forEach((transform) => {
                         policyId.Transforms.Add(this.ResolveTransform(transform));
                     });
                 }
@@ -200,14 +209,14 @@ export class SignedXml extends XmlDSigJs.SignedXml {
                 policyId.SigPolicyHash.DigestMethod = new XmlDSigJs.DigestMethod();
                 const digestAlgorithm = XmlDSigJs.CryptoConfig.GetHashAlgorithm(options.hash);
                 policyId.SigPolicyHash.DigestMethod.Algorithm = digestAlgorithm.namespaceURI;
-                let identifierDoc = policyId.SigPolicyId.Identifier.GetXml()!.cloneNode(true) as Element;
+                const identifierDoc = policyId.SigPolicyId.Identifier.GetXml()!.cloneNode(true) as Element;
                 this.CopyNamespaces(identifierDoc, identifierDoc, true);
                 this.InjectNamespaces(this.GetSignatureNamespaces(), identifierDoc, true);
                 let identifierContent: any = null;
                 if (policyId.Transforms && policyId.Transforms.Count) {
                     identifierContent = this.ApplyTransforms(policyId.Transforms, identifierDoc);
                 } else {
-                    let c14n = new XmlDSigJs.XmlDsigC14NTransform();
+                    const c14n = new XmlDSigJs.XmlDsigC14NTransform();
                     c14n.LoadInnerXml(identifierDoc);
                     identifierContent = c14n.GetOutput();
                 }
@@ -215,14 +224,14 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
                 if (options.qualifiers) {
                     policyId.SigPolicyQualifiers = new XAdES.SigPolicyQualifiers();
-                    options.qualifiers.forEach(qualifierValue => {
-                        let container = new XAdES.SigPolicyQualifier();
+                    options.qualifiers.forEach((qualifierValue) => {
+                        const container = new XAdES.SigPolicyQualifier();
                         if (typeof qualifierValue === "string") {
-                            let qualifier = new XAdES.SPURI();
+                            const qualifier = new XAdES.SPURI();
                             qualifier.Value = qualifierValue;
                             container.Add(qualifier);
                         } else {
-                            let qualifier = new XAdES.SPUserNotice();
+                            const qualifier = new XAdES.SPUserNotice();
                             if (qualifierValue.explicitText) {
                                 qualifier.ExplicitText = qualifierValue.explicitText;
                             }
@@ -231,8 +240,8 @@ export class SignedXml extends XmlDSigJs.SignedXml {
                                 qualifier.NoticeRef.Organization = qualifierValue.noticeRef.organization;
                                 qualifier.NoticeRef.NoticeNumbers = new XAdES.IntegerList();
                                 if (qualifierValue.noticeRef.noticeNumbers) {
-                                    qualifierValue.noticeRef.noticeNumbers.forEach(numberValue => {
-                                        let noticeNumber = new XAdES.Integer();
+                                    qualifierValue.noticeRef.noticeNumbers.forEach((numberValue) => {
+                                        const noticeNumber = new XAdES.Integer();
                                         noticeNumber.Value = numberValue;
                                         qualifier.NoticeRef.NoticeNumbers.Add(noticeNumber);
                                     });
@@ -246,8 +255,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
                 ssp.SignaturePolicyIdentifier.SignaturePolicyId = policyId;
                 ssp.SignaturePolicyIdentifier.SignaturePolicyImplied = false;
-            }
-            else {
+            } else {
                 ssp.SignaturePolicyIdentifier.SignaturePolicyImplied = true;
             }
         }
@@ -255,40 +263,46 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
     protected ApplySignatureProductionPlace(options?: OptionsProductionPlace) {
         if (this.Properties && options) {
-            let ssp = this.Properties.SignedProperties.SignedSignatureProperties;
+            const ssp = this.Properties.SignedProperties.SignedSignatureProperties;
 
-            if (options.city)
+            if (options.city) {
                 ssp.SignatureProductionPlace.City = options.city;
+            }
 
-            if (options.code)
+            if (options.code) {
                 ssp.SignatureProductionPlace.PostalCode = options.code;
+            }
 
-            if (options.country)
+            if (options.country) {
                 ssp.SignatureProductionPlace.CountryName = options.country;
+            }
 
-            if (options.state)
+            if (options.state) {
                 ssp.SignatureProductionPlace.StateOrProvince = options.state;
+            }
         }
     }
 
     protected ApplySignerRoles(options?: OptionsSignerRole) {
         if (this.Properties && options) {
-            let ssp = this.Properties.SignedProperties.SignedSignatureProperties;
+            const ssp = this.Properties.SignedProperties.SignedSignatureProperties;
 
-            if (options.claimed)
-                options.claimed.forEach(role => {
-                    let claimedRole = new XAdES.ClaimedRole();
+            if (options.claimed) {
+                options.claimed.forEach((role) => {
+                    const claimedRole = new XAdES.ClaimedRole();
                     claimedRole.Value = role;
                     ssp.SignerRole.ClaimedRoles.Add(claimedRole);
                 });
+            }
 
-            if (options.certified)
-                options.certified.forEach(role => {
-                    let certifiedRole = new XAdES.CertifiedRole();
+            if (options.certified) {
+                options.certified.forEach((role) => {
+                    const certifiedRole = new XAdES.CertifiedRole();
                     certifiedRole.Encoding = "der";
                     certifiedRole.Value = XmlCore.Convert.FromBase64(role);
                     ssp.SignerRole.CertifiedRoles.Add(certifiedRole);
                 });
+            }
 
         }
     }
@@ -297,28 +311,32 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         let x509: XmlDSigJs.X509Certificate | null = null;
         if (this.XmlSignature && this.Properties) {
 
-            let ssp = this.Properties.SignedProperties.SignedSignatureProperties;
+            const ssp = this.Properties.SignedProperties.SignedSignatureProperties;
             if (ssp.SigningCertificate.Count !== 1) {
                 throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Signature has got wrong amount of SigningCertificate, MUST be one");
             }
 
             // find certificate by Thumbprint
-            let alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm("SHA-256");
-            let signingCertificate = ssp.SigningCertificate.Item(0) !;
+            const alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm("SHA-256");
+            const signingCertificate = ssp.SigningCertificate.Item(0)!;
             const b64CertDigest = XmlCore.Convert.ToBase64(signingCertificate.CertDigest.DigestValue);
-            let keyInfos = this.XmlSignature.KeyInfo;
+            const keyInfos = this.XmlSignature.KeyInfo;
+            // tslint:disable-next-line:no-unused-expression
             for (let i = 0; i < keyInfos.Count, !x509; i++) {
-                let item = keyInfos.Item(i);
+                const item = keyInfos.Item(i);
                 if (item instanceof XmlDSigJs.KeyInfoX509Data) {
-                    let certs = item.Certificates;
+                    const certs = item.Certificates;
+                    // tslint:disable-next-line:no-unused-expression
                     for (let j = 0; j < certs.length, !x509; j++) {
-                        let cert = certs[j];
-                        if (!cert)
+                        const cert = certs[j];
+                        if (!cert) {
                             continue;
+                        }
                         const hash = new Uint8Array(await cert.Thumbprint(alg.algorithm as any));
                         const b64Hash = XmlCore.Convert.ToBase64(hash);
-                        if (b64Hash === b64CertDigest)
+                        if (b64Hash === b64CertDigest) {
                             x509 = cert;
+                        }
                     }
                 }
             }
@@ -326,12 +344,15 @@ export class SignedXml extends XmlDSigJs.SignedXml {
                 x509 &&
                 x509.Issuer === signingCertificate.IssuerSerial.X509IssuerName &&
                 x509.SerialNumber === signingCertificate.IssuerSerial.X509SerialNumber
-            ))
+            )) {
                 throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "SigningCertificate not found");
+            }
 
         }
 
         return x509;
     }
+
+    //#endregion
 
 }

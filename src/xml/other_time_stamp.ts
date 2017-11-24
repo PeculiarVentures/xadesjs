@@ -1,9 +1,9 @@
-import { XmlElement, XmlChildElement, XmlAttribute } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 import { CanonicalizationMethod } from "xmldsigjs";
 
+import { EncapsulatedTimeStampCollection, ReferenceInfos, XMLTimeStampCollection } from "./generic_time_stamp";
 import { XmlXades } from "./xml";
 import { XadesObject } from "./xml_base";
-import { ReferenceInfos, EncapsulatedTimeStampCollection, XMLTimeStampCollection } from "./generic_time_stamp";
 
 /**
  *
@@ -26,25 +26,24 @@ import { ReferenceInfos, EncapsulatedTimeStampCollection, XMLTimeStampCollection
  *
  */
 
-
 @XmlElement({
-    localName: XmlXades.ElementNames.OtherTimeStamp
+    localName: XmlXades.ElementNames.OtherTimeStamp,
 })
 export class OtherTimeStamp extends XadesObject {
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    Id: string;
+    public Id: string;
 
     @XmlChildElement({ parser: ReferenceInfos, noRoot: true })
-    ReferenceInfo: ReferenceInfos;
+    public ReferenceInfo: ReferenceInfos;
 
     @XmlChildElement({ parser: CanonicalizationMethod })
-    CanonicalizationMethod: CanonicalizationMethod;
+    public CanonicalizationMethod: CanonicalizationMethod;
 
     @XmlChildElement({ parser: EncapsulatedTimeStampCollection, noRoot: true })
-    EncapsulatedTimeStamp: EncapsulatedTimeStampCollection;
+    public EncapsulatedTimeStamp: EncapsulatedTimeStampCollection;
 
     @XmlChildElement({ parser: XMLTimeStampCollection, noRoot: true })
-    XMLTimeStamp: XMLTimeStampCollection;
+    public XMLTimeStamp: XMLTimeStampCollection;
 
 }

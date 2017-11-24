@@ -112,7 +112,7 @@ export let XmlXades = {
         EncapsulatedCRLValue: "EncapsulatedCRLValue",
         EncapsulatedOCSPValue: "EncapsulatedOCSPValue",
         ReferenceInfo: "ReferenceInfo",
-        Include: "Include"
+        Include: "Include",
     },
 
     AttributeNames: {
@@ -123,6 +123,6 @@ export let XmlXades = {
         Qualifier: "Qualifier",
         Uri: "uri",
         URI: "URI",
-        ReferencedData: "referencedData"
+        ReferencedData: "referencedData",
     },
 };

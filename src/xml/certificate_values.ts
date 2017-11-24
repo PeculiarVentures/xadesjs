@@ -1,9 +1,9 @@
-import { XmlElement, XmlChildElement, XmlAttribute } from "xml-core";
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 
-import { XmlXades } from "./xml";
-import { XadesObject, XadesCollection } from "./xml_base";
 import { Any } from "./any";
 import { EncapsulatedPKIData } from "./encapsulated_pki_data";
+import { XmlXades } from "./xml";
+import { XadesCollection, XadesObject } from "./xml_base";
 
 /**
  *
@@ -34,11 +34,11 @@ export class EncapsulatedX509CertificateCollection extends XadesCollection<Encap
 export class CertificateValues extends XadesObject {
 
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    Id: string;
+    public Id: string;
 
     @XmlChildElement({ parser: EncapsulatedX509CertificateCollection, noRoot: true })
-    EncapsulatedX509Certificates: EncapsulatedX509CertificateCollection;
+    public EncapsulatedX509Certificates: EncapsulatedX509CertificateCollection;
 
     @XmlChildElement({ parser: OtherCertificateCollection, noRoot: true })
-    OtherCertificates: OtherCertificateCollection;
+    public OtherCertificates: OtherCertificateCollection;
 }
