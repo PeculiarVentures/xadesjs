@@ -5,6 +5,7 @@ export * from "./complete_certificate_refs";
 export * from "./complete_revocation_refs";
 export * from "./counter_signature";
 export * from "./data_object_format";
+export * from "./date_time";
 export * from "./encapsulated_pki_data";
 export * from "./generic_time_stamp";
 export * from "./object_identifier";
