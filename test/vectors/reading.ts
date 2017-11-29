@@ -30,8 +30,8 @@ context("Reading XAdES", () => {
         if (!xades.Properties)
             return assert("Properties is empty");
 
-        assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningTime instanceof Date, true);
-        assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningTime.getFullYear(), 2016);
+        assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningTime.Value instanceof Date, true);
+        assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningTime.Value.getFullYear(), 2016);
         assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningCertificate.Count, 1);
         assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningCertificate.Item(0) !.IssuerSerial.X509IssuerName, "CN=a-sign-Premium-Sig-02,OU=a-sign-Premium-Sig-02,O=A-Trust Ges. f. Sicherheitssysteme im elektr. Datenverkehr GmbH,C=AT");
         assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningCertificate.Item(0) !.IssuerSerial.X509SerialNumber, "2039910436");
@@ -51,8 +51,8 @@ context("Reading XAdES", () => {
         if (!xades.Properties)
             return assert("Properties is empty");
 
-        assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningTime instanceof Date, true);
-        assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningTime.getFullYear(), 2016);
+        assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningTime.Value instanceof Date, true);
+        assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningTime.Value.getFullYear(), 2016);
         assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningCertificate.Count, 2);
         assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningCertificate.Item(0) !.IssuerSerial.X509IssuerName, "CN=GlobalSign PersonalSign 2 CA - SHA256 - G2,O=GlobalSign nv-sa,C=BE");
         assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningCertificate.Item(0) !.IssuerSerial.X509SerialNumber, "288350169419475868349393263988944744462");

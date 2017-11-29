@@ -2,7 +2,7 @@ import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 import { XmlBase64Converter, XmlNumberConverter } from "xml-core";
 
 import { Any } from "./any";
-import { XmlDateTimeConverter } from "./converter";
+import { XadesDateTime } from "./date_time";
 import { DigestAlgAndValueType } from "./signing_certificate";
 import { UnsignedSignatureProperty } from "./unsigned_signature_properties";
 import { XmlXades } from "./xml";
@@ -109,12 +109,10 @@ export class OCSPIdentifier extends XadesObject {
 
     @XmlChildElement({
         localName: XmlXades.ElementNames.IssueTime,
-        namespaceURI: XmlXades.NamespaceURI,
-        prefix: XmlXades.DefaultPrefix,
-        converter: XmlDateTimeConverter,
+        parser: XadesDateTime,
         required: true,
     })
-    public ProducedAt: Date;
+    public ProducedAt: XadesDateTime;
 
 }
 
@@ -147,12 +145,10 @@ export class CRLIdentifier extends XadesObject {
 
     @XmlChildElement({
         localName: XmlXades.ElementNames.IssueTime,
-        namespaceURI: XmlXades.NamespaceURI,
-        prefix: XmlXades.DefaultPrefix,
-        converter: XmlDateTimeConverter,
+        parser: XadesDateTime,
         required: true,
     })
-    public IssueTime: Date;
+    public IssueTime: XadesDateTime;
 
     @XmlChildElement({
         localName: XmlXades.ElementNames.Number,

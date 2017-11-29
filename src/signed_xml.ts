@@ -136,7 +136,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         if (this.Properties) {
             // Add SigningTime
             const sigProps = this.Properties.SignedProperties.SignedSignatureProperties;
-            sigProps.SigningTime = new Date();
+            sigProps.SigningTime.Value = new Date();
 
             // Add reference for SignedProperties
             const signingAlg = XmlCore.assign({}, algorithm, key.algorithm);

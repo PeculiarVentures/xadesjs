@@ -1,6 +1,6 @@
 import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 
-import { XmlDateTimeConverter } from "./converter";
+import { XadesDateTime } from "./date_time";
 import { SignaturePolicyIdentifier } from "./signature_policy_identifier";
 import { SignatureProductionPlace } from "./signature_product_place";
 import { SignerRole } from "./signer_role";
@@ -34,11 +34,9 @@ export class SignedSignatureProperties extends XadesObject {
 
     @XmlChildElement({
         localName: XmlXades.ElementNames.SigningTime,
-        namespaceURI: XmlXades.NamespaceURI,
-        prefix: XmlXades.DefaultPrefix,
-        converter: XmlDateTimeConverter,
+        parser: XadesDateTime,
     })
-    public SigningTime: Date;
+    public SigningTime: XadesDateTime;
 
     @XmlChildElement({ parser: SigningCertificate })
     public SigningCertificate: SigningCertificate;

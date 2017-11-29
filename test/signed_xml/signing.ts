@@ -52,6 +52,7 @@ context("XAdES signing", () => {
 
                 assert.equal(!!xades.SignedProperties, true);
                 assert.equal(!!xades.SignedProperties.SignedSignatureProperties.SigningTime, true);
+                assert.equal(!!xades.SignedProperties.SignedSignatureProperties.SigningTime.Value, true);
                 assert.equal(xades.SignedProperties.SignedSignatureProperties.SignaturePolicyIdentifier.IsEmpty(), false);
                 assert.equal(xades.SignedProperties.SignedSignatureProperties.SignerRole.IsEmpty(), true);
                 assert.equal(xades.SignedProperties.SignedSignatureProperties.SigningCertificate.IsEmpty(), true);
@@ -98,6 +99,7 @@ context("XAdES signing", () => {
 
                 assert.equal(!!xades.SignedProperties, true);
                 assert.equal(!!xades.SignedProperties.SignedSignatureProperties.SigningTime, true);
+                assert.equal(!!xades.SignedProperties.SignedSignatureProperties.SigningTime.Value, true);
                 assert.equal(xades.SignedProperties.SignedSignatureProperties.SignaturePolicyIdentifier.SignaturePolicyImplied, true);
                 assert.equal(xades.SignedProperties.SignedSignatureProperties.SignerRole.ClaimedRoles.Count, 3);
                 assert.equal(xades.SignedProperties.SignedSignatureProperties.SigningCertificate.Count, 1);

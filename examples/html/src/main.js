@@ -99,8 +99,8 @@ function sign() {
             signature = new XAdES.SignedXml();
 
             return signature.Sign(                  // Signing document
-                alg,                                    // algorithm 
-                keys.privateKey,                        // key 
+                alg,                                    // algorithm
+                keys.privateKey,                        // key
                 XAdES.Parse(getXml()),                  // document
                 {                                       // options
                     keyValue: useKeyValue() ? keys.publicKey : void 0,
@@ -159,7 +159,7 @@ function verify() {
 
             var ssp = signature.SignedProperties.SignedSignatureProperties;
             info.push("Signed signature properties:");
-            info.push("  Signing time: " + ssp.SigningTime);
+            info.push("  Signing time: " + ssp.SigningTime.Value);
             if (ssp.SigningCertificate.Count) {
                 info.push("Signing certificate:");
                 ssp.SigningCertificate.ForEach(function (cert) {
