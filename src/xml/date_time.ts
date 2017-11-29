@@ -23,7 +23,7 @@ export class XadesDateTime extends XadesObject {
      * Check [dateformat]{@link https://www.npmjs.com/package/dateformat} for supported formatting options.
      * If not specified, [Date#toISOString()]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString} is used.
      */
-    public Format: string;
+    public Format?: string;
 
     protected OnLoadXml(e: Element) {
         if (e.textContent) {
