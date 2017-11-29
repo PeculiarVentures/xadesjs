@@ -90,6 +90,15 @@ declare namespace XAdES.xml {
 
     //#endregion
 
+    //#region datetime
+
+    export class XadesDateTime extends XadesObject {
+        public Value: Date;
+        public Format?: string;
+    }
+
+    //#endregion
+
     //#region certificate_values
 
     export class OtherCertificate extends Any {
@@ -150,7 +159,7 @@ declare namespace XAdES.xml {
     export class OCSPIdentifier extends XadesObject {
         public URI: string;
         public ResponderID: ResponderID;
-        public ProducedAt: Date;
+        public ProducedAt: XadesDateTime;
     }
     export class OCSPRef extends XadesObject {
         public OCSPIdentifier: OCSPIdentifier;
@@ -161,7 +170,7 @@ declare namespace XAdES.xml {
     export class CRLIdentifier extends XadesObject {
         public URI: string;
         public Issuer: string;
-        public IssueTime: Date;
+        public IssueTime: XadesDateTime;
         public Number: number;
     }
     export class CRLRef extends XadesObject {
@@ -409,7 +418,7 @@ declare namespace XAdES.xml {
 
     export class SignedSignatureProperties extends XadesObject {
         public Id: string;
-        public SigningTime: Date;
+        public SigningTime: XadesDateTime;
         public SigningCertificate: SigningCertificate;
         public SignaturePolicyIdentifier: SignaturePolicyIdentifier;
         public SignatureProductionPlace: SignatureProductionPlace;
