@@ -9,3 +9,6 @@
 /dist
 **/*.map
 *.log
+
+# MAC OS
+.DS_Store
