@@ -1,5 +1,6 @@
-const dateFormat = require("dateformat");
 import { XmlContent, XmlElement } from "xml-core";
+
+import {dateFormat} from "../dateformat";
 
 import { XmlXades } from "./xml";
 import { XadesObject } from "./xml_base";
