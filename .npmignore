@@ -1,15 +1,15 @@
 /.vscode
+/.circleci
 /.nyc_output/
 /coverage/
 /node_modules
-/test/**/*.ts
+/test
 /examples
 /build
 /types
 /src
 **/*.map
 *.log
-circle.yml
 .babelrc
 rollup.*.js
 **/tsconfig.json
