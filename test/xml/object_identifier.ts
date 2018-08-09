@@ -1,26 +1,26 @@
 import * as assert from "assert";
-import * as XAdES from "../../";
+import * as XAdES from "../../src";
 
 context("xml", () => {
 
     context("ObjectIdentifier", () => {
 
         it("Parse", () => {
-            let xmlObject = new XAdES.xml.ObjectIdentifier();
+            const xmlObject = new XAdES.xml.ObjectIdentifier();
 
             xmlObject.Description = "Description";
             xmlObject.Identifier.Value = "uri:oid";
             xmlObject.Identifier.Qualifier = "OIDAsURI";
 
-            let ref = new XAdES.xml.DocumentationReference();
+            const ref = new XAdES.xml.DocumentationReference();
             ref.Uri = "http://some1.com";
             xmlObject.DocumentationReferences.Add(ref);
             assert.equal(xmlObject.DocumentationReferences.Count, 1);
 
-            let xml = xmlObject.toString();
+            const xml = xmlObject.toString();
             assert.equal(xml, `<xades:ObjectIdentifier xmlns:xades="http://uri.etsi.org/01903/v1.3.2#"><xades:Identifier Qualifier="OIDAsURI">uri:oid</xades:Identifier><xades:Description>Description</xades:Description><xades:DocumentationReferences><xades:DocumentationReference>http://some1.com</xades:DocumentationReference></xades:DocumentationReferences></xades:ObjectIdentifier>`);
 
-            let xmlObject2 = XAdES.xml.ObjectIdentifier.LoadXml(xml);
+            const xmlObject2 = XAdES.xml.ObjectIdentifier.LoadXml(xml);
 
             assert.equal(xmlObject2.Description, xmlObject.Description);
             assert.equal(xmlObject2.Identifier.Value, xmlObject.Identifier.Value);

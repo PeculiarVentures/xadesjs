@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import * as XAdES from "../../";
+import * as XAdES from "../../src";
 
 const WebCrypto = require("node-webcrypto-ossl");
 

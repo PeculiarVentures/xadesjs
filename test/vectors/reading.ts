@@ -1,10 +1,10 @@
 import * as assert from "assert";
-let WebCrypto = require("node-webcrypto-ossl");
+const WebCrypto = require("node-webcrypto-ossl");
 import { Application } from "xmldsigjs";
-import * as XAdES from "../../";
-import { SignedXml, xml } from "../../";
-let { QualifyingProperties, SignatureTimeStamp, CertificateValues, RevocationValues, ArchiveTimeStamp } = xml;
-let { CounterSignature } = xml;
+import * as XAdES from "../../src";
+import { SignedXml, xml } from "../../src";
+const { QualifyingProperties, SignatureTimeStamp, CertificateValues, RevocationValues, ArchiveTimeStamp } = xml;
+const { CounterSignature } = xml;
 
 Application.setEngine("OpenSSL", new WebCrypto());
 
@@ -22,12 +22,13 @@ const X_IT_ICB_6 = `<xades:QualifyingProperties Target="#signature-6758-0293-466
 
 context("Reading XAdES", () => {
 
-    it("X_AT_SIT_1", done => {
-        let xades = new SignedXml(XAdES.Parse(X_AT_SIT_1));
+    it("X_AT_SIT_1", (done) => {
+        const xades = new SignedXml(XAdES.Parse(X_AT_SIT_1));
         xades.LoadXml(X_AT_SIT_1);
 
-        if (!xades.Properties)
+        if (!xades.Properties) {
             return assert("Properties is empty");
+        }
 
         assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningTime.Value instanceof Date, true);
         assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningTime.Value.getFullYear(), 2016);
@@ -39,16 +40,17 @@ context("Reading XAdES", () => {
         assert.equal(xades.Properties.SignedProperties.SignedDataObjectProperties.DataObjectFormats.Item(0) !.MimeType, "text/xml");
 
         xades.Verify()
-            .then(res => assert.equal(res, true))
+            .then((res) => assert.equal(res, true))
             .then(done, done);
     });
 
-    it("X_BE_CONN_10", done => {
-        let xades = new SignedXml(XAdES.Parse(X_BE_CONN_10));
+    it("X_BE_CONN_10", (done) => {
+        const xades = new SignedXml(XAdES.Parse(X_BE_CONN_10));
         xades.LoadXml(X_BE_CONN_10);
 
-        if (!xades.Properties)
+        if (!xades.Properties) {
             return assert("Properties is empty");
+        }
 
         assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningTime.Value instanceof Date, true);
         assert.equal(xades.Properties.SignedProperties.SignedSignatureProperties.SigningTime.Value.getFullYear(), 2016);
@@ -64,12 +66,12 @@ context("Reading XAdES", () => {
         assert.equal(xades.Properties.SignedProperties.SignedDataObjectProperties.DataObjectFormats.Item(0) !.MimeType, "application/octet-stream");
 
         xades.Verify()
-            .then(res => assert.equal(res, true))
+            .then((res) => assert.equal(res, true))
             .then(done, done);
     });
 
     it("X_FR_CS_3", () => {
-        let xades = QualifyingProperties.LoadXml(X_FR_CS_3);
+        const xades = QualifyingProperties.LoadXml(X_FR_CS_3);
 
         assert.equal(xades.Target, "#PRF_2");
         assert.equal(xades.SignedProperties.Id, "PRF_2-SignedProperties");
@@ -95,7 +97,7 @@ context("Reading XAdES", () => {
     });
 
     it("X_BG_BOR_1", () => {
-        let xades = QualifyingProperties.LoadXml(X_BG_BOR_1);
+        const xades = QualifyingProperties.LoadXml(X_BG_BOR_1);
 
         assert.equal(xades.Target, "#id-413b14fe0d49b47be2670d4dbe692ded");
         assert.equal(xades.SignedProperties.Id, "xades-id-413b14fe0d49b47be2670d4dbe692ded");
@@ -133,14 +135,14 @@ context("Reading XAdES", () => {
     });
 
     it("X_BE_CONN_26", () => {
-        let xades = QualifyingProperties.LoadXml(X_BE_CONN_26);
+        const xades = QualifyingProperties.LoadXml(X_BE_CONN_26);
 
         assert.equal(xades.Target, "#id-b26a17d23edf045b392cf714167df701");
         assert.equal(xades.SignedProperties.Id, "xades-id-b26a17d23edf045b392cf714167df701");
 
         assert.equal(xades.UnsignedProperties.UnsignedSignatureProperties.Count, 4);
 
-        xades.UnsignedProperties.UnsignedSignatureProperties.Some(item => {
+        xades.UnsignedProperties.UnsignedSignatureProperties.Some((item) => {
             if (item instanceof SignatureTimeStamp) {
                 assert.equal(item.Id, "TS-e964b0fc-172d-4631-bc0e-fa456c429a5e");
                 assert.equal(item.CanonicalizationMethod.Algorithm, "http://www.w3.org/2001/10/xml-exc-c14n#");
@@ -152,7 +154,7 @@ context("Reading XAdES", () => {
             return false;
         });
 
-        xades.UnsignedProperties.UnsignedSignatureProperties.Some(item => {
+        xades.UnsignedProperties.UnsignedSignatureProperties.Some((item) => {
             if (item instanceof CertificateValues) {
                 assert.equal(item.EncapsulatedX509Certificates.Count, 2);
                 assert.equal(item.EncapsulatedX509Certificates.Item(0) !.Value.byteLength, 914);
@@ -161,7 +163,7 @@ context("Reading XAdES", () => {
             return false;
         });
 
-        xades.UnsignedProperties.UnsignedSignatureProperties.Some(item => {
+        xades.UnsignedProperties.UnsignedSignatureProperties.Some((item) => {
             if (item instanceof RevocationValues) {
                 assert.equal(item.CRLValues.Count, 1);
                 assert.equal(item.CRLValues.Item(0) !.Value.byteLength, 830);
@@ -170,7 +172,7 @@ context("Reading XAdES", () => {
             return false;
         });
 
-        xades.UnsignedProperties.UnsignedSignatureProperties.Some(item => {
+        xades.UnsignedProperties.UnsignedSignatureProperties.Some((item) => {
             if (item instanceof ArchiveTimeStamp) {
                 assert.equal(item.Id, "TS-8081f955-d8c9-498f-8922-dea64a21128d");
                 assert.equal(item.CanonicalizationMethod.Algorithm, "http://www.w3.org/2001/10/xml-exc-c14n#");
@@ -185,13 +187,13 @@ context("Reading XAdES", () => {
     });
 
     it("X_IT_ICB_6", () => {
-        let xades = QualifyingProperties.LoadXml(X_IT_ICB_6);
+        const xades = QualifyingProperties.LoadXml(X_IT_ICB_6);
 
         assert.equal(xades.Target, "#signature-6758-0293-4666-9275");
 
         assert.equal(xades.UnsignedProperties.UnsignedSignatureProperties.Count, 1);
 
-        xades.UnsignedProperties.UnsignedSignatureProperties.Some(item => {
+        xades.UnsignedProperties.UnsignedSignatureProperties.Some((item) => {
             if (item instanceof CounterSignature) {
                 assert.equal(item.Signature.Id, "signature-3538-3546-1081-6658");
                 return true;
