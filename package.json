@@ -8,6 +8,7 @@
   "jsnext:main": "lib/index.js",
   "scripts": {
     "start": "node test/html/server.js",
+    "prepare": "npm run build",
     "test": "mocha",
     "test:local": "nyc --reporter=lcov npm test",
     "build": "npm run build:lib && npm run build:es5 && npm run build:web",
