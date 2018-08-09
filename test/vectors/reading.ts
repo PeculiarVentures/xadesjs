@@ -1,5 +1,4 @@
 import * as assert from "assert";
-import { XmlObject } from "xml-core";
 let WebCrypto = require("node-webcrypto-ossl");
 import { Application } from "xmldsigjs";
 import * as XAdES from "../../";

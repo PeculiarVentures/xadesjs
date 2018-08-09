@@ -1,5 +1,4 @@
 import * as assert from "assert";
-import * as XmlCore from "xml-core";
 import * as XAdES from "../../";
 
 const WebCrypto = require("node-webcrypto-ossl");
@@ -48,7 +47,7 @@ context("XAdES signing", () => {
                 assert.equal(!!sig, true);
 
                 const xades = new XAdES.SignedXml(XAdES.Parse(sig));
-                xades.LoadXml(signature.XmlSignature.GetXml());
+                xades.LoadXml(signature.XmlSignature.GetXml()!);
 
                 assert.equal(!!xades.SignedProperties, true);
                 assert.equal(!!xades.SignedProperties.SignedSignatureProperties.SigningTime, true);
@@ -95,7 +94,7 @@ context("XAdES signing", () => {
                 assert.equal(!!sig, true);
 
                 const xades = new XAdES.SignedXml(XAdES.Parse(sig));
-                xades.LoadXml(signature.XmlSignature.GetXml());
+                xades.LoadXml(signature.XmlSignature.GetXml()!);
 
                 assert.equal(!!xades.SignedProperties, true);
                 assert.equal(!!xades.SignedProperties.SignedSignatureProperties.SigningTime, true);

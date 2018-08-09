@@ -8,13 +8,11 @@
   "jsnext:main": "lib/index.js",
   "scripts": {
     "start": "node test/html/server.js",
-    "test": "mocha test/**/*.js",
+    "test": "mocha",
     "test:local": "nyc --reporter=lcov npm test",
     "build": "npm run build:lib && npm run build:es5 && npm run build:web",
     "build:es5": "rollup -c",
     "build:lib": "rollup -c rollup.config.lib.js",
-    "build:map": "rollup -c --dev",
-    "build:test": "tsc -p test",
     "build:types": "tsc --declaration --declarationDir types",
     "build:web": "rollup -c rollup.config.web.js && babel dist/xades.js --out-file dist/xades.js",
     "pub": "npm run build && npm version patch && npm publish && git push",
@@ -47,24 +45,39 @@
   },
   "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
   "dependencies": {
-    "tslib": "^1.9.0",
-    "xmldsigjs": "^2.0.20"
+    "xmldsigjs": "^2.0.22"
   },
   "devDependencies": {
     "@types/dateformat": "^1.0.1",
-    "@types/mocha": "^2.2.48",
-    "babel-core": "^6.26.0",
-    "babel-plugin-external-helpers": "^6.18.0",
-    "babel-preset-es2015": "^6.18.0",
-    "babelrc-rollup": "^3.0.0",
-    "coveralls": "^3.0.0",
-    "mocha": "^4.1.0",
-    "node-webcrypto-ossl": "^1.0.34",
-    "nyc": "^11.4.1",
-    "rollup": "^0.52.3",
-    "rollup-plugin-babel": "^3.0.3",
-    "rollup-plugin-node-resolve": "^3.0.2",
+    "@types/mocha": "^5.2.5",
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "coveralls": "^3.0.2",
+    "mocha": "^5.2.0",
+    "node-webcrypto-ossl": "^1.0.37",
+    "nyc": "^12.0.2",
+    "rollup": "^0.64.1",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-typescript": "^0.8.1",
-    "typescript": "^2.7.1"
+    "ts-node": "^7.0.0",
+    "tslib": "^1.9.3",
+    "typescript": "^3.0.1"
+  },
+  "nyc": {
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "**/*.d.ts"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ]
   }
 }
