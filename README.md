@@ -5,7 +5,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/PeculiarVentures/xadesjs/badge.svg?branch=master)](https://coveralls.io/github/PeculiarVentures/xadesjs?branch=master)
 [![npm version](https://badge.fury.io/js/xadesjs.svg)](https://badge.fury.io/js/xadesjs)
 
-[![NPM](https://nodei.co/npm-dl/xadesjs.png?months=2&height=2)](https://nodei.co/npm/xadesjs/)
+[![NPM](https://nodei.co/npm/xadesjs.png)](https://nodei.co/npm/xadesjs/)
 
 
 [XAdES](https://en.wikipedia.org/wiki/XAdES) is short for "XML Advanced Electronic Signatures", it is a superset of XMLDSIG. This library aims to provide an implementation of XAdES in Typescript/Javascript that is built on [XMLDSIGjs](https://github.com/PeculiarVentures/xmldsigjs).
