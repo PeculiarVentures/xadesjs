@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/mern-starter # directory where steps will run
     docker: # run the steps with Docker
-      - image: circleci/node:8.11.3
+      - image: circleci/node:10.13.0
     steps:
       - checkout
       - run:
