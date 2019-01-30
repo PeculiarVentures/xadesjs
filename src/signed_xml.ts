@@ -94,7 +94,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
                 // Looking for <QualifyingProperties>
                 for (let i = 0; i < item.Element.childNodes.length; i++) {
                     const node = item.Element.childNodes.item(i);
-                    if (node.nodeType === XmlCore.XmlNodeType.Element && node.localName === XAdES.XmlXades.ElementNames.QualifyingProperties) {
+                    if (node.nodeType === XmlCore.XmlNodeType.Element && (node as Element).localName === XAdES.XmlXades.ElementNames.QualifyingProperties) {
                         properties = XAdES.QualifyingProperties.LoadXml(node as Element);
                         return true;
                     }
@@ -255,7 +255,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
                 ssp.SignaturePolicyIdentifier.SignaturePolicyId = policyId;
                 ssp.SignaturePolicyIdentifier.SignaturePolicyImplied = false;
-            } else {
+            } else if (options) {
                 ssp.SignaturePolicyIdentifier.SignaturePolicyImplied = true;
             }
         }
