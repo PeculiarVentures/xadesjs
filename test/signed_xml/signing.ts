@@ -1,7 +1,6 @@
+import { Crypto } from "@peculiar/webcrypto";
 import * as assert from "assert";
 import * as XAdES from "../../src";
-
-const WebCrypto = require("node-webcrypto-ossl");
 
 context("XAdES signing", () => {
 
@@ -15,8 +14,8 @@ context("XAdES signing", () => {
     const xml = `<root><child>Test</child></root>`;
 
     before((done) => {
-        const crypto = new WebCrypto() as Crypto;
-        XAdES.Application.setEngine("OpenSSL", crypto);
+        const crypto = new Crypto();
+        XAdES.Application.setEngine("NodeJS", crypto);
 
         Promise.resolve()
             .then(() =>
@@ -52,7 +51,7 @@ context("XAdES signing", () => {
                 assert.equal(!!xades.SignedProperties, true);
                 assert.equal(!!xades.SignedProperties.SignedSignatureProperties.SigningTime, true);
                 assert.equal(!!xades.SignedProperties.SignedSignatureProperties.SigningTime.Value, true);
-                assert.equal(xades.SignedProperties.SignedSignatureProperties.SignaturePolicyIdentifier.IsEmpty(), false);
+                assert.equal(xades.SignedProperties.SignedSignatureProperties.SignaturePolicyIdentifier.IsEmpty(), true);
                 assert.equal(xades.SignedProperties.SignedSignatureProperties.SignerRole.IsEmpty(), true);
                 assert.equal(xades.SignedProperties.SignedSignatureProperties.SigningCertificate.IsEmpty(), true);
                 assert.equal(xades.SignedProperties.SignedSignatureProperties.SignatureProductionPlace.IsEmpty(), true);
@@ -99,7 +98,7 @@ context("XAdES signing", () => {
                 assert.equal(!!xades.SignedProperties, true);
                 assert.equal(!!xades.SignedProperties.SignedSignatureProperties.SigningTime, true);
                 assert.equal(!!xades.SignedProperties.SignedSignatureProperties.SigningTime.Value, true);
-                assert.equal(xades.SignedProperties.SignedSignatureProperties.SignaturePolicyIdentifier.SignaturePolicyImplied, true);
+                assert.equal(xades.SignedProperties.SignedSignatureProperties.SignaturePolicyIdentifier.SignaturePolicyImplied, false);
                 assert.equal(xades.SignedProperties.SignedSignatureProperties.SignerRole.ClaimedRoles.Count, 3);
                 assert.equal(xades.SignedProperties.SignedSignatureProperties.SigningCertificate.Count, 1);
                 assert.equal(xades.SignedProperties.SignedSignatureProperties.SignatureProductionPlace.CountryName, "Country");

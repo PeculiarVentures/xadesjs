@@ -10,7 +10,7 @@
 
 [XAdES](https://en.wikipedia.org/wiki/XAdES) is short for "XML Advanced Electronic Signatures", it is a superset of XMLDSIG. This library aims to provide an implementation of XAdES in Typescript/Javascript that is built on [XMLDSIGjs](https://github.com/PeculiarVentures/xmldsigjs).
 
-Since it is based on [XMLDSIGjs](https://github.com/PeculiarVentures/xmldsigjs) and that library uses Web Crypto for cryptographic operations it can be used both in browsers and in Node.js (when used with a polyfill like [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)).
+Since it is based on [XMLDSIGjs](https://github.com/PeculiarVentures/xmldsigjs) and that library uses Web Crypto for cryptographic operations it can be used both in browsers and in Node.js (when used with a polyfill like [webcrypto](https://github.com/PeculiarVentures/webcrypto), [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl) or [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)).
 
 There are seven different profiles of XAdES, they are:
 - Basic Electronic Signature (XAdES-BES)
@@ -74,7 +74,7 @@ There is also a `lib` folder with an ES2015 JS file which you can use with `roll
 
 ### PLATFORM SUPPORT
 
-XAdESjs works with any browser that suppports Web Crypto. Since node does not have Web Crypto you will need a polyfill on this platform, for this reason the npm package includes [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl); browsers do not need this dependency and in those cases though it will be installed it will be ignored.
+XAdESjs works with any browser that suppports Web Crypto. Since node does not have Web Crypto you will need a polyfill on this platform, for this reason the npm package includes [webcrypto](https://github.com/PeculiarVentures/webcrypto); browsers do not need this dependency and in those cases though it will be installed it will be ignored.
 
 If you need to use a Hardware Security Module we have also created a polyfill for Web Crypto that supports PKCS #11. Our polyfill for this is [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11).
 
@@ -82,9 +82,9 @@ To use [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-
 
 ```javascript
 var xadesjs = require("./built/xades.js");
-var WebCrypto = require("node-webcrypto-ossl");
+var { Crypto } = require("@peculiar/webcrypto");
 
-xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
+xadesjs.Application.setEngine("NodeJS", new Crypto());
 ```
 
 The [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11) polyfill will work the same way. The only difference is that you have to specify the details about your PKCS #11 device when you instansiate it:
@@ -202,9 +202,9 @@ __Parameters__
 
 ```javascript
 var xadesjs = require("xadesjs");
-var WebCrypto = require("node-webcrypto-ossl");
+var { Crypto } = require("@peculiar/webcrypto");
 
-xadesjs.Application.setEngine("OpenSSL", new WebCrypto());
+xadesjs.Application.setEngine("NodeJS", new Crypto());
 
 // Generate RSA key pair
 var privateKey, publicKey;
@@ -341,17 +341,17 @@ function SignXml(xmlString, keys, algorithm) {
 </body>
 
 </html>
-````
+```
 
 ### Check XAdES-BES Signature
 
 #### In Node
 
-```javascript
+```js
 var XAdES = require("xadesjs");
-var WebCrypto = require("node-webcrypto-ossl").default;
+var { Crypto } = require("@peculiar/webcrypto");
 
-XAdES.Application.setEngine("OpenSSL", new WebCrypto());
+XAdES.Application.setEngine("NodeJS", new Crypto());
 
 var fs = require("fs");
 var xmlString = fs.readFileSync("some.xml","utf8");
@@ -418,12 +418,13 @@ signedXml.Verify()
 
 ```js
 const fs = require("fs");
-const WebCrypto = require("node-webcrypto-ossl");
+var { Crypto } = require("@peculiar/webcrypto");
 const xadesjs = require("xadesjs");
 const { XMLSerializer } = require("xmldom-alpha");
 
-const crypto = new WebCrypto();
-xadesjs.Application.setEngine("OpenSSL", crypto);
+
+const crypto = new Crypto();
+xadesjs.Application.setEngine("NodeJS", );
 
 function preparePem(pem) {
     return pem
@@ -532,5 +533,6 @@ This project takes inspiration (style, approach, design and code) from both the 
 - [Internet X.509 Public Key Infrastructure Time-Stamp Protocol](https://www.ietf.org/rfc/rfc3161.txt)
 - [XAdESj](https://github.com/luisgoncalves/xades4j)
 - [PKIjs](pkijs.org)
+- [webcrypto](https://github.com/PeculiarVentures/webcrypto)
 - [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl)
 - [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)
