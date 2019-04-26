@@ -143,6 +143,7 @@ interface OptionsXAdES {
     // Signed signature properties
 
     signingCertificate?: string;
+    signingTime?: OptionsSigningTime;
     policy?: OptionsPolicyId;
     productionPlace?: OptionsProductionPlace;
     signerRole?: OptionsSignerRole;
@@ -165,6 +166,11 @@ interface OptionsSignReference {
 }
 
 type OptionsSignTransform = "enveloped" | "c14n" | "exc-c14n" | "c14n-com" | "exc-c14n-com" | "base64";
+
+interface OptionsSigningTime {
+    value?: Date;
+    format?: string;
+}
 
 interface OptionsSignerRole {
     claimed?: string[];

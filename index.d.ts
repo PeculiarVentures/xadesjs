@@ -45,6 +45,18 @@ declare namespace XAdES {
         hash: AlgorithmIdentifier;
         qualifiers?: Array<OptionsPolicyUserNotice | string>;
     }
+
+    export interface OptionsSigningTime {
+        /**
+         * Signing time value. Default value if now
+         */
+        value?: Date;
+        /**
+         * Format of the signing time. Default format is ISO
+         */
+        format?: string;
+    }
+
     export interface OptionsXAdES extends XmlDSigJs.OptionsSign {
         /**
          * Sets a certificate of signer for signature. Optional
@@ -53,6 +65,10 @@ declare namespace XAdES {
          * @memberOf OptionsXAdES
          */
         signingCertificate?: string;
+        /**
+         * Sets signing time options
+         */
+        signingTime?: OptionsSigningTime;
         policy?: OptionsPolicyId;
         productionPlace?: OptionsProductionPlace;
         signerRole?: OptionsSignerRole;
