@@ -336,7 +336,7 @@ function SignXml(xmlString, keys, algorithm) {
                                 city: "City",
                                 code: "Code",
                             },
-                            signerRoles: {
+                            signerRole: {
                                 claimed: ["Some role"]
                             }
                         })
