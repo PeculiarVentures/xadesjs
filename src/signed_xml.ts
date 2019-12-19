@@ -122,8 +122,8 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         this.properties = properties;
     }
 
-    public Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsXAdES): PromiseLike<XmlDSigJs.Signature> {
-        return super.Sign.apply(this, arguments);
+    public async Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsXAdES) {
+        return super.Sign.apply(this, arguments as any);
     }
 
     //#endregion

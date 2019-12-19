@@ -1,7 +1,0 @@
-{
-    "comments": false,
-    "compact": false,
-    "presets": [
-        ["es2015", {"modules": false}]
-    ]
-}

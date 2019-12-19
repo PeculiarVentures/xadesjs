@@ -2,29 +2,28 @@
     "compilerOptions": {
         "module": "commonjs",
         "moduleResolution": "node",
-        "target": "esnext",
+        "target": "ES2018",
         "lib": [
-            "es5",
             "dom",
-            "es2015.promise",
-            "es2015.symbol"
+            "es2015"
         ],
-        "noImplicitAny": true,
-        "sourceMap": false,
+        "outDir": "build",
+        "esModuleInterop": true,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "sourceMap": true,
         "noUnusedLocals": true,
         "noUnusedParameters": false,
+        "strict": true,
+        "strictPropertyInitialization": false,
         "strictNullChecks": true,
         "pretty": true,
         "noImplicitReturns": true,
         "experimentalDecorators": true,
-        "rootDir": "src",
-        "outDir": "build",
-        "importHelpers": true
+        "importHelpers": true,
+        "forceConsistentCasingInFileNames": true
     },
     "exclude": [
-        "node_modules",
-        "test",
-        "src/pki",
-        "src/index.ts"
+        "build"
     ]
 }

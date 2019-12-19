@@ -1,12 +1,8 @@
-/.vscode
-/.nyc_output/
-/coverage/
-/node_modules
-/test/**/*.js
-/build
-/types
-/lib
-/dist
+.vscode/
+.nyc_output/
+coverage/
+node_modules/
+build/
 **/*.map
 *.log
 

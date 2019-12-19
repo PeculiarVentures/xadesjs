@@ -282,11 +282,11 @@ function SignXml(xmlString, keys, algorithm) {
 
 <body>
     <pre id="signature"><code></code></pre>
-    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/promise.js"></script>
-    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/webcrypto-liner.min.js"></script>
-    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/asmcrypto.js"></script>
-    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/elliptic.js"></script>
-    <script type="text/javascript" src="dist/xades.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.7.0/polyfill.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/asmCrypto/2.3.2/asmcrypto.all.es5.min.js"></script>
+    <script src="https://cdn.rawgit.com/indutny/elliptic/master/dist/elliptic.min.js"></script>
+    <script src="https://unpkg.com/webcrypto-liner@1.1.2/build/webcrypto-liner.shim.min.js"></script>
+    <script src="https://unpkg.com/xadesjs@2.0.16/build/xades.js"></script>
     <script type="text/javascript">
         // Generate RSA key pair
         var privateKey, publicKey;
@@ -389,11 +389,11 @@ signedXml.Verify()
 
 <body>
     <pre id="signature"><code></code></pre>
-    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/promise.js"></script>
-    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/webcrypto-liner.min.js"></script>
-    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/asmcrypto.js"></script>
-    <script src="https://peculiarventures.github.io/pv-webcrypto-tests/src/elliptic.js"></script>
-    <script type="text/javascript" src="dist/xades.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.7.0/polyfill.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/asmCrypto/2.3.2/asmcrypto.all.es5.min.js"></script>
+    <script src="https://cdn.rawgit.com/indutny/elliptic/master/dist/elliptic.min.js"></script>
+    <script src="https://unpkg.com/webcrypto-liner@1.1.2/build/webcrypto-liner.shim.min.js"></script>
+    <script src="https://unpkg.com/xadesjs@2.0.16/build/xades.js"></script>
     <script type="text/javascript">
         "use strict";
         fetch("https://cdn.rawgit.com/PeculiarVentures/xadesjs/master/test/static/valid_signature.xml")
@@ -539,6 +539,6 @@ This project takes inspiration (style, approach, design and code) from both the 
 - [Internet X.509 Public Key Infrastructure Time-Stamp Protocol](https://www.ietf.org/rfc/rfc3161.txt)
 - [XAdESj](https://github.com/luisgoncalves/xades4j)
 - [PKIjs](pkijs.org)
-- [webcrypto](https://github.com/PeculiarVentures/webcrypto)
+- [@peculiar/webcrypto](https://github.com/PeculiarVentures/webcrypto)
 - [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl)
 - [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)

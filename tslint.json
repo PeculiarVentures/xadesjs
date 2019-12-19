@@ -14,6 +14,8 @@
         "prefer-for-of": false,
         "forin": false,
         "no-conditional-assignment": false,
+        "no-string-literal": false,
+        "space-before-function-paren": false,
         "no-var-requires": false
     },
     "rulesDirectory": []
