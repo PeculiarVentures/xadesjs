@@ -50,7 +50,7 @@ const browser = [
     input,
     plugins: [
       resolve({
-        main: ["esnext", "module", "main"],
+        mainFields: ["esnext", "module", "main"],
         preferBuiltins: true,
       }),
       commonjs(),

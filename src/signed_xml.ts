@@ -38,7 +38,7 @@ export interface OptionsPolicyId {
     identifier: OptionsPolicyIdentifier;
     transforms?: XmlDSigJs.OptionsSignTransform[];
     hash: AlgorithmIdentifier;
-    qualifiers?: Array<OptionsPolicyUserNotice | string>;
+    qualifiers?: (OptionsPolicyUserNotice | string)[];
 }
 
 export interface OptionsSigningTime {

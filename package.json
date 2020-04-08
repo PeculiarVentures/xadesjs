@@ -50,31 +50,31 @@
   },
   "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
   "dependencies": {
-    "xml-core": "^1.0.20",
-    "xmldsigjs": "^2.0.28"
+    "xml-core": "^1.0.21",
+    "xmldsigjs": "^2.0.30"
   },
   "devDependencies": {
-    "@babel/core": "^7.7.7",
-    "@babel/plugin-proposal-class-properties": "^7.7.4",
-    "@babel/plugin-proposal-object-rest-spread": "^7.7.7",
-    "@babel/preset-env": "^7.7.7",
-    "@peculiar/webcrypto": "^1.0.22",
-    "@rollup/plugin-node-resolve": "^6.0.0",
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.9.5",
+    "@babel/preset-env": "^7.9.5",
+    "@peculiar/webcrypto": "^1.0.27",
+    "@rollup/plugin-node-resolve": "^6.1.0",
     "@types/dateformat": "^3.0.1",
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^12.12.21",
-    "coveralls": "^3.0.9",
-    "mocha": "^6.2.2",
-    "nyc": "^14.1.1",
-    "rollup": "^1.27.13",
-    "rollup-plugin-babel": "^4.3.3",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^12.12.35",
+    "coveralls": "^3.0.11",
+    "mocha": "^7.1.1",
+    "nyc": "^15.0.1",
+    "rollup": "^2.3.4",
+    "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-terser": "^5.1.3",
+    "rollup-plugin-terser": "^5.3.0",
     "rollup-plugin-typescript2": "^0.25.3",
-    "ts-node": "^8.5.4",
-    "tslib": "^1.10.0",
-    "tslint": "^5.20.1",
-    "typescript": "^3.7.3"
+    "ts-node": "^8.8.2",
+    "tslib": "^1.11.1",
+    "tslint": "^6.1.1",
+    "typescript": "^3.8.3"
   },
   "nyc": {
     "extension": [
@@ -90,6 +90,15 @@
     "reporter": [
       "text-summary",
       "html"
+    ]
+  },
+  "mocha": {
+    "require": "ts-node/register",
+    "extension": [
+      "ts"
+    ],
+    "spec": [
+      "test/**/*.ts"
     ]
   }
 }
