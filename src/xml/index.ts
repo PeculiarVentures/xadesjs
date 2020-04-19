@@ -20,6 +20,7 @@ export * from "./signed_properties";
 export * from "./signed_signature_properties";
 export * from "./signer_role";
 export * from "./signing_certificate";
+export * from "./signing_certificate_v2";
 export * from "./unsigned_data_object_property";
 export * from "./unsigned_properties";
 export * from "./unsigned_signature_properties";
