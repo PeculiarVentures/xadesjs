@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import * as XAdES from "../../src";
-const { XMLSerializer } = require("xmldom-alpha");
+const { XMLSerializer } = require("xmldom");
 
 context("xml", () => {
 

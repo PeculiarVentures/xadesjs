@@ -41,7 +41,7 @@ const main = {
 };
 
 const browserExternals = {
-  "xmldom-alpha": "self",
+  "xmldom": "self",
   "xpath": "self",
 };
 

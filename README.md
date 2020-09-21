@@ -426,7 +426,7 @@ signedXml.Verify()
 const fs = require("fs");
 var { Crypto } = require("@peculiar/webcrypto");
 const xadesjs = require("xadesjs");
-const { XMLSerializer } = require("xmldom-alpha");
+const { XMLSerializer } = require("xmldom");
 
 
 const crypto = new Crypto();

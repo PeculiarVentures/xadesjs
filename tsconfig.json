@@ -21,7 +21,8 @@
         "noImplicitReturns": true,
         "experimentalDecorators": true,
         "importHelpers": true,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "skipLibCheck": true
     },
     "exclude": [
         "build"
