@@ -28,7 +28,7 @@ export interface OptionsPolicyUserNotice {
 }
 
 export interface OptionsPolicyIdentifier {
-    qualifier: XAdES.IdentifierQualifier;
+    qualifier?: XAdES.IdentifierQualifier;
     value: string;
     description?: string;
     references?: string[];
@@ -38,6 +38,7 @@ export interface OptionsPolicyId {
     identifier: OptionsPolicyIdentifier;
     transforms?: XmlDSigJs.OptionsSignTransform[];
     hash: AlgorithmIdentifier;
+    digestValue?: string,
     qualifiers?: (OptionsPolicyUserNotice | string)[];
 }
 
@@ -61,6 +62,14 @@ export interface OptionsXAdES extends XmlDSigJs.OptionsSign {
      * @memberOf OptionsXAdES
      */
     signingCertificate?: string;
+
+    /**
+     * Sets a certificate of signer for signature. Optional
+     *
+     * @type {string} base64 string of X509 certificate
+     * @memberOf OptionsXAdES
+     */
+    signingCertificateV2?: string;
 
     /**
      * Sets signing time options
@@ -175,6 +184,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
             signature.SignedInfo.References.Add(xadesRef);
 
             await this.ApplySigningCertificate(options.signingCertificate);
+            await this.ApplySigningCertificateV2(options.signingCertificateV2);
             await this.ApplySignaturePolicyIdentifier(options.policy);
             this.ApplySignatureProductionPlace(options.productionPlace);
             this.ApplySignerRoles(options.signerRole);
@@ -202,6 +212,26 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         }
     }
 
+    protected async ApplySigningCertificateV2(base64string?: string) {
+        if (this.Properties && base64string) {
+            const raw = XmlCore.Convert.FromBase64(base64string);
+            const cert = new XmlDSigJs.X509Certificate(raw);
+
+            const ssp = this.Properties.SignedProperties.SignedSignatureProperties;
+            if (ssp.SigningCertificateV2.Count) {
+                throw new XmlCore.XmlError(XmlCore.XE.XML_EXCEPTION, "Signature can contain only one SigningCertificateV2");
+            }
+            const signingCertificate = new XAdES.CertV2();
+            // signingCertificate.IssuerSerial :TODO: base64 encoded DER of IssuerSerial as defined by IETF RFC 5035
+
+            const alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm("SHA-256");
+            signingCertificate.CertDigest.DigestMethod.Algorithm = alg.namespaceURI;
+            signingCertificate.CertDigest.DigestValue = new Uint8Array(await cert.Thumbprint(alg.algorithm.name as any));
+
+            this.Properties.SignedProperties.SignedSignatureProperties.SigningCertificateV2.Add(signingCertificate);
+        }
+    }
+
     protected async ApplySignaturePolicyIdentifier(options?: OptionsPolicyId | boolean) {
         if (this.Properties) {
             const ssp = this.Properties.SignedProperties.SignedSignatureProperties;
@@ -210,7 +240,9 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
                 policyId.SigPolicyId = new XAdES.SigPolicyId();
                 policyId.SigPolicyId.Identifier = new XAdES.Identifier();
-                policyId.SigPolicyId.Identifier.Qualifier = options.identifier.qualifier;
+                if (options.identifier.qualifier) {
+                    policyId.SigPolicyId.Identifier.Qualifier = options.identifier.qualifier;
+                }
                 policyId.SigPolicyId.Identifier.Value = options.identifier.value;
                 if (options.identifier.description) {
                     policyId.SigPolicyId.Description = options.identifier.description;
@@ -235,18 +267,22 @@ export class SignedXml extends XmlDSigJs.SignedXml {
                 policyId.SigPolicyHash.DigestMethod = new XmlDSigJs.DigestMethod();
                 const digestAlgorithm = XmlDSigJs.CryptoConfig.GetHashAlgorithm(options.hash);
                 policyId.SigPolicyHash.DigestMethod.Algorithm = digestAlgorithm.namespaceURI;
-                const identifierDoc = policyId.SigPolicyId.Identifier.GetXml()!.cloneNode(true) as Element;
-                this.CopyNamespaces(identifierDoc, identifierDoc, true);
-                this.InjectNamespaces(this.GetSignatureNamespaces(), identifierDoc, true);
-                let identifierContent: any = null;
-                if (policyId.Transforms && policyId.Transforms.Count) {
-                    identifierContent = this.ApplyTransforms(policyId.Transforms, identifierDoc);
+                if (options.digestValue) {
+                    policyId.SigPolicyHash.DigestValue = XmlCore.Convert.FromBase64(options.digestValue);
                 } else {
-                    const c14n = new XmlDSigJs.XmlDsigC14NTransform();
-                    c14n.LoadInnerXml(identifierDoc);
-                    identifierContent = c14n.GetOutput();
+                    const identifierDoc = policyId.SigPolicyId.Identifier.GetXml()!.cloneNode(true) as Element;
+                    this.CopyNamespaces(identifierDoc, identifierDoc, true);
+                    this.InjectNamespaces(this.GetSignatureNamespaces(), identifierDoc, true);
+                    let identifierContent: any = null;
+                    if (policyId.Transforms && policyId.Transforms.Count) {
+                        identifierContent = this.ApplyTransforms(policyId.Transforms, identifierDoc);
+                    } else {
+                        const c14n = new XmlDSigJs.XmlDsigC14NTransform();
+                        c14n.LoadInnerXml(identifierDoc);
+                        identifierContent = c14n.GetOutput();
+                    }
+                    policyId.SigPolicyHash.DigestValue = await digestAlgorithm.Digest(identifierContent);
                 }
-                policyId.SigPolicyHash.DigestValue = await digestAlgorithm.Digest(identifierContent);
 
                 if (options.qualifiers) {
                     policyId.SigPolicyQualifiers = new XAdES.SigPolicyQualifiers();
