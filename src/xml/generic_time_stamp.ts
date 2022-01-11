@@ -1,6 +1,6 @@
 import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
 import { XmlBase64Converter } from "xml-core";
-import { CanonicalizationMethod, XmlSignature } from "xmldsigjs";
+import { CanonicalizationMethod, DigestMethod, XmlSignature } from "xmldsigjs";
 
 import { Any } from "./any";
 import { EncapsulatedPKIData } from "./encapsulated_pki_data";
@@ -69,20 +69,24 @@ export class ReferenceInfo extends XadesObject {
     @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
     public Id: string;
 
+    /**
+     * Gets or sets the digest method Uniform Resource Identifier (URI) of the current
+     */
     @XmlChildElement({
-        localName: XmlSignature.ElementNames.DigestMethod,
-        namespaceURI: XmlSignature.NamespaceURI,
-        prefix: XmlSignature.DefaultPrefix,
         required: true,
+        parser: DigestMethod,
     })
-    public DigestMethod: string;
+    public DigestMethod = new DigestMethod();
 
-    @XmlChildElement({
-        localName: XmlSignature.ElementNames.DigestMethod,
+    /**
+     * Gets or sets the digest value of the current Reference.
+     */
+     @XmlChildElement({
+        required: true,
+        localName: XmlSignature.ElementNames.DigestValue,
         namespaceURI: XmlSignature.NamespaceURI,
         prefix: XmlSignature.DefaultPrefix,
         converter: XmlBase64Converter,
-        required: true,
     })
     public DigestValue: Uint8Array;
 
