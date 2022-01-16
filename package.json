@@ -5,8 +5,8 @@
   "main": "build/index.js",
   "types": "build/types/index.d.ts",
   "module": "build/index.es.js",
-  "browser": "build/xades.js",
-  "browserMin": "build/xades.min.js",
+  "browser": "build/index.js",
+  "browserMin": "build/index.es.js",
   "scripts": {
     "prepare": "npm run build",
     "test": "npm run lint && mocha",
