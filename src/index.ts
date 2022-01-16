@@ -4,4 +4,6 @@ export let xml = xadesXml;
 export * from "./signed_xml";
 
 export { Application } from "xmldsigjs";
-export default { Select, Parse, Convert } from "xml-core";
+export { Select, Parse, Convert } from "xml-core";
+
+export default xadesXml;
