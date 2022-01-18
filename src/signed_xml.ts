@@ -131,7 +131,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         this.properties = properties;
     }
 
-    public async Sign(algorithm: Algorithm, key: CryptoKey, data: Document, options?: OptionsXAdES) {
+    public async Sign(algorithm: Algorithm, key: CryptoKey, data: Document | XmlDSigJs.DigestReferenceSource, options?: OptionsXAdES) {
         return super.Sign.apply(this, arguments as any);
     }
 
