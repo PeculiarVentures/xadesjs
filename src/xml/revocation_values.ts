@@ -42,7 +42,7 @@ export class OtherValues extends XadesCollection<OtherValue> { }
 @XmlElement({ localName: XmlXades.ElementNames.EncapsulatedOCSPValue })
 export class EncapsulatedOCSPValue extends EncapsulatedPKIData { }
 
-@XmlElement({ localName: XmlXades.ElementNames.OCSPValues })
+@XmlElement({ localName: XmlXades.ElementNames.OCSPValues, parser: EncapsulatedOCSPValue })
 export class OCSPValues extends XadesCollection<EncapsulatedOCSPValue> { }
 
 @XmlElement({ localName: XmlXades.ElementNames.EncapsulatedCRLValue })
