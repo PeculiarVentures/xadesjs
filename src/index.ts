@@ -1,6 +1,4 @@
-import * as xadesXml from "./xml";
-
-export let xml = xadesXml;
+export * as xml from "./xml";
 export * from "./signed_xml";
 
 export { Application } from "xmldsigjs";
