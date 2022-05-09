@@ -2469,10 +2469,10 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-pvtsutils@^1.2.1, pvtsutils@^1.2.2, pvtsutils@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/pvtsutils/-/pvtsutils-1.3.0.tgz#3bb61f758c4c5ccd48a21a5b4943bfef643de47f"
-  integrity sha512-q/BKu90CcOTSxuaoUwfAbLReg2jwlXjKpUO5htADXdDmz/XG4rIkgvA5xkc24td2SCg3vcoH9182TEceK2Zn0g==
+pvtsutils@^1.2.1, pvtsutils@^1.2.2, pvtsutils@^1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/pvtsutils/-/pvtsutils-1.3.2.tgz#9f8570d132cdd3c27ab7d51a2799239bf8d8d5de"
+  integrity sha512-+Ipe2iNUyrZz+8K/2IOo+kKikdtfhRKzNpQbruF2URmqPtoqAs8g3xS7TJvFF2GcPXjh7DkqMnpVveRFq4PgEQ==
   dependencies:
     tslib "^2.4.0"
 
@@ -2660,10 +2660,10 @@ rollup-pluginutils@^2.8.1:
   dependencies:
     estree-walker "^0.6.1"
 
-rollup@^2.71.1:
-  version "2.71.1"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.71.1.tgz#82b259af7733dfd1224a8171013aaaad02971a22"
-  integrity sha512-lMZk3XfUBGjrrZQpvPSoXcZSfKcJ2Bgn+Z0L1MoW2V8Wh7BVM+LOBJTPo16yul2MwL59cXedzW1ruq3rCjSRgw==
+rollup@^2.72.1:
+  version "2.72.1"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.72.1.tgz#861c94790537b10008f0ca0fbc60e631aabdd045"
+  integrity sha512-NTc5UGy/NWFGpSqF1lFY8z9Adri6uhyMLI6LvPAXdBKoPRFhIIiBUpt+Qg2awixqO3xvzSijjhnb4+QEZwJmxA==
   optionalDependencies:
     fsevents "~2.3.2"
 
@@ -3095,14 +3095,14 @@ xml-core@^1.1.4:
     tslib "^2.3.1"
     xpath.js "^1.1.0"
 
-xmldsigjs@^2.4.1:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/xmldsigjs/-/xmldsigjs-2.4.1.tgz#64687879ed133f90ef3e939d483ac2c18089a0e0"
-  integrity sha512-TodCUlDOk3BqToFN6tFAeiBa6YrC4Pid1MP6E8mB/55S74/rh/NHwALioG+/cw/4OWm5YC9oK7wx1ndCkmzCOQ==
+xmldsigjs@^2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/xmldsigjs/-/xmldsigjs-2.5.0.tgz#2d6564f39f30c97ce918b8a392b8f2d5db277cf9"
+  integrity sha512-1qh8+QCZk1zsL9yed3YD34vYGuFBDRowBlVPAiUAT9RRzjtSFRa28+wca+8AuLvFAzXEvvoRSS8A6zS3dpZEyw==
   dependencies:
     asn1js "^2.4.0"
     pkijs "^2.3.0"
-    pvtsutils "^1.3.0"
+    pvtsutils "^1.3.2"
     pvutils "^1.1.3"
     tslib "^2.4.0"
     xml-core "^1.1.4"

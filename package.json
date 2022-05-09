@@ -51,7 +51,7 @@
   "homepage": "https://github.com/PeculiarVentures/xadesjs#readme",
   "dependencies": {
     "xml-core": "^1.1.4",
-    "xmldsigjs": "^2.4.1"
+    "xmldsigjs": "^2.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.17.10",
@@ -67,7 +67,7 @@
     "coveralls": "^3.1.1",
     "mocha": "^10.0.0",
     "nyc": "^15.1.0",
-    "rollup": "^2.71.1",
+    "rollup": "^2.72.1",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-terser": "^7.0.2",
