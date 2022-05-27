@@ -53,23 +53,27 @@ export interface OptionsSigningTime {
     format?: string;
 }
 
+export interface OptionsSigningCertificate {
+    certificate: string;
+    digestAlgorithm?: AlgorithmIdentifier;
+}
+
+export interface OptionsSigningCertificateV2 {
+    certificate: string;
+    digestAlgorithm?: AlgorithmIdentifier;
+}
+
 export interface OptionsXAdES extends XmlDSigJs.OptionsSign {
 
     /**
      * Sets a certificate of signer for signature. Optional
-     *
-     * @type {string} base64 string of X509 certificate
-     * @memberOf OptionsXAdES
      */
-    signingCertificate?: string;
+    signingCertificate?: string | OptionsSigningCertificate;
 
     /**
      * Sets a certificate of signer for signature. Optional
-     *
-     * @type {string} base64 string of X509 certificate
-     * @memberOf OptionsXAdES
      */
-    signingCertificateV2?: string;
+    signingCertificateV2?: string | OptionsSigningCertificateV2;
 
     /**
      * Sets signing time options
@@ -147,10 +151,10 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         const rnd = XmlDSigJs.Application.crypto.getRandomValues(new Uint8Array(6)) as Uint8Array;
         const id = XmlCore.Convert.ToHex(rnd);
 
-        this.XmlSignature.Id = `id-${id}`;
+        this.XmlSignature.Id ||= `id-${id}`;
         const dataObject = new XAdES.DataObject();
         dataObject.QualifyingProperties.Target = `#${this.XmlSignature.Id}`;
-        dataObject.QualifyingProperties.SignedProperties.Id = `xades-${this.XmlSignature.Id}`;
+        dataObject.QualifyingProperties.SignedProperties.Id ||= `xades-${this.XmlSignature.Id}`;
 
         this.properties = dataObject.QualifyingProperties;
         this.XmlSignature.ObjectList.Add(dataObject);
@@ -191,9 +195,17 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         }
     }
 
-    protected async ApplySigningCertificate(base64string?: string) {
-        if (this.Properties && base64string) {
-            const raw = XmlCore.Convert.FromBase64(base64string);
+    protected async ApplySigningCertificate(value?: string | OptionsSigningCertificate) {
+        if (this.Properties && value) {
+            const options: OptionsSigningCertificate = typeof value === "string"
+                ? {
+                    certificate: value,
+                }
+                : value;
+            if (!options.digestAlgorithm) {
+                options.digestAlgorithm = "SHA-256"; // set default alg if required
+            }
+            const raw = XmlCore.Convert.FromBase64(options.certificate);
             const cert = new XmlDSigJs.X509Certificate(raw);
 
             const ssp = this.Properties.SignedProperties.SignedSignatureProperties;
@@ -202,19 +214,27 @@ export class SignedXml extends XmlDSigJs.SignedXml {
             }
             const signingCertificate = new XAdES.Cert();
             signingCertificate.IssuerSerial.X509IssuerName = cert.Issuer;
-            signingCertificate.IssuerSerial.X509SerialNumber = cert.SerialNumber; // TODO: Must be Big number here
+            signingCertificate.IssuerSerial.X509SerialNumber = cert.SerialNumber;
 
-            const alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm("SHA-256");
+            const alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm(options.digestAlgorithm);
             signingCertificate.CertDigest.DigestMethod.Algorithm = alg.namespaceURI;
-            signingCertificate.CertDigest.DigestValue = new Uint8Array(await cert.Thumbprint(alg.algorithm.name as any));
+            signingCertificate.CertDigest.DigestValue = new Uint8Array(await cert.Thumbprint(alg.algorithm.name));
 
             this.Properties.SignedProperties.SignedSignatureProperties.SigningCertificate.Add(signingCertificate);
         }
     }
 
-    protected async ApplySigningCertificateV2(base64string?: string) {
-        if (this.Properties && base64string) {
-            const raw = XmlCore.Convert.FromBase64(base64string);
+    protected async ApplySigningCertificateV2(value?: string | OptionsSigningCertificateV2) {
+        if (this.Properties && value) {
+            const options: OptionsSigningCertificate = typeof value === "string"
+                ? {
+                    certificate: value,
+                }
+                : value;
+            if (!options.digestAlgorithm) {
+                options.digestAlgorithm = "SHA-256"; // set default alg if required
+            }
+            const raw = XmlCore.Convert.FromBase64(options.certificate);
             const cert = new XmlDSigJs.X509Certificate(raw);
 
             const ssp = this.Properties.SignedProperties.SignedSignatureProperties;
@@ -224,9 +244,9 @@ export class SignedXml extends XmlDSigJs.SignedXml {
             const signingCertificate = new XAdES.CertV2();
             // signingCertificate.IssuerSerial :TODO: base64 encoded DER of IssuerSerial as defined by IETF RFC 5035
 
-            const alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm("SHA-256");
+            const alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm(options.digestAlgorithm);
             signingCertificate.CertDigest.DigestMethod.Algorithm = alg.namespaceURI;
-            signingCertificate.CertDigest.DigestValue = new Uint8Array(await cert.Thumbprint(alg.algorithm.name as any));
+            signingCertificate.CertDigest.DigestValue = new Uint8Array(await cert.Thumbprint(alg.algorithm.name ));
 
             this.Properties.SignedProperties.SignedSignatureProperties.SigningCertificateV2.Add(signingCertificate);
         }
