@@ -25,4 +25,4 @@ jobs:
         run: yarn coverage
 
       - name: Coveralls
-        run: yarn coveralls
+        uses: coverallsapp/github-action@v2
