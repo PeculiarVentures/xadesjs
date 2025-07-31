@@ -16,13 +16,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci
 
       - name: Coverage
-        run: yarn coverage
+        run: npm run coverage
 
       - name: Coveralls
         uses: coverallsapp/github-action@v2
