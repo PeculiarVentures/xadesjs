@@ -430,7 +430,7 @@ const { XMLSerializer } = require("xmldom");
 
 
 const crypto = new Crypto();
-xadesjs.Application.setEngine("NodeJS", );
+xadesjs.Application.setEngine("NodeJS", crypto);
 
 function preparePem(pem) {
     return pem
