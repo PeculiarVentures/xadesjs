@@ -24,8 +24,7 @@
     "pub:next": "npm version prerelease --preid=next && npm publish --tag next",
     "postpub:next": "git push",
     "sync": "git ac && git pull --rebase && git push",
-    "coverage": "nyc npm test",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+    "coverage": "nyc npm test"
   },
   "repository": {
     "type": "git",
@@ -89,8 +88,7 @@
       "**/*.d.ts"
     ],
     "reporter": [
-      "text-summary",
-      "html"
+      "lcov"
     ]
   },
   "mocha": {
