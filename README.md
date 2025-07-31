@@ -1,7 +1,7 @@
 # XAdESjs
 
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/PeculiarVentures/xadesjs/master/LICENSE.md)
-[![CircleCI](https://circleci.com/gh/PeculiarVentures/xadesjs.svg?style=svg)](https://circleci.com/gh/PeculiarVentures/xadesjs)
+[![GitHub Actions](https://github.com/PeculiarVentures/xadesjs/workflows/CI/badge.svg)](https://github.com/PeculiarVentures/xadesjs/actions)
 [![Coverage Status](https://coveralls.io/repos/github/PeculiarVentures/xadesjs/badge.svg?branch=master)](https://coveralls.io/github/PeculiarVentures/xadesjs?branch=master)
 [![npm version](https://badge.fury.io/js/xadesjs.svg)](https://badge.fury.io/js/xadesjs)
 
