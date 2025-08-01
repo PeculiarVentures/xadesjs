@@ -1,7 +1,6 @@
-import { XmlChildElement, XmlElement } from "xml-core";
-
-import { XmlXades } from "./xml";
-import { XadesObject } from "./xml_base";
+import { XmlChildElement, XmlElement } from 'xml-core';
+import { XmlXades } from './xml';
+import { XadesObject } from './xml_base';
 
 /**
  *
@@ -19,36 +18,35 @@ import { XadesObject } from "./xml_base";
 
 @XmlElement({ localName: XmlXades.ElementNames.SignatureProductionPlace })
 export class SignatureProductionPlace extends XadesObject {
+  @XmlChildElement({
+    localName: XmlXades.ElementNames.City,
+    defaultValue: '',
+    namespaceURI: XmlXades.NamespaceURI,
+    prefix: XmlXades.DefaultPrefix,
+  })
+  public City: string;
 
-    @XmlChildElement({
-        localName: XmlXades.ElementNames.City,
-        defaultValue: "",
-        namespaceURI: XmlXades.NamespaceURI,
-        prefix: XmlXades.DefaultPrefix,
-    })
-    public City: string;
+  @XmlChildElement({
+    localName: XmlXades.ElementNames.StateOrProvince,
+    defaultValue: '',
+    namespaceURI: XmlXades.NamespaceURI,
+    prefix: XmlXades.DefaultPrefix,
+  })
+  public StateOrProvince: string;
 
-    @XmlChildElement({
-        localName: XmlXades.ElementNames.StateOrProvince,
-        defaultValue: "",
-        namespaceURI: XmlXades.NamespaceURI,
-        prefix: XmlXades.DefaultPrefix,
-    })
-    public StateOrProvince: string;
+  @XmlChildElement({
+    localName: XmlXades.ElementNames.PostalCode,
+    defaultValue: '',
+    namespaceURI: XmlXades.NamespaceURI,
+    prefix: XmlXades.DefaultPrefix,
+  })
+  public PostalCode: string;
 
-    @XmlChildElement({
-        localName: XmlXades.ElementNames.PostalCode,
-        defaultValue: "",
-        namespaceURI: XmlXades.NamespaceURI,
-        prefix: XmlXades.DefaultPrefix,
-    })
-    public PostalCode: string;
-
-    @XmlChildElement({
-        localName: XmlXades.ElementNames.CountryName,
-        defaultValue: "",
-        namespaceURI: XmlXades.NamespaceURI,
-        prefix: XmlXades.DefaultPrefix,
-    })
-    public CountryName: string;
+  @XmlChildElement({
+    localName: XmlXades.ElementNames.CountryName,
+    defaultValue: '',
+    namespaceURI: XmlXades.NamespaceURI,
+    prefix: XmlXades.DefaultPrefix,
+  })
+  public CountryName: string;
 }

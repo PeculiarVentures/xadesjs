@@ -1,9 +1,10 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
-
-import { CertIDList } from "./signing_certificate";
-import { UnsignedSignatureProperty } from "./unsigned_signature_properties";
-import { XmlXades } from "./xml";
-import { XadesObject } from "./xml_base";
+import {
+  XmlAttribute, XmlChildElement, XmlElement,
+} from 'xml-core';
+import { CertIDList } from './signing_certificate';
+import { UnsignedSignatureProperty } from './unsigned_signature_properties';
+import { XmlXades } from './xml';
+import { XadesObject } from './xml_base';
 
 /**
  *
@@ -19,11 +20,13 @@ import { XadesObject } from "./xml_base";
 
 @XmlElement({ localName: XmlXades.ElementNames.CompleteCertificateRefs })
 export class CompleteCertificateRefs extends XadesObject implements UnsignedSignatureProperty {
+  @XmlAttribute({
+    localName: XmlXades.AttributeNames.Id, defaultValue: '',
+  })
+  public Id: string;
 
-    @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    public Id: string;
-
-    @XmlChildElement({ localName: XmlXades.ElementNames.CertRefs, parser: CertIDList, required: true })
-    public CertRefs: CertIDList;
-
+  @XmlChildElement({
+    localName: XmlXades.ElementNames.CertRefs, parser: CertIDList, required: true,
+  })
+  public CertRefs: CertIDList;
 }

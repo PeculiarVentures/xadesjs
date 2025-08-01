@@ -1,9 +1,12 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
-import { CanonicalizationMethod } from "xmldsigjs";
-
-import { EncapsulatedTimeStampCollection, ReferenceInfos, XMLTimeStampCollection } from "./generic_time_stamp";
-import { XmlXades } from "./xml";
-import { XadesObject } from "./xml_base";
+import {
+  XmlAttribute, XmlChildElement, XmlElement,
+} from 'xml-core';
+import { CanonicalizationMethod } from 'xmldsigjs';
+import {
+  EncapsulatedTimeStampCollection, ReferenceInfos, XMLTimeStampCollection,
+} from './generic_time_stamp';
+import { XmlXades } from './xml';
+import { XadesObject } from './xml_base';
 
 /**
  *
@@ -26,24 +29,28 @@ import { XadesObject } from "./xml_base";
  *
  */
 
-@XmlElement({
-    localName: XmlXades.ElementNames.OtherTimeStamp,
-})
+@XmlElement({ localName: XmlXades.ElementNames.OtherTimeStamp })
 export class OtherTimeStamp extends XadesObject {
+  @XmlAttribute({
+    localName: XmlXades.AttributeNames.Id, defaultValue: '',
+  })
+  public Id: string;
 
-    @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    public Id: string;
+  @XmlChildElement({
+    parser: ReferenceInfos, noRoot: true,
+  })
+  public ReferenceInfo: ReferenceInfos;
 
-    @XmlChildElement({ parser: ReferenceInfos, noRoot: true })
-    public ReferenceInfo: ReferenceInfos;
+  @XmlChildElement({ parser: CanonicalizationMethod })
+  public CanonicalizationMethod: CanonicalizationMethod;
 
-    @XmlChildElement({ parser: CanonicalizationMethod })
-    public CanonicalizationMethod: CanonicalizationMethod;
+  @XmlChildElement({
+    parser: EncapsulatedTimeStampCollection, noRoot: true,
+  })
+  public EncapsulatedTimeStamp: EncapsulatedTimeStampCollection;
 
-    @XmlChildElement({ parser: EncapsulatedTimeStampCollection, noRoot: true })
-    public EncapsulatedTimeStamp: EncapsulatedTimeStampCollection;
-
-    @XmlChildElement({ parser: XMLTimeStampCollection, noRoot: true })
-    public XMLTimeStamp: XMLTimeStampCollection;
-
+  @XmlChildElement({
+    parser: XMLTimeStampCollection, noRoot: true,
+  })
+  public XMLTimeStamp: XMLTimeStampCollection;
 }

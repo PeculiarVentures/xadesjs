@@ -1,8 +1,7 @@
-import { XmlAttribute, XmlElement } from "xml-core";
-
-import { Any } from "./any";
-import { XmlXades } from "./xml";
-import { XadesCollection } from "./xml_base";
+import { XmlAttribute, XmlElement } from 'xml-core';
+import { Any } from './any';
+import { XmlXades } from './xml';
+import { XadesCollection } from './xml_base';
 
 /**
  *
@@ -19,10 +18,12 @@ import { XadesCollection } from "./xml_base";
 @XmlElement({ localName: XmlXades.ElementNames.UnsignedDataObjectProperty })
 export class UnsignedDataObjectProperty extends Any { }
 
-@XmlElement({ localName: XmlXades.ElementNames.UnsignedSignatureProperties, parser: UnsignedDataObjectProperty })
+@XmlElement({
+  localName: XmlXades.ElementNames.UnsignedSignatureProperties, parser: UnsignedDataObjectProperty,
+})
 export class UnsignedDataObjectProperties extends XadesCollection<UnsignedDataObjectProperty> {
-
-    @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    public Id: string;
-
+  @XmlAttribute({
+    localName: XmlXades.AttributeNames.Id, defaultValue: '',
+  })
+  public Id: string;
 }
