@@ -1,9 +1,10 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
-
-import { SignedDataObjectProperties } from "./signed_data_object_properties";
-import { SignedSignatureProperties } from "./signed_signature_properties";
-import { XmlXades } from "./xml";
-import { XadesObject } from "./xml_base";
+import {
+  XmlAttribute, XmlChildElement, XmlElement,
+} from 'xml-core';
+import { SignedDataObjectProperties } from './signed_data_object_properties';
+import { SignedSignatureProperties } from './signed_signature_properties';
+import { XmlXades } from './xml';
+import { XadesObject } from './xml_base';
 
 /**
  *
@@ -18,18 +19,16 @@ import { XadesObject } from "./xml_base";
  *
  */
 
-@XmlElement({
-    localName: XmlXades.ElementNames.SignedProperties,
-})
+@XmlElement({ localName: XmlXades.ElementNames.SignedProperties })
 export class SignedProperties extends XadesObject {
+  @XmlAttribute({
+    localName: XmlXades.AttributeNames.Id, defaultValue: '',
+  })
+  public Id: string;
 
-    @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    public Id: string;
+  @XmlChildElement({ parser: SignedSignatureProperties })
+  public SignedSignatureProperties: SignedSignatureProperties;
 
-    @XmlChildElement({parser: SignedSignatureProperties})
-    public SignedSignatureProperties: SignedSignatureProperties;
-
-    @XmlChildElement({parser: SignedDataObjectProperties})
-    public SignedDataObjectProperties: SignedDataObjectProperties;
-
+  @XmlChildElement({ parser: SignedDataObjectProperties })
+  public SignedDataObjectProperties: SignedDataObjectProperties;
 }

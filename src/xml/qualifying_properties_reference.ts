@@ -1,7 +1,6 @@
-import { XmlAttribute, XmlElement } from "xml-core";
-
-import { XmlXades } from "./xml";
-import { XadesObject } from "./xml_base";
+import { XmlAttribute, XmlElement } from 'xml-core';
+import { XmlXades } from './xml';
+import { XadesObject } from './xml_base';
 
 /**
  *
@@ -15,11 +14,13 @@ import { XadesObject } from "./xml_base";
 
 @XmlElement({ localName: XmlXades.ElementNames.QualifyingPropertiesReference })
 export class QualifyingPropertiesReference extends XadesObject {
+  @XmlAttribute({
+    localName: XmlXades.AttributeNames.URI, required: true,
+  })
+  public Uri: string;
 
-    @XmlAttribute({ localName: XmlXades.AttributeNames.URI, required: true })
-    public Uri: string;
-
-    @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    public Id: string;
-
+  @XmlAttribute({
+    localName: XmlXades.AttributeNames.Id, defaultValue: '',
+  })
+  public Id: string;
 }

@@ -1,8 +1,9 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
-
-import { EncapsulatedPKIData } from "./encapsulated_pki_data";
-import { XmlXades } from "./xml";
-import { XadesCollection, XadesObject } from "./xml_base";
+import {
+  XmlAttribute, XmlChildElement, XmlElement,
+} from 'xml-core';
+import { EncapsulatedPKIData } from './encapsulated_pki_data';
+import { XmlXades } from './xml';
+import { XadesCollection, XadesObject } from './xml_base';
 
 /**
  *
@@ -36,34 +37,40 @@ import { XadesCollection, XadesObject } from "./xml_base";
 @XmlElement({ localName: XmlXades.ElementNames.OtherValue })
 export class OtherValue extends EncapsulatedPKIData { }
 
-@XmlElement({ localName: XmlXades.ElementNames.OCSPValues, parser: OtherValue })
+@XmlElement({
+  localName: XmlXades.ElementNames.OCSPValues, parser: OtherValue,
+})
 export class OtherValues extends XadesCollection<OtherValue> { }
 
 @XmlElement({ localName: XmlXades.ElementNames.EncapsulatedOCSPValue })
 export class EncapsulatedOCSPValue extends EncapsulatedPKIData { }
 
-@XmlElement({ localName: XmlXades.ElementNames.OCSPValues, parser: EncapsulatedOCSPValue })
+@XmlElement({
+  localName: XmlXades.ElementNames.OCSPValues, parser: EncapsulatedOCSPValue,
+})
 export class OCSPValues extends XadesCollection<EncapsulatedOCSPValue> { }
 
 @XmlElement({ localName: XmlXades.ElementNames.EncapsulatedCRLValue })
 export class EncapsulatedCRLValue extends EncapsulatedPKIData { }
 
-@XmlElement({ localName: XmlXades.ElementNames.CRLValues, parser: EncapsulatedCRLValue })
+@XmlElement({
+  localName: XmlXades.ElementNames.CRLValues, parser: EncapsulatedCRLValue,
+})
 export class CRLValues extends XadesCollection<EncapsulatedCRLValue> { }
 
 @XmlElement({ localName: XmlXades.ElementNames.RevocationValues })
 export class RevocationValues extends XadesObject {
+  @XmlAttribute({
+    localName: XmlXades.AttributeNames.Id, defaultValue: '',
+  })
+  public Id: string;
 
-    @XmlAttribute({ localName: XmlXades.AttributeNames.Id, defaultValue: "" })
-    public Id: string;
+  @XmlChildElement({ parser: CRLValues })
+  public CRLValues: CRLValues;
 
-    @XmlChildElement({ parser: CRLValues })
-    public CRLValues: CRLValues;
+  @XmlChildElement({ parser: OCSPValues })
+  public OCSPValues: OCSPValues;
 
-    @XmlChildElement({ parser: OCSPValues })
-    public OCSPValues: OCSPValues;
-
-    @XmlChildElement({ parser: OtherValues })
-    public OtherValues: OtherValues;
-
+  @XmlChildElement({ parser: OtherValues })
+  public OtherValues: OtherValues;
 }

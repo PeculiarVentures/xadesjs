@@ -1,8 +1,9 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
-
-import { ObjectIdentifier } from "./object_identifier";
-import { XmlXades } from "./xml";
-import { XadesObject } from "./xml_base";
+import {
+  XmlAttribute, XmlChildElement, XmlElement,
+} from 'xml-core';
+import { ObjectIdentifier } from './object_identifier';
+import { XmlXades } from './xml';
+import { XadesObject } from './xml_base';
 
 /**
  *
@@ -21,20 +22,32 @@ import { XadesObject } from "./xml_base";
 
 @XmlElement({ localName: XmlXades.ElementNames.DataObjectFormat })
 export class DataObjectFormat extends XadesObject {
+  @XmlAttribute({
+    localName: XmlXades.AttributeNames.ObjectReference, required: true,
+  })
+  public ObjectReference: string;
 
-    @XmlAttribute({ localName: XmlXades.AttributeNames.ObjectReference, required: true })
-    public ObjectReference: string;
+  @XmlChildElement({
+    localName: XmlXades.ElementNames.Description,
+    namespaceURI: XmlXades.NamespaceURI,
+    prefix: XmlXades.DefaultPrefix,
+  })
+  public Description: string;
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.Description, namespaceURI: XmlXades.NamespaceURI, prefix: XmlXades.DefaultPrefix })
-    public Description: string;
+  @XmlChildElement({ parser: ObjectIdentifier })
+  public ObjectIdentifier: ObjectIdentifier;
 
-    @XmlChildElement({ parser: ObjectIdentifier })
-    public ObjectIdentifier: ObjectIdentifier;
+  @XmlChildElement({
+    localName: XmlXades.ElementNames.MimeType,
+    namespaceURI: XmlXades.NamespaceURI,
+    prefix: XmlXades.DefaultPrefix,
+  })
+  public MimeType: string;
 
-    @XmlChildElement({ localName: XmlXades.ElementNames.MimeType, namespaceURI: XmlXades.NamespaceURI, prefix: XmlXades.DefaultPrefix })
-    public MimeType: string;
-
-    @XmlChildElement({ localName: XmlXades.ElementNames.Encoding, namespaceURI: XmlXades.NamespaceURI, prefix: XmlXades.DefaultPrefix })
-    public Encoding: string;
-
+  @XmlChildElement({
+    localName: XmlXades.ElementNames.Encoding,
+    namespaceURI: XmlXades.NamespaceURI,
+    prefix: XmlXades.DefaultPrefix,
+  })
+  public Encoding: string;
 }
