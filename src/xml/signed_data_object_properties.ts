@@ -11,13 +11,33 @@ import { XadesCollection, XadesObject } from './xml_base';
  *
  * <xsd:element name="SignedDataObjectProperties" type="SignedDataObjectPropertiesType"/>
  * <xsd:complexType name="SignedDataObjectPropertiesType">
- *     <xsd:sequence>
- *         <xsd:element name="DataObjectFormat" type="DataObjectFormatType" minOccurs="0" maxOccurs="unbounded"/>
- *         <xsd:element name="CommitmentTypeIndication" type="CommitmentTypeIndicationType" minOccurs="0" maxOccurs="unbounded"/>
- *         <xsd:element name="AllDataObjectsTimeStamp" type="XAdESTimeStampType" minOccurs="0" maxOccurs="unbounded"/>
- *         <xsd:element name="IndividualDataObjectsTimeStamp" type="XAdESTimeStampType" minOccurs="0" maxOccurs="unbounded"/>
- *     </xsd:sequence>
- *     <xsd:attribute name="Id" type="xsd:ID" use="optional"/>
+ *   <xsd:sequence>
+ *     <xsd:element
+ *       name="DataObjectFormat"
+ *       type="DataObjectFormatType"
+ *       minOccurs="0"
+ *       maxOccurs="unbounded"
+ *     />
+ *     <xsd:element
+ *       name="CommitmentTypeIndication"
+ *       type="CommitmentTypeIndicationType"
+ *       minOccurs="0"
+ *       maxOccurs="unbounded"
+ *     />
+ *     <xsd:element
+ *       name="AllDataObjectsTimeStamp"
+ *       type="XAdESTimeStampType"
+ *       minOccurs="0"
+ *       maxOccurs="unbounded"
+ *     />
+ *     <xsd:element
+ *       name="IndividualDataObjectsTimeStamp"
+ *       type="XAdESTimeStampType"
+ *       minOccurs="0"
+ *       maxOccurs="unbounded"
+ *     />
+ *   </xsd:sequence>
+ *   <xsd:attribute name="Id" type="xsd:ID" use="optional"/>
  * </xsd:complexType>
  *
  */
@@ -28,8 +48,8 @@ export class IndividualDataObjectsTimeStamp extends XAdESTimeStamp { }
 @XmlElement({
   localName: 'IndividualDataObjectsTimeStampCollection', parser: IndividualDataObjectsTimeStamp,
 })
-export class IndividualDataObjectsTimeStampCollection extends XadesCollection<IndividualDataObjectsTimeStamp> {
-}
+export class IndividualDataObjectsTimeStampCollection
+  extends XadesCollection<IndividualDataObjectsTimeStamp> {}
 
 @XmlElement({ localName: XmlXades.ElementNames.AllDataObjectsTimeStamp })
 export class AllDataObjectsTimeStamp extends XAdESTimeStamp { }

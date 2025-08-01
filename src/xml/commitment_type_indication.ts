@@ -11,19 +11,28 @@ import { XadesCollection, XadesObject } from './xml_base';
  *
  * <xsd:element name="CommitmentTypeIndication" type="CommitmentTypeIndicationType"/>
  * <xsd:complexType name="CommitmentTypeIndicationType">
- *     <xsd:sequence>
- *         <xsd:element name="CommitmentTypeId" type="ObjectIdentifierType"/>
- *         <xsd:choice>
- *             <xsd:element name="ObjectReference" type="xsd:anyURI" maxOccurs="unbounded"/>
- *             <xsd:element name="AllSignedDataObjects"/>
- *         </xsd:choice>
- *         <xsd:element name="CommitmentTypeQualifiers" type="CommitmentTypeQualifiersListType" minOccurs="0"/>
- *     </xsd:sequence>
+ *   <xsd:sequence>
+ *     <xsd:element name="CommitmentTypeId" type="ObjectIdentifierType"/>
+ *     <xsd:choice>
+ *       <xsd:element name="ObjectReference" type="xsd:anyURI" maxOccurs="unbounded"/>
+ *       <xsd:element name="AllSignedDataObjects"/>
+ *     </xsd:choice>
+ *     <xsd:element
+ *       name="CommitmentTypeQualifiers"
+ *       type="CommitmentTypeQualifiersListType"
+ *       minOccurs="0"
+ *     />
+ *   </xsd:sequence>
  * </xsd:complexType>
  * <xsd:complexType name="CommitmentTypeQualifiersListType">
- *     <xsd:sequence>
- *         <xsd:element name="CommitmentTypeQualifier" type="AnyType" minOccurs="0" maxOccurs="unbounded"/>
- *     </xsd:sequence>
+ *   <xsd:sequence>
+ *     <xsd:element
+ *       name="CommitmentTypeQualifier"
+ *       type="AnyType"
+ *       minOccurs="0"
+ *       maxOccurs="unbounded"
+ *     />
+ *   </xsd:sequence>
  * </xsd:complexType>
  *
  */
@@ -48,10 +57,12 @@ export class ObjectReference extends XadesObject {
 export class ObjectReferenceCollection extends XadesCollection<ObjectReference> { }
 
 const XmlAllSignedDataObjectsConverter: IConverter<boolean> = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   set: (value: string) => {
     // if SignaturePolicyImplied exists then return true
     return true;
   },
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   get: (value: boolean) => {
     return void 0;
   },

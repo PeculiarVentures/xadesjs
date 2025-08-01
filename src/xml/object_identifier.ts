@@ -12,7 +12,11 @@ import { XadesCollection, XadesObject } from './xml_base';
  *   <xsd:sequence>
  *     <xsd:element name="Identifier" type="IdentifierType"/>
  *     <xsd:element name="Description" type="xsd:string" minOccurs="0"/>
- *     <xsd:element name="DocumentationReferences" type="DocumentationReferencesType" minOccurs="0"/>
+ *     <xsd:element
+ *       name="DocumentationReferences"
+ *       type="DocumentationReferencesType"
+ *       minOccurs="0"
+ *     />
  *   </xsd:sequence>
  * </xsd:complexType>
  * <xsd:complexType name="IdentifierType">

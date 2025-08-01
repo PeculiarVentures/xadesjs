@@ -72,8 +72,8 @@ export class ReferenceInfo extends XadesObject {
   public Id: string;
 
   /**
-     * Gets or sets the digest method Uniform Resource Identifier (URI) of the current
-     */
+   * Gets or sets the digest method Uniform Resource Identifier (URI) of the current
+   */
   @XmlChildElement({
     required: true,
     parser: DigestMethod,
@@ -81,8 +81,8 @@ export class ReferenceInfo extends XadesObject {
   public DigestMethod = new DigestMethod();
 
   /**
-     * Gets or sets the digest value of the current Reference.
-     */
+   * Gets or sets the digest value of the current Reference.
+   */
   @XmlChildElement({
     required: true,
     localName: XmlSignature.ElementNames.DigestValue,

@@ -83,11 +83,12 @@ export function dateFormat(date: any, mask: string, utc?: boolean, gmt?: boolean
     tt: H < 12 ? i18n.timeNames[2] : i18n.timeNames[3],
     T: H < 12 ? i18n.timeNames[4] : i18n.timeNames[5],
     TT: H < 12 ? i18n.timeNames[6] : i18n.timeNames[7],
+    // eslint-disable-next-line no-nested-ternary
     Z: gmt
       ? 'GMT'
       : utc
         ? 'UTC'
-        : (String(date).match(timezone) || ['']).pop()!.replace(timezoneClip, ''),
+        : (String(date).match(timezone) || ['']).pop()?.replace(timezoneClip, ''),
     o: (o > 0 ? '-' : '+') + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4),
     // S: ["th", "st", "nd", "rd"][d % 10 > 3 ? 0 : (d % 100 - d % 10 != 10) * d % 10],
     W,
@@ -147,8 +148,7 @@ function pad(val: any, len = 2) {
  * Get the ISO 8601 week number
  * Based on comments from
  * http://techblog.procurios.nl/k/n618/news/view/33796/14863/Calculate-ISO-8601-week-and-year-in-javascript.html
- *
- * @param  {Object} `date`
+ * @param {Object} `date`
  * @return {Number}
  */
 function getWeek(date: Date) {
@@ -178,8 +178,7 @@ function getWeek(date: Date) {
 /**
  * Get ISO-8601 numeric representation of the day of the week
  * 1 (for Monday) through 7 (for Sunday)
- *
- * @param  {Object} `date`
+ * @param {Object} `date`
  * @return {Number}
  */
 function getDayOfWeek(date: Date) {
@@ -194,7 +193,7 @@ function getDayOfWeek(date: Date) {
 
 /**
  * kind-of shortcut
- * @param  {*} val
+ * @param {*} val
  * @return {String}
  */
 function kindOf(val: any) {

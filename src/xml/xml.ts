@@ -3,13 +3,13 @@ export const XmlXades = {
   DefaultPrefix: 'xades',
 
   /**
-     * The XAdES XML namespace URI
-     */
+   * The XAdES XML namespace URI
+   */
   NamespaceURI: 'http://uri.etsi.org/01903/v1.3.2#',
 
   /**
-     * Mandated type name for the Uri reference to the SignedProperties element
-     */
+   * Mandated type name for the Uri reference to the SignedProperties element
+   */
   SignedPropertiesType: 'http://uri.etsi.org/01903/v1.3.2#SignedProperties',
 
   ElementNames: {

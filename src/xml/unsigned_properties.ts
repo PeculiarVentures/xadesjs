@@ -10,11 +10,19 @@ import { XadesObject } from './xml_base';
  *
  * <xsd:element name="UnsignedProperties" type="UnsignedPropertiesType"/>
  * <xsd:complexType name="UnsignedPropertiesType">
- *     <xsd:sequence>
- *         <xsd:element name="UnsignedSignatureProperties" type="UnsignedSignaturePropertiesType" minOccurs="0"/>
- *         <xsd:element name="UnsignedDataObjectProperties" type="UnsignedDataObjectPropertiesType" minOccurs="0"/>
- *     </xsd:sequence>
- *     <xsd:attribute name="Id" type="xsd:ID" use="optional"/>
+ *   <xsd:sequence>
+ *     <xsd:element
+ *       name="UnsignedSignatureProperties"
+ *       type="UnsignedSignaturePropertiesType"
+ *       minOccurs="0"
+ *     />
+ *     <xsd:element
+ *       name="UnsignedDataObjectProperties"
+ *       type="UnsignedDataObjectPropertiesType"
+ *       minOccurs="0"
+ *     />
+ *   </xsd:sequence>
+ *   <xsd:attribute name="Id" type="xsd:ID" use="optional"/>
  * </xsd:complexType>
  *
  */

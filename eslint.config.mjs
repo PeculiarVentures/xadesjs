@@ -21,5 +21,10 @@ export default tseslint.config([
       'test/**/*.ts',
     ],
   },
-  { rules: { '@typescript-eslint/naming-convention': 'off' } },
+  {
+    rules: {
+      '@typescript-eslint/naming-convention': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
 ]);

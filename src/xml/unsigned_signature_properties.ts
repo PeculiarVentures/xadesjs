@@ -65,7 +65,6 @@ export class AttributeRevocationValues
 
 /**
  * Abstract class for UnsignedSignatureProperties
- *
  * @export
  * @class UnsignedSignatureProperty
  * @extends {XadesObject}

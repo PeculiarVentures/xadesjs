@@ -33,7 +33,8 @@ export class EncapsulatedX509Certificate extends EncapsulatedPKIData { }
 @XmlElement({
   localName: 'EncapsulatedX509CertificateCollection', parser: EncapsulatedX509Certificate,
 })
-export class EncapsulatedX509CertificateCollection extends XadesCollection<EncapsulatedX509Certificate> { }
+export class EncapsulatedX509CertificateCollection
+  extends XadesCollection<EncapsulatedX509Certificate> { }
 
 @XmlElement({ localName: XmlXades.ElementNames.CertificateValues })
 export class CertificateValues extends XadesObject {

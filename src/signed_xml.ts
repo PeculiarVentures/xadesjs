@@ -43,12 +43,13 @@ export interface OptionsPolicyId {
 
 export interface OptionsSigningTime {
   /**
-     * Signing time value. Default value if now
-     */
+   * Signing time value. Default value if now
+   */
   value?: Date;
+
   /**
-     * Format of the signing time. Default format is ISO
-     */
+   * Format of the signing time. Default format is ISO
+   */
   format?: string;
 }
 
@@ -62,21 +63,22 @@ export interface OptionsSigningCertificateV2 {
   digestAlgorithm?: AlgorithmIdentifier;
 }
 
+// eslint-disable-next-line import/namespace
 export interface OptionsXAdES extends XmlDSigJs.OptionsSign {
 
   /**
-     * Sets a certificate of signer for signature. Optional
-     */
+   * Sets a certificate of signer for signature. Optional
+   */
   signingCertificate?: string | OptionsSigningCertificate;
 
   /**
-     * Sets a certificate of signer for signature. Optional
-     */
+   * Sets a certificate of signer for signature. Optional
+   */
   signingCertificateV2?: string | OptionsSigningCertificateV2;
 
   /**
-     * Sets signing time options
-     */
+   * Sets signing time options
+   */
   signingTime?: OptionsSigningTime;
 
   policy?: OptionsPolicyId | boolean;
@@ -115,7 +117,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
   // #region Public methods
 
-  public LoadXml(value: Element | string, useContainer?: boolean) {
+  public LoadXml(value: Element | string) {
     super.LoadXml(value as string);
 
     let properties: XAdES.QualifyingProperties | null = null;
@@ -126,7 +128,8 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         for (let i = 0; i < item.Element.childNodes.length; i++) {
           const node = item.Element.childNodes.item(i);
 
-          if (node.nodeType === XmlCore.XmlNodeType.Element && (node as Element).localName === XAdES.XmlXades.ElementNames.QualifyingProperties) {
+          if (node.nodeType === XmlCore.XmlNodeType.Element
+            && (node as Element).localName === XAdES.XmlXades.ElementNames.QualifyingProperties) {
             properties = XAdES.QualifyingProperties.LoadXml(node as Element);
 
             return true;
@@ -141,11 +144,16 @@ export class SignedXml extends XmlDSigJs.SignedXml {
   }
 
   public async Sign(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     algorithm: Algorithm,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     key: CryptoKey,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     data: Document | XmlDSigJs.DigestReferenceSource,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options?: OptionsXAdES,
   ) {
+    // eslint-disable-next-line prefer-rest-params
     return super.Sign.apply(this, arguments as any);
   }
 
@@ -201,7 +209,8 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
       xadesRef.Type = XADES_REFERENCE_TYPE;
       xadesRef.Uri = `#${this.Properties.SignedProperties.Id}`;
-      xadesRef.DigestMethod.Algorithm = XmlDSigJs.CryptoConfig.GetHashAlgorithm(xadesRefHash).namespaceURI;
+      xadesRef.DigestMethod.Algorithm = XmlDSigJs.CryptoConfig
+        .GetHashAlgorithm(xadesRefHash).namespaceURI;
 
       signature.SignedInfo.References.Add(xadesRef);
 
@@ -240,9 +249,13 @@ export class SignedXml extends XmlDSigJs.SignedXml {
       const alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm(options.digestAlgorithm);
 
       signingCertificate.CertDigest.DigestMethod.Algorithm = alg.namespaceURI;
-      signingCertificate.CertDigest.DigestValue = new Uint8Array(await cert.Thumbprint(alg.algorithm.name));
+      signingCertificate.CertDigest.DigestValue = new Uint8Array(
+        await cert.Thumbprint(alg.algorithm.name),
+      );
 
-      this.Properties.SignedProperties.SignedSignatureProperties.SigningCertificate.Add(signingCertificate);
+      this.Properties.SignedProperties.SignedSignatureProperties.SigningCertificate.Add(
+        signingCertificate,
+      );
     }
   }
 
@@ -266,14 +279,19 @@ export class SignedXml extends XmlDSigJs.SignedXml {
       }
 
       const signingCertificate = new XAdES.CertV2();
-      // signingCertificate.IssuerSerial :TODO: base64 encoded DER of IssuerSerial as defined by IETF RFC 5035
+      // TODO: base64 encoded DER of IssuerSerial as defined by IETF RFC 5035
+      // signingCertificate.IssuerSerial
 
       const alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm(options.digestAlgorithm);
 
       signingCertificate.CertDigest.DigestMethod.Algorithm = alg.namespaceURI;
-      signingCertificate.CertDigest.DigestValue = new Uint8Array(await cert.Thumbprint(alg.algorithm.name));
+      signingCertificate.CertDigest.DigestValue = new Uint8Array(
+        await cert.Thumbprint(alg.algorithm.name),
+      );
 
-      this.Properties.SignedProperties.SignedSignatureProperties.SigningCertificateV2.Add(signingCertificate);
+      this.Properties.SignedProperties.SignedSignatureProperties.SigningCertificateV2.Add(
+        signingCertificate,
+      );
     }
   }
 
@@ -320,7 +338,8 @@ export class SignedXml extends XmlDSigJs.SignedXml {
         if (options.digestValue) {
           policyId.SigPolicyHash.DigestValue = XmlCore.Convert.FromBase64(options.digestValue);
         } else {
-          const identifierDoc = policyId.SigPolicyId.Identifier.GetXml()!.cloneNode(true) as Element;
+          const identifierDoc = policyId.SigPolicyId.Identifier
+            .GetXml()?.cloneNode(true) as Element;
 
           this.CopyNamespaces(identifierDoc, identifierDoc, true);
           this.InjectNamespaces(this.GetSignatureNamespaces(), identifierDoc, true);
@@ -443,6 +462,7 @@ export class SignedXml extends XmlDSigJs.SignedXml {
 
       // find certificate by Thumbprint
       const alg = XmlDSigJs.CryptoConfig.GetHashAlgorithm('SHA-256');
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const signingCertificate = ssp.SigningCertificate.Item(0)!;
       const b64CertDigest = XmlCore.Convert.ToBase64(signingCertificate.CertDigest.DigestValue);
       const keyInfos = this.XmlSignature.KeyInfo;
