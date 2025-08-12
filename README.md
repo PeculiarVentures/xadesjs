@@ -7,6 +7,13 @@
 
 [![NPM](https://nodei.co/npm/xadesjs.png)](https://nodei.co/npm/xadesjs/)
 
+## Notice: Repository Archived
+
+This repository is no longer maintained. Its functionality has been merged into the [xmldsigjs](https://github.com/PeculiarVentures/xmldsigjs) monorepo, and is now part of it.
+
+For future development and updates, please use [xmldsigjs](https://github.com/PeculiarVentures/xmldsigjs).
+
+## Introduction
 
 [XAdES](https://en.wikipedia.org/wiki/XAdES) is short for "XML Advanced Electronic Signatures", it is a superset of XMLDSIG. This library aims to provide an implementation of XAdES in Typescript/Javascript that is built on [XMLDSIGjs](https://github.com/PeculiarVentures/xmldsigjs).
 
@@ -542,3 +549,4 @@ This project takes inspiration (style, approach, design and code) from both the 
 - [@peculiar/webcrypto](https://github.com/PeculiarVentures/webcrypto)
 - [node-webcrypto-ossl](https://github.com/PeculiarVentures/node-webcrypto-ossl)
 - [node-webcrypto-p11](https://github.com/PeculiarVentures/node-webcrypto-p11)
+
